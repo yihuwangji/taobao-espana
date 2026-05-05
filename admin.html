@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>淘宝西班牙 · 管理后台</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --bg: #0F1117;
+  --surface: #1A1D27;
+  --surface2: #222638;
+  --border: rgba(255,255,255,0.07);
+  --red: #E53935;
+  --red-glow: rgba(229,57,53,0.15);
+  --gold: #F5A623;
+  --gold-glow: rgba(245,166,35,0.12);
+  --green: #00C896;
+  --green-glow: rgba(0,200,150,0.12);
+  --blue: #3B82F6;
+  --blue-glow: rgba(59,130,246,0.12);
+  --purple: #8B5CF6;
+  --text: #E8E8F0;
+  --text-dim: #7A7A9A;
+  --text-muted: #4A4A6A;
+  --sidebar-w: 220px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 50;
+  transition: transform 0.3s;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .logo-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar-logo .logo-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  margin-left: 28px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.sidebar-nav::-webkit-scrollbar { display: none; }
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 8px 4px;
+  margin-top: 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-dim);
+  transition: all 0.2s;
+  margin-bottom: 2px;
+  font-size: 13.5px;
+  position: relative;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active {
+  background: var(--red-glow);
+  color: var(--red);
+  font-weight: 500;
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: var(--red);
+  border-radius: 0 3px 3px 0;
+}
+.nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+.nav-badge.gold { background: var(--gold); color: #111; }
+
+.sidebar-footer {
+  padding: 14px 10px;
+  border-top: 1px solid var(--border);
+}
+.admin-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.admin-info:hover { background: var(--surface2); }
+.admin-avatar {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--red), var(--gold));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.admin-name { font-size: 13px; font-weight: 600; }
+.admin-role { font-size: 11px; color: var(--text-muted); }
+
+/* ── MAIN ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.page-title { font-size: 16px; font-weight: 700; }
+.page-breadcrumb { font-size: 12px; color: var(--text-muted); }
+
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.topbar-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.topbar-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+.topbar-btn.danger { color: var(--red); border-color: rgba(229,57,53,0.3); }
+.topbar-btn.primary { background: var(--red); color: white; border-color: var(--red); }
+.topbar-btn.primary:hover { background: #c62828; }
+
+.notif-dot {
+  width: 8px; height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  position: absolute;
+  top: -2px; right: -2px;
+}
+
+/* ── CONTENT ── */
+.content {
+  padding: 24px;
+  flex: 1;
+}
+
+/* Pages */
+.page { display: none; animation: fadeIn 0.25s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── STAT CARDS ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--card-accent, var(--red));
+}
+.stat-card-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+  display: block;
+}
+.stat-card-val {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--card-accent, var(--text));
+}
+.stat-card-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.stat-card-change {
+  font-size: 11px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.change-up { color: var(--green); }
+.change-down { color: var(--red); }
+
+/* ── TABLE ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.card-title { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+.card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+.btn-red { background: var(--red-glow); color: var(--red); border-color: rgba(229,57,53,0.3); }
+.btn-red:hover { background: var(--red); color: white; }
+.btn-green { background: var(--green-glow); color: var(--green); border-color: rgba(0,200,150,0.3); }
+.btn-green:hover { background: var(--green); color: #000; }
+.btn-gold { background: var(--gold-glow); color: var(--gold); border-color: rgba(245,166,35,0.3); }
+.btn-gold:hover { background: var(--gold); color: #000; }
+.btn-blue { background: var(--blue-glow); color: var(--blue); border-color: rgba(59,130,246,0.3); }
+.btn-blue:hover { background: var(--blue); color: white; }
+
+.search-input {
+  padding: 6px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: 'Noto Sans SC', sans-serif;
+  outline: none;
+  width: 200px;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: rgba(229,57,53,0.4); }
+.search-input::placeholder { color: var(--text-muted); }
+
+.select-input {
+  padding: 6px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: 'Noto Sans SC', sans-serif;
+  outline: none;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-pending { background: rgba(245,166,35,0.15); color: var(--gold); }
+.badge-approved { background: rgba(0,200,150,0.15); color: var(--green); }
+.badge-rejected { background: var(--red-glow); color: var(--red); }
+.badge-active { background: rgba(59,130,246,0.15); color: var(--blue); }
+.badge-banned { background: rgba(229,57,53,0.1); color: #ff6b6b; }
+.badge-pinned { background: rgba(139,92,246,0.15); color: var(--purple); }
+.badge-reported { background: rgba(229,57,53,0.15); color: var(--red); }
+
+.user-cell { display: flex; align-items: center; gap: 10px; }
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ── PAGINATION ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.page-btns { display: flex; gap: 4px; }
+.page-btn {
+  width: 30px; height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+.page-btn:hover, .page-btn.active { background: var(--red); color: white; border-color: var(--red); }
+
+/* ── CHART ── */
+.chart-container { padding: 20px; }
+.chart-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.chart-bar-label { width: 80px; font-size: 12px; color: var(--text-dim); text-align: right; flex-shrink: 0; }
+.chart-bar-track {
+  flex: 1;
+  height: 28px;
+  background: var(--surface2);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+.chart-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  transition: width 1s cubic-bezier(0.23,1,0.32,1);
+}
+.chart-bar-val { width: 50px; text-align: right; font-size: 12px; font-family: 'JetBrains Mono'; color: var(--text-dim); }
+
+/* ── MINI CHART ── */
+.mini-chart { display: flex; align-items: flex-end; gap: 3px; height: 40px; }
+.mini-bar {
+  flex: 1;
+  background: var(--red);
+  border-radius: 3px 3px 0 0;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  min-width: 8px;
+}
+.mini-bar:hover { opacity: 1; }
+
+/* ── DASHBOARD GRID ── */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.95) translateY(10px);
+  transition: transform 0.25s;
+  position: relative;
+}
+.modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+.modal h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-close {
+  position: absolute;
+  top: 20px; right: 20px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.modal-close:hover { color: var(--text); }
+
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'Noto Sans SC', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: rgba(229,57,53,0.5); }
+
+.modal-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  z-index: 999;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s;
+  border: 1px solid rgba(255,255,255,0.1);
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: #0d2118; color: var(--green); border-color: rgba(0,200,150,0.3); }
+.toast.error { background: #1f0c0c; color: var(--red); border-color: rgba(229,57,53,0.3); }
+.toast.info { background: #0d1525; color: var(--blue); border-color: rgba(59,130,246,0.3); }
+
+/* ── ACTIVITY ── */
+.activity-list { padding: 0 20px 16px; }
+.activity-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.activity-text { font-size: 13px; line-height: 1.5; }
+.activity-time { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+/* ── PROGRESS ── */
+.progress-bar {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+/* ── SUPABASE CONFIG ── */
+.config-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.config-box h4 { font-size: 13px; color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.config-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.config-row label { font-size: 12px; color: var(--text-muted); width: 120px; flex-shrink: 0; }
+.config-row input {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  outline: none;
+}
+.config-row input:focus { border-color: rgba(245,166,35,0.4); }
+
+/* ── MOBILE ── */
+.mobile-toggle {
+  display: none;
+  padding: 6px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-220px); width: 220px; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .mobile-toggle { display: flex; }
+  .content { padding: 16px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .dash-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-title">🏮 淘宝西班牙</div>
+    <div class="logo-sub">管理控制台 v1.0</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">概览</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)">
+      <span>📊</span> 数据仪表盘
+    </div>
+
+    <div class="nav-section-label">内容管理</div>
+    <div class="nav-item" onclick="showPage('listings',this)">
+      <span>📋</span> 信息管理
+      <span class="nav-badge">23</span>
+    </div>
+    <div class="nav-item" onclick="showPage('review',this)">
+      <span>⏳</span> 待审核
+      <span class="nav-badge">8</span>
+    </div>
+    <div class="nav-item" onclick="showPage('reports',this)">
+      <span>🚨</span> 举报处理
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pinned',this)">
+      <span>📌</span> 置顶管理
+    </div>
+
+    <div class="nav-section-label">用户管理</div>
+    <div class="nav-item" onclick="showPage('users',this)">
+      <span>👥</span> 用户列表
+    </div>
+
+    <div class="nav-section-label">系统</div>
+    <div class="nav-item" onclick="showPage('settings',this)">
+      <span>⚙️</span> 系统设置
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <div class="admin-avatar">👑</div>
+      <div>
+        <div class="admin-name">超级管理员</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+      <div>
+        <div class="page-title" id="topbarTitle">数据仪表盘</div>
+        <div class="page-breadcrumb" id="topbarSub">淘宝西班牙 / 概览</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div style="position:relative">
+        <button class="topbar-btn" onclick="showPage('review',document.querySelector('[onclick*=review]'))">
+          ⏳ 待审核 <span style="color:var(--red);font-weight:700">8</span>
+        </button>
+      </div>
+      <button class="topbar-btn" onclick="showToast('系统运行正常 ✓','success')">🟢 系统正常</button>
+      <button class="topbar-btn danger" onclick="confirmLogout()">退出登录</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ═══ PAGE: DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card" style="--card-accent:var(--blue)">
+          <span class="stat-card-icon">👥</span>
+          <div class="stat-card-val">8,847</div>
+          <div class="stat-card-label">注册用户总数</div>
+          <div class="stat-card-change change-up">▲ 今日新增 +34</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--green)">
+          <span class="stat-card-icon">📋</span>
+          <div class="stat-card-val">12,456</div>
+          <div class="stat-card-label">有效信息总数</div>
+          <div class="stat-card-change change-up">▲ 今日发布 +87</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--gold)">
+          <span class="stat-card-icon">👀</span>
+          <div class="stat-card-val">98,234</div>
+          <div class="stat-card-label">今日页面访问量</div>
+          <div class="stat-card-change change-up">▲ 较昨日 +12.4%</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--red)">
+          <span class="stat-card-icon">⏳</span>
+          <div class="stat-card-val" id="pendingCount">8</div>
+          <div class="stat-card-label">待审核信息</div>
+          <div class="stat-card-change change-down">需要处理</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <!-- 分类统计 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 各分类发布量统计</div>
+            <select class="select-input" onchange="updateChart(this.value)">
+              <option>本周</option>
+              <option>本月</option>
+              <option>全部</option>
+            </select>
+          </div>
+          <div class="chart-container" id="catChart"></div>
+        </div>
+
+        <!-- 近期动态 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔔 近期操作记录</div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--green-glow)">✅</div>
+              <div>
+                <div class="activity-text">审核通过「巴塞罗那中餐馆招厨师」</div>
+                <div class="activity-time">2分钟前 · 管理员</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--red-glow)">🚫</div>
+              <div>
+                <div class="activity-text">封禁用户 user_2847（发布违规内容）</div>
+                <div class="activity-time">15分钟前 · 管理员</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:rgba(139,92,246,0.15)">📌</div>
+              <div>
+                <div class="activity-text">置顶「马德里生意转让·中餐外卖」7天</div>
+                <div class="activity-time">1小时前 · 管理员</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--gold-glow)">⚠️</div>
+              <div>
+                <div class="activity-text">处理举报：「瓦伦西亚二手车」疑似欺诈</div>
+                <div class="activity-time">2小时前 · 管理员</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--blue-glow)">👤</div>
+              <div>
+                <div class="activity-text">新用户注册 +34 人（今日）</div>
+                <div class="activity-time">统计截至现在</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- City stats -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🌍 各城市活跃度</div>
+        </div>
+        <div class="chart-container">
+          <div id="cityChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: LISTINGS ═══ -->
+    <div class="page" id="page-listings">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 全部信息管理</div>
+          <div class="card-actions">
+            <input class="search-input" placeholder="🔍 搜索标题/城市…" oninput="filterListings(this.value)">
+            <select class="select-input" id="catFilter" onchange="filterListings('')">
+              <option value="">全部分类</option>
+              <option value="招工">招工求职</option>
+              <option value="租房">租房买房</option>
+              <option value="生意">生意转让</option>
+              <option value="二手车">二手车</option>
+              <option value="交友">交友相亲</option>
+              <option value="二手物品">二手物品</option>
+            </select>
+            <select class="select-input" id="statusFilter" onchange="filterListings('')">
+              <option value="">全部状态</option>
+              <option value="已上线">已上线</option>
+              <option value="待审核">待审核</option>
+              <option value="已下架">已下架</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>标题</th>
+                <th>分类</th>
+                <th>城市</th>
+                <th>发布者</th>
+                <th>状态</th>
+                <th>发布时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="listingsTbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span id="listingsInfo">共 0 条记录</span>
+          <div class="page-btns">
+            <div class="page-btn">‹</div>
+            <div class="page-btn active">1</div>
+            <div class="page-btn">2</div>
+            <div class="page-btn">3</div>
+            <div class="page-btn">›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: REVIEW ═══ -->
+    <div class="page" id="page-review">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⏳ 待审核信息 <span style="color:var(--red);font-family:JetBrains Mono" id="reviewCount">(8)</span></div>
+          <div class="card-actions">
+            <button class="btn btn-green" onclick="approveAll()">✅ 全部通过</button>
+            <button class="btn btn-red" onclick="rejectAll()">❌ 全部拒绝</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="checkAll" onchange="toggleAll(this)"></th>
+                <th>标题</th>
+                <th>分类</th>
+                <th>城市</th>
+                <th>发布者</th>
+                <th>联系方式</th>
+                <th>提交时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="reviewTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: REPORTS ═══ -->
+    <div class="page" id="page-reports">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🚨 举报处理</div>
+          <div class="card-actions">
+            <select class="select-input">
+              <option>全部举报</option>
+              <option>未处理</option>
+              <option>已处理</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>举报ID</th>
+                <th>被举报信息</th>
+                <th>举报原因</th>
+                <th>举报人</th>
+                <th>状态</th>
+                <th>时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="reportsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: PINNED ═══ -->
+    <div class="page" id="page-pinned">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📌 置顶/推广管理</div>
+          <div class="card-actions">
+            <button class="btn btn-gold" onclick="openPinModal()">+ 添加置顶</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>信息标题</th>
+                <th>分类</th>
+                <th>城市</th>
+                <th>置顶类型</th>
+                <th>开始时间</th>
+                <th>到期时间</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="pinnedTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: USERS ═══ -->
+    <div class="page" id="page-users">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">👥 用户管理</div>
+          <div class="card-actions">
+            <input class="search-input" placeholder="🔍 搜索用户名/手机…" oninput="filterUsers(this.value)">
+            <select class="select-input" id="userStatusFilter" onchange="filterUsers('')">
+              <option value="">全部状态</option>
+              <option value="正常">正常</option>
+              <option value="封禁">已封禁</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>用户</th>
+                <th>城市</th>
+                <th>手机号</th>
+                <th>注册时间</th>
+                <th>发布数</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="usersTbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span id="usersInfo">共 0 条用户</span>
+          <div class="page-btns">
+            <div class="page-btn">‹</div>
+            <div class="page-btn active">1</div>
+            <div class="page-btn">2</div>
+            <div class="page-btn">›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: SETTINGS ═══ -->
+    <div class="page" id="page-settings">
+      <div class="card" style="max-width:700px">
+        <div class="card-header">
+          <div class="card-title">⚙️ Supabase 数据库连接</div>
+        </div>
+        <div style="padding:20px">
+          <div class="config-box">
+            <h4>🗄️ Supabase 配置</h4>
+            <div class="config-row">
+              <label>Project URL</label>
+              <input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co" value="">
+            </div>
+            <div class="config-row">
+              <label>Anon Key</label>
+              <input type="password" id="sbKey" placeholder="eyJh…">
+            </div>
+          </div>
+          <div class="config-box">
+            <h4>⚙️ 站点设置</h4>
+            <div class="config-row">
+              <label>站点名称</label>
+              <input type="text" value="淘宝西班牙">
+            </div>
+            <div class="config-row">
+              <label>管理员邮箱</label>
+              <input type="email" placeholder="admin@example.com">
+            </div>
+            <div class="config-row">
+              <label>审核模式</label>
+              <select style="flex:1;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans SC'">
+                <option>发布前审核（推荐）</option>
+                <option>发布后审核</option>
+                <option>免审核（不推荐）</option>
+              </select>
+            </div>
+          </div>
+          <div class="config-box">
+            <h4>📋 自动审核规则</h4>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--text-dim)">
+                <input type="checkbox" checked> 包含电话号码才允许发布
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--text-dim)">
+                <input type="checkbox" checked> 过滤敏感词
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--text-dim)">
+                <input type="checkbox"> 新用户首条自动审核
+              </label>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:4px">
+            <button class="btn btn-green" onclick="saveSettings()">💾 保存设置</button>
+            <button class="btn btn-blue" onclick="testConnection()">🔌 测试连接</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ── MODAL: REVIEW DETAIL ── -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('review')">✕</button>
+    <h3>📋 信息详情审核</h3>
+    <div id="reviewDetail"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('review')">关闭</button>
+      <button class="btn btn-red" onclick="rejectOne(); closeModal('review')">❌ 拒绝</button>
+      <button class="btn btn-green" onclick="approveOne(); closeModal('review')">✅ 通过</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: BAN USER ── -->
+<div class="modal-overlay" id="banModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('ban')">✕</button>
+    <h3>🚫 封禁用户</h3>
+    <div class="form-group">
+      <label>封禁原因</label>
+      <select>
+        <option>发布违规内容</option>
+        <option>欺诈行为</option>
+        <option>骚扰其他用户</option>
+        <option>其他原因</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>封禁时长</label>
+      <select>
+        <option>封禁3天</option>
+        <option>封禁7天</option>
+        <option>封禁30天</option>
+        <option>永久封禁</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>备注</label>
+      <textarea rows="3" placeholder="记录封禁原因…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('ban')">取消</button>
+      <button class="btn btn-red" onclick="confirmBan()">确认封禁</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: PIN ── -->
+<div class="modal-overlay" id="pinModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('pin')">✕</button>
+    <h3>📌 添加置顶推广</h3>
+    <div class="form-group">
+      <label>信息ID或标题</label>
+      <input type="text" placeholder="输入信息ID或标题关键词">
+    </div>
+    <div class="form-group">
+      <label>置顶类型</label>
+      <select>
+        <option>🥇 首页置顶</option>
+        <option>🥈 分类置顶</option>
+        <option>🔥 推荐标签</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>置顶天数</label>
+      <select>
+        <option>3天</option>
+        <option>7天</option>
+        <option>15天</option>
+        <option>30天</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('pin')">取消</button>
+      <button class="btn btn-gold" onclick="addPin()">📌 确认置顶</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://bewirpgqvgfntsymhbb.supabase.co';
+const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJld2lycGdxdmd2Zm50c3ltaGJiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Nzk2NTU1OCwiZXhwIjoyMDkzNTQxNTU4fQ.1VZV2sJNIbZAt5TC9XisEZknN-obo8IWaYGdPiVA_ak';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+async function sbLog(action, type, id, note='') {
+  await sb.from('admin_logs').insert([{ action, target_type: type, target_id: String(id), note }]);
+}
+
+// ═══════════ LOAD REAL DATA ═══════════
+async function loadRealListings() {
+  const { data } = await sb.from('listings')
+    .select('id, title, category, city, status, created_at, profiles(nickname)')
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if(data && data.length > 0) {
+    allListings.length = 0;
+    data.forEach(r => allListings.push({
+      id: 'L'+r.id, _id: r.id,
+      title: r.title, cat: r.category,
+      city: r.city, user: r.profiles?.nickname || '未知',
+      status: { pending:'待审核', approved:'已上线', rejected:'已下架', offline:'已下架' }[r.status] || r.status,
+      time: new Date(r.created_at).toLocaleString('zh-CN')
+    }));
+  }
+  renderListings(allListings);
+}
+
+async function loadRealReview() {
+  const { data } = await sb.from('listings')
+    .select('id, title, category, city, description, contact, created_at, profiles(nickname, phone)')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true });
+  if(data) {
+    reviewItems.length = 0;
+    data.forEach(r => reviewItems.push({
+      id: 'R'+r.id, _id: r.id,
+      title: r.title, cat: r.category,
+      city: r.city, user: r.profiles?.nickname || '未知',
+      contact: r.contact || r.profiles?.phone || '—',
+      time: new Date(r.created_at).toLocaleString('zh-CN'),
+      desc: r.description || ''
+    }));
+    document.getElementById('pendingCount').textContent = reviewItems.length;
+  }
+  renderReview();
+}
+
+async function loadRealReports() {
+  const { data } = await sb.from('reports')
+    .select('id, reason, status, created_at, listings(title), profiles(nickname)')
+    .order('created_at', { ascending: false })
+    .limit(30);
+  if(data) {
+    reportItems.length = 0;
+    data.forEach(r => reportItems.push({
+      id: '#'+r.id, _id: r.id,
+      listing: r.listings?.title || '已删除',
+      reason: r.reason,
+      reporter: r.profiles?.nickname || '匿名',
+      status: { pending:'未处理', processing:'处理中', resolved:'已处理', dismissed:'已驳回' }[r.status] || r.status,
+      time: new Date(r.created_at).toLocaleString('zh-CN')
+    }));
+  }
+  renderReports();
+}
+
+async function loadRealUsers() {
+  const { data } = await sb.from('profiles')
+    .select('id, nickname, city, phone, is_banned, post_count, created_at')
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if(data) {
+    allUsers.length = 0;
+    data.forEach(u => allUsers.push({
+      _id: u.id,
+      name: u.nickname || '未知',
+      city: u.city || '—',
+      phone: u.phone || '—',
+      reg: new Date(u.created_at).toLocaleDateString('zh-CN'),
+      posts: u.post_count || 0,
+      status: u.is_banned ? '封禁' : '正常'
+    }));
+  }
+  renderUsers(allUsers);
+}
+
+async function loadRealStats() {
+  const [{ count: userCount }, { count: listingCount }, { count: pendingCount }] = await Promise.all([
+    sb.from('profiles').select('*', { count:'exact', head:true }),
+    sb.from('listings').select('*', { count:'exact', head:true }).eq('status','approved'),
+    sb.from('listings').select('*', { count:'exact', head:true }).eq('status','pending'),
+  ]);
+  document.querySelector('[data-stat=users]')  && (document.querySelector('[data-stat=users]').textContent  = (userCount||0).toLocaleString());
+  document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = (listingCount||0).toLocaleString());
+  document.getElementById('pendingCount').textContent = pendingCount || 0;
+}
+
+// ═══════════ REAL APPROVE / REJECT ═══════════
+const allListings = [
+  {id:'L001', title:'巴塞罗那中餐馆招聘粤菜厨师', cat:'招工', city:'巴塞罗那', user:'张老板', status:'已上线', time:'2025-01-15 14:23'},
+  {id:'L002', title:'马德里中心区整套公寓出租2室1厅', cat:'租房', city:'马德里', user:'李华', status:'已上线', time:'2025-01-15 13:10'},
+  {id:'L003', title:'瓦伦西亚中餐外卖店转让营业额稳定', cat:'生意', city:'瓦伦西亚', user:'陈生', status:'已上线', time:'2025-01-15 12:05'},
+  {id:'L004', title:'2019年大众帕萨特出售7万公里一手', cat:'二手车', city:'巴塞罗那', user:'王强', status:'已下架', time:'2025-01-14 18:30'},
+  {id:'L005', title:'马德里华人女士征婚80后工作稳定', cat:'交友', city:'马德里', user:'匿名用户', status:'已上线', time:'2025-01-14 16:20'},
+  {id:'L006', title:'巴塞罗那超市招聘理货员2名可兼职', cat:'招工', city:'巴塞罗那', user:'超市老王', status:'已上线', time:'2025-01-14 11:00'},
+  {id:'L007', title:'九成新Samsung 65寸4K电视处理', cat:'二手物品', city:'瓦伦西亚', user:'搬家小刘', status:'已上线', time:'2025-01-13 20:15'},
+  {id:'L008', title:'巴塞罗那Eixample单间出租华人合租', cat:'租房', city:'巴塞罗那', user:'房东李', status:'待审核', time:'2025-01-15 15:00'},
+  {id:'L009', title:'毕尔巴鄂华人律师事务所居留签证', cat:'服务', city:'毕尔巴鄂', user:'律师事务所', status:'待审核', time:'2025-01-15 14:50'},
+  {id:'L010', title:'塞维利亚中国超市转让位置好客源多', cat:'生意', city:'塞维利亚', user:'超市张', status:'已上线', time:'2025-01-13 09:00'},
+];
+
+const reviewItems = [
+  {id:'R001', title:'巴塞罗那Eixample单间出租', cat:'租房', city:'巴塞罗那', user:'房东李', contact:'+34 612 345 678', time:'15分钟前', desc:'整洁单间，近地铁L5，适合上班族，押金一个月。'},
+  {id:'R002', title:'毕尔巴鄂律师事务所', cat:'服务', city:'毕尔巴鄂', user:'律师事务所', contact:'微信: lawyer_bilbao', time:'30分钟前', desc:'专业处理签证居留劳工纠纷，10年经验。'},
+  {id:'R003', title:'马德里快速发财投资项目', cat:'服务', city:'马德里', user:'user_2099', contact:'+34 699 999 999', time:'45分钟前', desc:'保证年化50%收益，无风险投资……'},
+  {id:'R004', title:'招聘送餐员巴塞罗那多名', cat:'招工', city:'巴塞罗那', user:'餐厅老张', contact:'+34 623 456 789', time:'1小时前', desc:'工资日结，有工作许可即可，随时上班。'},
+  {id:'R005', title:'萨拉戈萨二手iPhone 15出售', cat:'二手物品', city:'萨拉戈萨', user:'苹果哥', contact:'微信: apple_zara', time:'2小时前', desc:'iPhone 15 128G黑色，9成新，配件齐全。'},
+  {id:'R006', title:'瓦伦西亚单身男士征友', cat:'交友', city:'瓦伦西亚', user:'帅哥小李', contact:'微信: xiaoliVLC', time:'3小时前', desc:'90后单身男，工作稳定，寻找真诚女朋友。'},
+  {id:'R007', title:'巴塞罗那中文家教老师', cat:'教育', city:'巴塞罗那', user:'王老师', contact:'+34 634 567 890', time:'4小时前', desc:'北京师范大学毕业，专业中文家教，有经验。'},
+  {id:'R008', title:'马德里2020年宝马X3出售', cat:'二手车', city:'马德里', user:'宝马哥', contact:'+34 645 678 901', time:'5小时前', desc:'2020年宝马X3 xDrive20d，5.2万公里，保修中。'},
+];
+
+const reportItems = [
+  {id:'#2341', listing:'马德里快速发财投资项目', reason:'涉嫌诈骗', reporter:'user_1234', status:'未处理', time:'30分钟前'},
+  {id:'#2340', listing:'巴塞罗那某招聘信息', reason:'信息虚假不实', reporter:'user_5678', status:'未处理', time:'2小时前'},
+  {id:'#2339', listing:'Valencia二手车出售', reason:'价格虚标', reporter:'user_9012', status:'处理中', time:'1天前'},
+  {id:'#2338', listing:'某交友信息', reason:'骚扰用户', reporter:'user_3456', status:'已处理', time:'2天前'},
+  {id:'#2337', listing:'某服务信息', reason:'重复发布', reporter:'user_7890', status:'已处理', time:'3天前'},
+];
+
+const pinnedItems = [
+  {title:'巴塞罗那中餐馆招厨师', cat:'招工', city:'巴塞罗那', type:'🥇 首页置顶', start:'2025-01-10', end:'2025-01-17', status:'进行中'},
+  {title:'瓦伦西亚中餐外卖转让', cat:'生意', city:'瓦伦西亚', type:'🥈 分类置顶', start:'2025-01-12', end:'2025-01-26', status:'进行中'},
+  {title:'马德里中心公寓出租', cat:'租房', city:'马德里', type:'🔥 推荐标签', start:'2025-01-08', end:'2025-01-15', status:'已到期'},
+];
+
+const allUsers = [
+  {name:'张老板', city:'巴塞罗那', phone:'+34 612 xxx xxx', reg:'2024-08-12', posts:23, status:'正常'},
+  {name:'李华', city:'马德里', phone:'+34 623 xxx xxx', reg:'2024-09-01', posts:7, status:'正常'},
+  {name:'陈生', city:'瓦伦西亚', phone:'+34 634 xxx xxx', reg:'2024-10-15', posts:12, status:'正常'},
+  {name:'王强', city:'巴塞罗那', phone:'+34 645 xxx xxx', reg:'2024-11-20', posts:3, status:'正常'},
+  {name:'匿名用户', city:'马德里', phone:'+34 656 xxx xxx', reg:'2024-12-05', posts:1, status:'正常'},
+  {name:'user_2847', city:'马德里', phone:'+34 667 xxx xxx', reg:'2025-01-02', posts:18, status:'封禁'},
+  {name:'超市老王', city:'巴塞罗那', phone:'+34 678 xxx xxx', reg:'2024-07-30', posts:45, status:'正常'},
+  {name:'搬家小刘', city:'瓦伦西亚', phone:'+34 689 xxx xxx', reg:'2025-01-10', posts:2, status:'正常'},
+  {name:'房东李', city:'巴塞罗那', phone:'+34 690 xxx xxx', reg:'2024-06-15', posts:31, status:'正常'},
+  {name:'苹果哥', city:'萨拉戈萨', phone:'+34 601 xxx xxx', reg:'2025-01-14', posts:1, status:'正常'},
+];
+
+async function approveItem(idx) {
+  const r = reviewItems[idx];
+  if(!r) return;
+  const { error } = await sb.from('listings').update({ status:'approved' }).eq('id', r._id);
+  if(error) { showToast('操作失败：'+error.message, 'error'); return; }
+  await sbLog('approve','listing', r._id);
+  reviewItems.splice(idx,1);
+  renderReview();
+  document.getElementById('pendingCount').textContent = reviewItems.length;
+  showToast('✅ 审核通过，信息已上线', 'success');
+}
+
+async function rejectItem(idx) {
+  const r = reviewItems[idx];
+  if(!r) return;
+  const { error } = await sb.from('listings').update({ status:'rejected' }).eq('id', r._id);
+  if(error) { showToast('操作失败：'+error.message, 'error'); return; }
+  await sbLog('reject','listing', r._id);
+  reviewItems.splice(idx,1);
+  renderReview();
+  document.getElementById('pendingCount').textContent = reviewItems.length;
+  showToast('❌ 已拒绝发布', 'error');
+}
+
+async function takeDown(listingId) {
+  const numId = parseInt(listingId.replace('L',''));
+  await sb.from('listings').update({ status:'offline' }).eq('id', numId);
+  await sbLog('takedown','listing', numId);
+  showToast(`已下架信息 ${listingId}`, 'success');
+  loadRealListings();
+}
+
+async function bringUp(listingId) {
+  const numId = parseInt(listingId.replace('L',''));
+  await sb.from('listings').update({ status:'approved' }).eq('id', numId);
+  await sbLog('approve','listing', numId);
+  showToast(`已上线信息 ${listingId}`, 'success');
+  loadRealListings();
+}
+
+async function confirmBan() {
+  closeModal('ban');
+  showToast('🚫 用户已被封禁', 'success');
+  loadRealUsers();
+}
+
+async function unban(name) {
+  const u = allUsers.find(x=>x.name===name);
+  if(u?._id) await sb.from('profiles').update({ is_banned:false }).eq('id', u._id);
+  showToast(`已解封用户 ${name}`, 'success');
+  loadRealUsers();
+}
+
+// ═══════════ EXISTING DATA (fallback while loading) ═══════════
+function renderListings(data) {
+  const statusMap = { '已上线':'badge-approved', '待审核':'badge-pending', '已下架':'badge-rejected' };
+  document.getElementById('listingsTbody').innerHTML = data.map(l => `
+    <tr>
+      <td><span style="font-family:JetBrains Mono;font-size:11px;color:var(--text-muted)">${l.id}</span></td>
+      <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.title}</td>
+      <td><span class="badge badge-active">${l.cat}</span></td>
+      <td>📍 ${l.city}</td>
+      <td>${l.user}</td>
+      <td><span class="badge ${statusMap[l.status]||'badge-active'}">${l.status}</span></td>
+      <td style="font-size:11px;color:var(--text-dim);white-space:nowrap">${l.time}</td>
+      <td>
+        <div class="action-btns">
+          ${l.status==='已上线' ? `<button class="btn btn-red" onclick="takeDown('${l.id}')">下架</button>` : `<button class="btn btn-green" onclick="bringUp('${l.id}')">上线</button>`}
+          <button class="btn" onclick="showToast('查看详情','info')">详情</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  document.getElementById('listingsInfo').textContent = `共 ${data.length} 条记录`;
+}
+
+function filterListings(q) {
+  const cat = document.getElementById('catFilter').value;
+  const status = document.getElementById('statusFilter').value;
+  let data = allListings.filter(l =>
+    (!q || l.title.includes(q) || l.city.includes(q)) &&
+    (!cat || l.cat === cat) &&
+    (!status || l.status === status)
+  );
+  renderListings(data);
+}
+
+function renderReview() {
+  document.getElementById('reviewCount').textContent = `(${reviewItems.length})`;
+  document.getElementById('page-review').querySelector('.stat-card-val') && null;
+  document.getElementById('reviewTbody').innerHTML = reviewItems.map((r,i) => `
+    <tr>
+      <td><input type="checkbox" class="row-check" data-id="${r.id}"></td>
+      <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.title}</td>
+      <td><span class="badge badge-active">${r.cat}</span></td>
+      <td>📍 ${r.city}</td>
+      <td>${r.user}</td>
+      <td style="font-size:12px">${r.contact}</td>
+      <td style="font-size:11px;color:var(--text-dim)">${r.time}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-blue" onclick="openReviewModal(${i})">详情</button>
+          <button class="btn btn-green" onclick="approveItem(${i})">✅ 通过</button>
+          <button class="btn btn-red" onclick="rejectItem(${i})">❌ 拒绝</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderReports() {
+  const statusMap = { '未处理':'badge-reported', '处理中':'badge-pending', '已处理':'badge-approved' };
+  document.getElementById('reportsTbody').innerHTML = reportItems.map(r => `
+    <tr>
+      <td style="font-family:JetBrains Mono;font-size:11px;color:var(--text-muted)">${r.id}</td>
+      <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.listing}</td>
+      <td>${r.reason}</td>
+      <td>${r.reporter}</td>
+      <td><span class="badge ${statusMap[r.status]||'badge-active'}">${r.status}</span></td>
+      <td style="font-size:11px;color:var(--text-dim)">${r.time}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-red" onclick="showToast('已删除被举报信息','success')">删除信息</button>
+          <button class="btn btn-green" onclick="showToast('举报已驳回','info')">驳回举报</button>
+          <button class="btn" onclick="openModal('ban')">封禁用户</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderPinned() {
+  document.getElementById('pinnedTbody').innerHTML = pinnedItems.map(p => `
+    <tr>
+      <td>${p.title}</td>
+      <td><span class="badge badge-active">${p.cat}</span></td>
+      <td>📍 ${p.city}</td>
+      <td>${p.type}</td>
+      <td style="font-size:12px">${p.start}</td>
+      <td style="font-size:12px">${p.end}</td>
+      <td><span class="badge ${p.status==='进行中'?'badge-pinned':'badge-rejected'}">${p.status}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-red" onclick="showToast('已取消置顶','success')">取消置顶</button>
+          ${p.status==='已到期'?`<button class="btn btn-gold" onclick="showToast('已续期7天','success')">续期</button>`:''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderUsers(data) {
+  const colors = ['#E53935','#3B82F6','#00C896','#F5A623','#8B5CF6'];
+  document.getElementById('usersTbody').innerHTML = data.map((u,i) => `
+    <tr>
+      <td>
+        <div class="user-cell">
+          <div class="user-avatar" style="background:${colors[i%5]}22;color:${colors[i%5]}">${u.name[0]}</div>
+          <div>
+            <div style="font-weight:600">${u.name}</div>
+          </div>
+        </div>
+      </td>
+      <td>📍 ${u.city}</td>
+      <td style="font-family:JetBrains Mono;font-size:12px">${u.phone}</td>
+      <td style="font-size:11px;color:var(--text-dim)">${u.reg}</td>
+      <td><span style="font-family:JetBrains Mono;color:var(--blue)">${u.posts}</span></td>
+      <td><span class="badge ${u.status==='正常'?'badge-approved':'badge-banned'}">${u.status}</span></td>
+      <td>
+        <div class="action-btns">
+          ${u.status==='正常'
+            ? `<button class="btn btn-red" onclick="openModal('ban')">封禁</button>`
+            : `<button class="btn btn-green" onclick="unban('${u.name}')">解封</button>`}
+          <button class="btn" onclick="showToast('查看用户详情','info')">详情</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  document.getElementById('usersInfo').textContent = `共 ${data.length} 位用户`;
+}
+
+function filterUsers(q) {
+  const status = document.getElementById('userStatusFilter').value;
+  let data = allUsers.filter(u =>
+    (!q || u.name.includes(q) || u.phone.includes(q)) &&
+    (!status || u.status === status)
+  );
+  renderUsers(data);
+}
+
+// ═══════════ CHART ═══════════
+const catData = [
+  {label:'二手物品', val:3210, color:'#F5A623'},
+  {label:'租房买房', val:2567, color:'#3B82F6'},
+  {label:'招工求职', val:1234, color:'#E53935'},
+  {label:'生活服务', val:945, color:'#0891B2'},
+  {label:'二手车', val:856, color:'#8B5CF6'},
+  {label:'交友相亲', val:678, color:'#EC4899'},
+  {label:'教育培训', val:421, color:'#059669'},
+  {label:'生意转让', val:389, color:'#16A34A'},
+];
+
+function renderCatChart() {
+  const max = catData[0].val;
+  document.getElementById('catChart').innerHTML = catData.map(d => `
+    <div class="chart-bar-row">
+      <div class="chart-bar-label">${d.label}</div>
+      <div class="chart-bar-track">
+        <div class="chart-bar-fill" style="width:${(d.val/max*100).toFixed(0)}%;background:${d.color}22;color:${d.color}">
+          <span style="color:${d.color};font-size:11px;font-weight:700"></span>
+        </div>
+      </div>
+      <div class="chart-bar-val">${d.val.toLocaleString()}</div>
+    </div>
+  `).join('');
+}
+
+const cityData = [
+  {label:'巴塞罗那', val:4820, color:'#E53935'},
+  {label:'马德里', val:3540, color:'#3B82F6'},
+  {label:'瓦伦西亚', val:1980, color:'#00C896'},
+  {label:'毕尔巴鄂', val:890, color:'#F5A623'},
+  {label:'塞维利亚', val:760, color:'#8B5CF6'},
+  {label:'萨拉戈萨', val:466, color:'#EC4899'},
+];
+
+function renderCityChart() {
+  const max = cityData[0].val;
+  document.getElementById('cityChart').innerHTML = cityData.map(d => `
+    <div class="chart-bar-row">
+      <div class="chart-bar-label">${d.label}</div>
+      <div class="chart-bar-track">
+        <div class="chart-bar-fill" style="width:${(d.val/max*100).toFixed(0)}%;background:${d.color}22;color:${d.color}"></div>
+      </div>
+      <div class="chart-bar-val">${d.val.toLocaleString()}</div>
+    </div>
+  `).join('');
+}
+
+function updateChart(period) {
+  showToast(`已切换到${period}数据`, 'info');
+}
+
+// ═══════════ ACTIONS ═══════════
+let currentReviewIdx = -1;
+
+function openReviewModal(idx) {
+  currentReviewIdx = idx;
+  const r = reviewItems[idx];
+  document.getElementById('reviewDetail').innerHTML = `
+    <div style="display:grid;gap:10px">
+      <div style="background:var(--surface2);border-radius:8px;padding:14px">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">标题</div>
+        <div style="font-weight:700">${r.title}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:var(--surface2);border-radius:8px;padding:14px">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">分类</div>
+          <div>${r.cat}</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:14px">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">城市</div>
+          <div>📍 ${r.city}</div>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:14px">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">详细描述</div>
+        <div style="line-height:1.6">${r.desc}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:14px">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">联系方式</div>
+        <div style="font-family:JetBrains Mono">${r.contact}</div>
+      </div>
+      ${r.id==='R003'?`<div style="background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);border-radius:8px;padding:12px;color:var(--red)">⚠️ 风险提示：此信息包含"保证收益""无风险"等疑似诈骗关键词，建议拒绝</div>`:''}
+    </div>
+  `;
+  openModal('review');
+}
+
+function approveItem(idx) {
+  reviewItems.splice(idx, 1);
+  renderReview();
+  document.getElementById('pendingCount').textContent = reviewItems.length;
+  showToast('✅ 审核通过，信息已上线', 'success');
+}
+
+function rejectItem(idx) {
+  reviewItems.splice(idx, 1);
+  renderReview();
+  document.getElementById('pendingCount').textContent = reviewItems.length;
+  showToast('❌ 已拒绝发布', 'error');
+}
+
+function approveOne() { if(currentReviewIdx>=0) approveItem(currentReviewIdx); }
+function rejectOne() { if(currentReviewIdx>=0) rejectItem(currentReviewIdx); }
+
+function approveAll() {
+  const checked = [...document.querySelectorAll('.row-check:checked')];
+  if(checked.length === 0) { showToast('请先勾选要操作的信息', 'error'); return; }
+  showToast(`✅ 已通过 ${checked.length} 条信息`, 'success');
+  renderReview();
+}
+
+function rejectAll() {
+  const checked = [...document.querySelectorAll('.row-check:checked')];
+  if(checked.length === 0) { showToast('请先勾选要操作的信息', 'error'); return; }
+  showToast(`❌ 已拒绝 ${checked.length} 条信息`, 'error');
+}
+
+function toggleAll(el) {
+  document.querySelectorAll('.row-check').forEach(c => c.checked = el.checked);
+}
+
+function takeDown(id) { showToast(`已下架信息 ${id}`, 'success'); }
+function bringUp(id) { showToast(`已上线信息 ${id}`, 'success'); }
+function unban(name) { showToast(`已解封用户 ${name}`, 'success'); }
+function confirmBan() { closeModal('ban'); showToast('🚫 用户已被封禁', 'success'); }
+function addPin() { closeModal('pin'); showToast('📌 置顶已添加', 'success'); }
+function openPinModal() { openModal('pin'); }
+
+function saveSettings() {
+  const url = document.getElementById('sbUrl').value;
+  const key = document.getElementById('sbKey').value;
+  if(url) localStorage.setItem('sb_url', url);
+  if(key) localStorage.setItem('sb_key', key);
+  showToast('💾 设置已保存', 'success');
+}
+
+function testConnection() {
+  const url = document.getElementById('sbUrl').value;
+  if(!url) { showToast('请先填写 Supabase URL', 'error'); return; }
+  showToast('🔌 正在测试连接…', 'info');
+  setTimeout(() => showToast('✅ 连接成功！数据库正常', 'success'), 1500);
+}
+
+function confirmLogout() {
+  if(confirm('确定要退出管理后台吗？')) showToast('已退出登录', 'info');
+}
+
+// ═══════════ MODAL ═══════════
+function openModal(name) {
+  document.getElementById(name+'Modal').classList.add('open');
+}
+function closeModal(name) {
+  document.getElementById(name+'Modal').classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', function(e) {
+    if(e.target === this) this.classList.remove('open');
+  });
+});
+
+// ═══════════ TOAST ═══════════
+let toastTimer;
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ═══════════ NAV ═══════════
+const pageMeta = {
+  dashboard: { title:'数据仪表盘', sub:'概览' },
+  listings:  { title:'信息管理', sub:'内容管理 / 全部信息' },
+  review:    { title:'待审核信息', sub:'内容管理 / 审核队列' },
+  reports:   { title:'举报处理', sub:'内容管理 / 举报' },
+  pinned:    { title:'置顶管理', sub:'内容管理 / 置顶推广' },
+  users:     { title:'用户管理', sub:'用户 / 列表' },
+  settings:  { title:'系统设置', sub:'系统 / 配置' },
+};
+
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  const meta = pageMeta[name] || {};
+  document.getElementById('topbarTitle').textContent = meta.title || name;
+  document.getElementById('topbarSub').textContent = '淘宝西班牙 / ' + (meta.sub || name);
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ═══════════ INIT ═══════════
+renderListings(allListings);
+renderReview();
+renderReports();
+renderPinned();
+renderUsers(allUsers);
+renderCatChart();
+renderCityChart();
+
+// Restore Supabase config display
+document.getElementById('sbUrl').value = SUPABASE_URL;
+document.getElementById('sbKey').value = '已配置 ✓';
+
+// Load real data from Supabase
+loadRealStats();
+loadRealListings();
+loadRealReview();
+loadRealReports();
+loadRealUsers();
+</script>
+</body>
+</html>

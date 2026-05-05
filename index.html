@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>淘宝西班牙 - 西班牙华人生活服务平台</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+  :root {
+    --red: #D42B2B;
+    --red-dark: #9E1C1C;
+    --red-light: #FF4444;
+    --gold: #F5A623;
+    --gold-light: #FFD166;
+    --cream: #FDF6EC;
+    --ink: #1A0A00;
+    --ink-mid: #3D2010;
+    --ink-light: #7A5C3F;
+    --spain-yellow: #F7C244;
+    --white: #FFFFFF;
+    --shadow: rgba(212,43,43,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: var(--red);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+  }
+
+  .header-top {
+    background: var(--red-dark);
+    padding: 6px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+  }
+
+  .header-top a { color: var(--gold-light); text-decoration: none; margin-left: 16px; }
+  .header-top a:hover { color: white; }
+
+  .header-main {
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--gold);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .logo-icon::after {
+    content: '';
+    position: absolute;
+    top: -10px; right: -10px;
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+  }
+
+  .logo-text { color: white; }
+  .logo-text h1 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    line-height: 1.1;
+  }
+  .logo-text span {
+    font-size: 11px;
+    color: var(--gold-light);
+    letter-spacing: 1px;
+  }
+
+  .search-bar {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    max-width: 520px;
+  }
+
+  .search-bar input {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px 0 0 6px;
+    font-size: 14px;
+    font-family: 'Noto Sans SC', sans-serif;
+    outline: none;
+    background: white;
+    color: var(--ink);
+  }
+
+  .search-bar button {
+    padding: 10px 20px;
+    background: var(--gold);
+    border: none;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    transition: background 0.2s;
+    white-space: nowrap;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+
+  .search-bar button:hover { background: var(--gold-light); }
+
+  .header-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .btn-outline {
+    padding: 8px 16px;
+    border: 1.5px solid rgba(255,255,255,0.6);
+    color: white;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+  .btn-gold {
+    padding: 8px 16px;
+    background: var(--gold);
+    border: none;
+    color: var(--ink);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-gold:hover { background: var(--gold-light); }
+
+  /* Nav categories */
+  .nav-cats {
+    background: #B82020;
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-cats::-webkit-scrollbar { display: none; }
+
+  .nav-cat {
+    padding: 10px 18px;
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .nav-cat:hover, .nav-cat.active {
+    color: var(--gold-light);
+    border-bottom-color: var(--gold);
+    background: rgba(0,0,0,0.1);
+  }
+
+  /* ===== HERO BANNER ===== */
+  .hero {
+    background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 50%, #C03030 100%);
+    padding: 40px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(245,166,35,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .hero::after {
+    content: '🇪🇸';
+    position: absolute;
+    font-size: 200px;
+    opacity: 0.05;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .hero h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(22px, 5vw, 38px);
+    color: white;
+    font-weight: 900;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  .hero p {
+    color: rgba(255,255,255,0.8);
+    font-size: 15px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+  }
+  .stat-label { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+  /* ===== MAIN CATEGORIES ===== */
+  .section { padding: 32px 24px; max-width: 1200px; margin: 0 auto; }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-title h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .section-title::before {
+    content: '';
+    width: 5px;
+    height: 24px;
+    background: var(--red);
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .section-title .see-all {
+    margin-left: auto;
+    color: var(--red);
+    font-size: 13px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .section-title .see-all:hover { color: var(--red-dark); }
+
+  /* Category cards */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+  }
+
+  .cat-card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px 14px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    border: 2px solid transparent;
+    text-decoration: none;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--cat-color, var(--red));
+    transform: scaleX(0);
+    transition: transform 0.25s;
+  }
+
+  .cat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--shadow);
+    border-color: var(--cat-color, var(--red));
+  }
+
+  .cat-card:hover::before { transform: scaleX(1); }
+
+  .cat-icon {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+
+  .cat-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .cat-count {
+    font-size: 11px;
+    color: var(--ink-light);
+  }
+
+  /* ===== LISTINGS GRID ===== */
+  .listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .listing-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    transition: all 0.25s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .listing-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  .listing-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: linear-gradient(135deg, #f0e8d8, #e8d8c0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    position: relative;
+  }
+
+  .listing-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--red);
+    color: white;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  .listing-badge.gold { background: var(--gold); color: var(--ink); }
+  .listing-badge.blue { background: #2563EB; }
+  .listing-badge.green { background: #16A34A; }
+
+  .listing-body { padding: 14px; }
+
+  .listing-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .listing-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .listing-price {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--red);
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .listing-price span { font-size: 12px; font-weight: 400; color: var(--ink-light); }
+
+  .listing-loc {
+    font-size: 11px;
+    color: var(--ink-light);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .listing-tags {
+    display: flex;
+    gap: 5px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #F0EBE3;
+    color: var(--ink-mid);
+  }
+
+  /* ===== CITY TABS ===== */
+  .city-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .city-tab {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #DDD;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    color: var(--ink-mid);
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+
+  .city-tab:hover, .city-tab.active {
+    background: var(--red);
+    color: white;
+    border-color: var(--red);
+  }
+
+  /* ===== POST AD BANNER ===== */
+  .post-banner {
+    background: linear-gradient(135deg, var(--gold) 0%, #E8911A 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 0 24px;
+    box-shadow: 0 4px 20px rgba(245,166,35,0.35);
+  }
+
+  .post-banner h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .post-banner p { color: var(--ink-mid); font-size: 14px; }
+
+  .btn-post {
+    padding: 12px 28px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+  }
+
+  .btn-post:hover { background: var(--red-dark); transform: translateY(-1px); }
+
+  /* ===== INFO CARDS ===== */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--card-color, var(--red));
+  }
+
+  .info-card-icon { font-size: 28px; margin-bottom: 10px; }
+  .info-card h4 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .info-card p { font-size: 13px; color: var(--ink-light); line-height: 1.6; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.7);
+    padding: 40px 24px 20px;
+    margin-top: 48px;
+  }
+
+  .footer-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+
+  .footer-col h4 {
+    color: var(--gold);
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 8px; }
+  .footer-col a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  .footer-col a:hover { color: white; }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    font-size: 12px;
+  }
+
+  .footer-logo {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 18px;
+    color: var(--gold);
+    font-weight: 900;
+    margin-bottom: 10px;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #F0EBE3;
+  }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--ink-mid); }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #DDD;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Noto Sans SC', sans-serif;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--red); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--ink-light);
+    transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--ink); }
+
+  /* ===== ALERTS ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #16A34A;
+    color: white;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    z-index: 2000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.35s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ===== DIVIDER ===== */
+  .section-divider {
+    border: none;
+    border-top: 2px dashed rgba(212,43,43,0.1);
+    margin: 0 24px;
+  }
+
+  /* ===== MOBILE BOTTOM NAV ===== */
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 1px solid #EEE;
+    padding: 8px 0;
+    z-index: 99;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
+  }
+
+  .mobile-nav-items {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 12px;
+    cursor: pointer;
+    color: var(--ink-light);
+    font-size: 11px;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .mobile-nav-item.active, .mobile-nav-item:hover { color: var(--red); }
+  .mobile-nav-item span:first-child { font-size: 22px; }
+
+  @media (max-width: 640px) {
+    .mobile-nav { display: block; }
+    .header-actions { display: none; }
+    body { padding-bottom: 60px; }
+    .post-banner { margin: 0 16px; }
+    .section { padding: 24px 16px; }
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cat-card, .listing-card, .info-card {
+    animation: fadeUp 0.4s ease backwards;
+  }
+
+  .cat-card:nth-child(1) { animation-delay: 0.05s; }
+  .cat-card:nth-child(2) { animation-delay: 0.10s; }
+  .cat-card:nth-child(3) { animation-delay: 0.15s; }
+  .cat-card:nth-child(4) { animation-delay: 0.20s; }
+  .cat-card:nth-child(5) { animation-delay: 0.25s; }
+  .cat-card:nth-child(6) { animation-delay: 0.30s; }
+  .cat-card:nth-child(7) { animation-delay: 0.35s; }
+  .cat-card:nth-child(8) { animation-delay: 0.40s; }
+
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .relative { position: relative; }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="header-top">
+    <div>🇪🇸 西班牙华人生活服务平台 · España China Community</div>
+    <div>
+      <a href="#" onclick="openModal('login')">登录</a>
+      <a href="#" onclick="openModal('register')">注册</a>
+      <a href="#">我的信息</a>
+      <a href="#">帮助中心</a>
+    </div>
+  </div>
+  <div class="header-main">
+    <a href="#" class="logo">
+      <div class="logo-icon">🏮</div>
+      <div class="logo-text">
+        <h1>淘宝西班牙</h1>
+        <span>TaoBao España · 华人第一信息平台</span>
+      </div>
+    </a>
+    <div class="search-bar">
+      <input type="text" placeholder="搜索招工、房源、二手车、生意转让…" id="searchInput">
+      <button onclick="doSearch()">🔍 搜索</button>
+    </div>
+    <div class="header-actions">
+      <button class="btn-outline" onclick="openModal('login')">登录</button>
+      <button class="btn-gold" onclick="openModal('post')">＋ 免费发布</button>
+    </div>
+  </div>
+  <nav class="nav-cats">
+    <a href="#" class="nav-cat active" onclick="filterCat('all',this)">🏠 全部</a>
+    <a href="#" class="nav-cat" onclick="filterCat('worker',this)">👷 招工求职</a>
+    <a href="#" class="nav-cat" onclick="filterCat('house',this)">🏡 租房买房</a>
+    <a href="#" class="nav-cat" onclick="filterCat('business',this)">🏪 生意转让</a>
+    <a href="#" class="nav-cat" onclick="filterCat('car',this)">🚗 二手车</a>
+    <a href="#" class="nav-cat" onclick="filterCat('dating',this)">💕 交友相亲</a>
+    <a href="#" class="nav-cat" onclick="filterCat('goods',this)">📦 二手物品</a>
+    <a href="#" class="nav-cat" onclick="filterCat('service',this)">🛠 生活服务</a>
+    <a href="#" class="nav-cat" onclick="filterCat('edu',this)">📚 教育培训</a>
+  </nav>
+</header>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <h2>🏮 西班牙华人生活圈 · 信息发布与寻找一站搞定</h2>
+  <p>覆盖巴塞罗那、马德里、瓦伦西亚、毕尔巴鄂等全西班牙各大城市</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">12,400+</div>
+      <div class="stat-label">有效信息</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">8,800+</div>
+      <div class="stat-label">注册用户</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">15+</div>
+      <div class="stat-label">覆盖城市</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">每日更新</div>
+      <div class="stat-label">实时信息</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div style="max-width:1200px;margin:0 auto;">
+
+<!-- Categories -->
+<div class="section">
+  <div class="section-title">
+    <h3>信息分类</h3>
+    <a href="#" class="see-all">查看全部 →</a>
+  </div>
+  <div class="cat-grid" id="catGrid">
+    <a href="#" class="cat-card" style="--cat-color:#D42B2B" onclick="filterCat('worker',null);return false;">
+      <span class="cat-icon">👷</span>
+      <span class="cat-name">招工求职</span>
+      <span class="cat-count">1,234 条信息</span>
+    </a>
+    <a href="#" class="cat-card" style="--cat-color:#2563EB" onclick="filterCat('house',null);return false;">
+      <span class="cat-icon">🏡</span>
+      <span class="cat-name">租房买房</span>
+      <span class="cat-count">2,567 条信息</span>
+    </a>
+    <a href="#" class="cat-card" style="--cat-color:#16A34A" onclick="filterCat('business',null);return false;">
+      <span class="cat-icon">🏪</span>
+      <span class="cat-name">生意转让</span>
+      <span class="cat-count">389 条信息</span>
+    </a>
+    <a href="#" class="cat-card" style="--cat-color:#7C3AED" onclick="filterCat('car',null);return false;">
+      <span class="cat-icon">🚗</span>
+      <span class="cat-name">二手车</span>
+      <span class="cat-count">856 条信息</span>
+    </a>
+    <a href="#" class="cat-card" style="--cat-color:#EC4899" onclick="filterCat('dating',null);return false;">
+      <span class="cat-icon">💕</span>
+      <span class="cat-name">交友相亲</span>
+      <span class="cat-count">678 条信息</span>
+    </a>
+    <a href="#" class="cat-card" style="--cat-color:#F59E0B" onclick="filterCat('goods',null);return false;">
+      <span class="cat-icon">📦</span>
+      <span class="cat-name">二手物品</span>
+      <span class="cat-count">3,210 条信息</span>
+    </a>
+    <a href="#" class="cat-card" style="--cat-color:#0891B2" onclick="filterCat('service',null);return false;">
+      <span class="cat-icon">🛠</span>
+      <span class="cat-name">生活服务</span>
+      <span class="cat-count">945 条信息</span>
+    </a>
+    <a href="#" class="cat-card" style="--cat-color:#059669" onclick="filterCat('edu',null);return false;">
+      <span class="cat-icon">📚</span>
+      <span class="cat-name">教育培训</span>
+      <span class="cat-count">421 条信息</span>
+    </a>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- Latest listings -->
+<div class="section">
+  <div class="section-title">
+    <h3 id="listingTitle">最新信息</h3>
+    <a href="#" class="see-all">查看更多 →</a>
+  </div>
+
+  <!-- City filter -->
+  <div class="city-tabs">
+    <button class="city-tab active" onclick="filterCity('全部',this)">🌐 全部城市</button>
+    <button class="city-tab" onclick="filterCity('巴塞罗那',this)">🏙 巴塞罗那</button>
+    <button class="city-tab" onclick="filterCity('马德里',this)">🏛 马德里</button>
+    <button class="city-tab" onclick="filterCity('瓦伦西亚',this)">🌊 瓦伦西亚</button>
+    <button class="city-tab" onclick="filterCity('毕尔巴鄂',this)">⛰ 毕尔巴鄂</button>
+    <button class="city-tab" onclick="filterCity('塞维利亚',this)">🌸 塞维利亚</button>
+    <button class="city-tab" onclick="filterCity('萨拉戈萨',this)">🕌 萨拉戈萨</button>
+  </div>
+
+  <div class="listings-grid" id="listingsGrid"></div>
+</div>
+
+</div>
+
+<!-- ===== POST BANNER ===== -->
+<div class="post-banner">
+  <div>
+    <h3>🚀 免费发布您的信息</h3>
+    <p>招工、找房、转让生意、卖车… 一键发布，精准触达西班牙华人社区</p>
+  </div>
+  <button class="btn-post" onclick="openModal('post')">立即免费发布 →</button>
+</div>
+
+<div style="max-width:1200px;margin:0 auto;">
+
+<!-- Info cards -->
+<div class="section">
+  <div class="section-title">
+    <h3>平台优势</h3>
+  </div>
+  <div class="info-grid">
+    <div class="info-card" style="--card-color:#D42B2B">
+      <div class="info-card-icon">🆓</div>
+      <h4>完全免费</h4>
+      <p>发布信息完全免费，无需付费。我们致力于打造西班牙华人最实用的免费信息平台。</p>
+    </div>
+    <div class="info-card" style="--card-color:#2563EB">
+      <div class="info-card-icon">⚡</div>
+      <h4>快速发布</h4>
+      <p>注册后1分钟即可发布信息，审核通过后立即上线展示，让您的信息第一时间被看见。</p>
+    </div>
+    <div class="info-card" style="--card-color:#16A34A">
+      <div class="info-card-icon">🇨🇳🇪🇸</div>
+      <h4>双语支持</h4>
+      <p>平台支持中西双语，帮助您突破语言障碍，与当地西班牙人和华人社区无缝沟通。</p>
+    </div>
+    <div class="info-card" style="--card-color:#F59E0B">
+      <div class="info-card-icon">📱</div>
+      <h4>手机优化</h4>
+      <p>完美适配手机浏览，随时随地查看和发布信息，让信息触达更加便捷高效。</p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-logo">🏮 淘宝西班牙</div>
+      <p style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.5);">西班牙最大华人生活服务信息平台，服务全西班牙华人社区。</p>
+    </div>
+    <div class="footer-col">
+      <h4>信息分类</h4>
+      <ul>
+        <li><a href="#">👷 招工求职</a></li>
+        <li><a href="#">🏡 租房买房</a></li>
+        <li><a href="#">🏪 生意转让</a></li>
+        <li><a href="#">🚗 二手车</a></li>
+        <li><a href="#">💕 交友相亲</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>更多服务</h4>
+      <ul>
+        <li><a href="#">📦 二手物品</a></li>
+        <li><a href="#">🛠 生活服务</a></li>
+        <li><a href="#">📚 教育培训</a></li>
+        <li><a href="#">🍜 餐饮美食</a></li>
+        <li><a href="#">✈️ 回国服务</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>关注我们</h4>
+      <ul>
+        <li><a href="#">💬 微信公众号</a></li>
+        <li><a href="#">📢 微信群</a></li>
+        <li><a href="#">📱 WhatsApp</a></li>
+        <li><a href="#">📘 Facebook</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>帮助中心</h4>
+      <ul>
+        <li><a href="#">如何发布信息</a></li>
+        <li><a href="#">联系我们</a></li>
+        <li><a href="#">举报违规信息</a></li>
+        <li><a href="#">用户协议</a></li>
+        <li><a href="#">隐私政策</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2025 淘宝西班牙 · TaoBao España · 版权所有</div>
+    <div>西班牙华人生活服务平台 | 覆盖全西班牙15+城市</div>
+  </div>
+</footer>
+
+<!-- ===== MOBILE BOTTOM NAV ===== -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-items">
+    <a href="#" class="mobile-nav-item active">
+      <span>🏠</span><span>首页</span>
+    </a>
+    <a href="#" class="mobile-nav-item" onclick="filterCat('worker',null);return false;">
+      <span>👷</span><span>招工</span>
+    </a>
+    <a href="#" class="mobile-nav-item" onclick="openModal('post');return false;" style="color:var(--red)">
+      <span>➕</span><span>发布</span>
+    </a>
+    <a href="#" class="mobile-nav-item" onclick="filterCat('dating',null);return false;">
+      <span>💕</span><span>交友</span>
+    </a>
+    <a href="#" class="mobile-nav-item">
+      <span>👤</span><span>我的</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ===== MODALS ===== -->
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal relative">
+    <button class="modal-close" onclick="closeModal('login')">✕</button>
+    <h3>🏮 登录淘宝西班牙</h3>
+    <div class="form-group">
+      <label>邮箱</label>
+      <input type="email" id="loginEmail" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <input type="password" id="loginPassword" placeholder="请输入密码">
+    </div>
+    <button id="loginBtn" class="btn-post" style="width:100%;padding:12px;font-size:16px;border-radius:8px;margin-top:8px" onclick="submitLogin()">登录</button>
+    <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--ink-light)">还没有账号？<a href="#" style="color:var(--red)" onclick="closeModal('login');openModal('register');return false;">立即注册</a></p>
+  </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal relative">
+    <button class="modal-close" onclick="closeModal('register')">✕</button>
+    <h3>🎉 注册新账号</h3>
+    <div class="form-group">
+      <label>昵称</label>
+      <input type="text" id="regNickname" placeholder="您的昵称">
+    </div>
+    <div class="form-group">
+      <label>手机号码（含国际区号）</label>
+      <input type="text" id="regPhone" placeholder="+34 6XX XXX XXX">
+    </div>
+    <div class="form-group">
+      <label>邮箱</label>
+      <input type="email" id="regEmail" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label>所在城市</label>
+      <select id="regCity">
+        <option>巴塞罗那</option>
+        <option>马德里</option>
+        <option>瓦伦西亚</option>
+        <option>毕尔巴鄂</option>
+        <option>塞维利亚</option>
+        <option>萨拉戈萨</option>
+        <option>其他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>密码（至少8位）</label>
+      <input type="password" id="regPassword" placeholder="至少8位字符">
+    </div>
+    <button id="regBtn" class="btn-post" style="width:100%;padding:12px;font-size:16px;border-radius:8px;margin-top:8px" onclick="submitRegister()">注册</button>
+  </div>
+</div>
+
+<!-- Post Ad Modal -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal relative">
+    <button class="modal-close" onclick="closeModal('post')">✕</button>
+    <h3>📢 免费发布信息</h3>
+    <div class="form-group">
+      <label>信息类别</label>
+      <select id="postCat" onchange="updatePostForm()">
+        <option value="">— 请选择类别 —</option>
+        <option value="worker">👷 招工求职</option>
+        <option value="house">🏡 租房买房</option>
+        <option value="business">🏪 生意转让</option>
+        <option value="car">🚗 二手车</option>
+        <option value="dating">💕 交友相亲</option>
+        <option value="goods">📦 二手物品</option>
+        <option value="service">🛠 生活服务</option>
+        <option value="edu">📚 教育培训</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>标题</label>
+      <input type="text" placeholder="简洁明了的标题，例如：巴塞罗那招中餐厨师一名" id="postTitle">
+    </div>
+    <div class="form-group">
+      <label>详细描述</label>
+      <textarea id="postDesc" rows="4" placeholder="详细描述您的信息，包括要求、薪资/价格、工作内容等…"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>城市</label>
+        <select id="postCity">
+          <option>巴塞罗那</option>
+          <option>马德里</option>
+          <option>瓦伦西亚</option>
+          <option>毕尔巴鄂</option>
+          <option>塞维利亚</option>
+          <option>萨拉戈萨</option>
+          <option>其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>价格/薪资（€）</label>
+        <input type="text" id="postPrice" placeholder="例：1200€/月 或 面议">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>联系方式（微信/手机/WhatsApp）*</label>
+      <input type="text" id="postContact" placeholder="+34 6XX XXX XXX 或 微信号">
+    </div>
+    <button id="postBtn" class="btn-post" style="width:100%;padding:12px;font-size:16px;border-radius:8px;margin-top:8px" onclick="submitPost()">🚀 立即发布（免费）</button>
+    <p style="text-align:center;margin-top:10px;font-size:12px;color:var(--ink-light)">发布即表示同意 <a href="#" style="color:var(--red)">用户协议</a> 及 <a href="#" style="color:var(--red)">隐私政策</a></p>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ===== SUPABASE =====
+const SUPABASE_URL = 'https://bewirpgqvgfntsymhbb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJld2lycGdxdmd2Zm50c3ltaGJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5NjU1NTgsImV4cCI6MjA5MzU0MTU1OH0.34J99wu64G2QcPRqAye0u1VUTXt8IbAO5BQynAjS7oM';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 当前登录用户
+let currentUser = null;
+sb.auth.getUser().then(({ data }) => {
+  currentUser = data.user;
+  if (currentUser) {
+    document.querySelectorAll('.header-actions .btn-outline').forEach(b => b.style.display='none');
+    const btn = document.querySelector('.header-actions .btn-gold');
+    if(btn) btn.textContent = '＋ 免费发布';
+  }
+});
+
+// ===== 静态备用数据（数据库空时显示）=====
+const fallbackListings = [
+  {
+    id:1, cat:'worker', city:'巴塞罗那',
+    icon:'👨‍🍳', badge:'招聘', badgeType:'',
+    title:'巴塞罗那中餐馆招聘正宗粤菜厨师一名，包吃住',
+    price:'1,500', unit:'€/月',
+    tags:['包吃住','合法工作','急招'],
+    time:'2小时前'
+  },
+  {
+    id:2, cat:'house', city:'马德里',
+    icon:'🏠', badge:'出租', badgeType:'blue',
+    title:'马德里中心区整套公寓出租，2室1厅，近地铁，华人区',
+    price:'900', unit:'€/月',
+    tags:['整套','近地铁','华人区'],
+    time:'3小时前'
+  },
+  {
+    id:3, cat:'business', city:'瓦伦西亚',
+    icon:'🍜', badge:'转让', badgeType:'green',
+    title:'瓦伦西亚中餐外卖店转让，营业额稳定，客源好，随时接手',
+    price:'28,000', unit:'€转让',
+    tags:['营业中','客源稳','证件齐'],
+    time:'5小时前'
+  },
+  {
+    id:4, cat:'car', city:'巴塞罗那',
+    icon:'🚙', badge:'出售', badgeType:'',
+    title:'2019年大众帕萨特出售，7万公里，保养记录完整，一手车',
+    price:'16,500', unit:'€',
+    tags:['一手车','7万公里','已验车'],
+    time:'1天前'
+  },
+  {
+    id:5, cat:'dating', city:'马德里',
+    icon:'💑', badge:'征婚', badgeType:'gold',
+    title:'马德里华人女士找对象，80后，工作稳定，希望认识靠谱男士',
+    price:'真诚', unit:'交友',
+    tags:['80后','真诚','稳定'],
+    time:'6小时前'
+  },
+  {
+    id:6, cat:'worker', city:'巴塞罗那',
+    icon:'🧹', badge:'招聘', badgeType:'',
+    title:'巴塞罗那超市招聘理货员2名，不限性别，可全职兼职',
+    price:'1,200', unit:'€/月',
+    tags:['可兼职','华人超市','急招'],
+    time:'8小时前'
+  },
+  {
+    id:7, cat:'goods', city:'瓦伦西亚',
+    icon:'📺', badge:'出售', badgeType:'',
+    title:'九成新Samsung 65寸4K电视出售，搬家处理，便宜出',
+    price:'350', unit:'€',
+    tags:['九成新','Samsung','搬家急售'],
+    time:'1天前'
+  },
+  {
+    id:8, cat:'house', city:'巴塞罗那',
+    icon:'🛏', badge:'出租', badgeType:'blue',
+    title:'巴塞罗那Eixample区单间出租，华人合租，近超市地铁',
+    price:'550', unit:'€/月',
+    tags:['单间','华人合租','近地铁'],
+    time:'4小时前'
+  },
+  {
+    id:9, cat:'service', city:'马德里',
+    icon:'⚖️', badge:'服务', badgeType:'green',
+    title:'马德里华人律师事务所，专业处理居留签证、劳工纠纷',
+    price:'咨询', unit:'免费',
+    tags:['专业律师','中文服务','签证居留'],
+    time:'2天前'
+  },
+  {
+    id:10, cat:'car', city:'马德里',
+    icon:'🚌', badge:'出售', badgeType:'',
+    title:'2021年丰田RAV4 Hybrid出售，3万公里，保险杠无划痕',
+    price:'29,000', unit:'€',
+    tags:['混合动力','低公里','保修中'],
+    time:'1天前'
+  },
+  {
+    id:11, cat:'edu', city:'巴塞罗那',
+    icon:'📖', badge:'招生', badgeType:'gold',
+    title:'巴塞罗那专业西班牙语学校招生，小班制，华人老师辅导',
+    price:'150', unit:'€/月',
+    tags:['小班制','华人教师','适合新移民'],
+    time:'3天前'
+  },
+  {
+    id:12, cat:'dating', city:'巴塞罗那',
+    icon:'🎉', badge:'活动', badgeType:'gold',
+    title:'巴塞罗那华人单身派对，每月举办，已有300+华人参与',
+    price:'免费', unit:'参加',
+    tags:['月度活动','300+华人','轻松氛围'],
+    time:'1天前'
+  },
+];
+
+// ===== 分类图标映射 =====
+const catIcons = { '招工':'👷','租房':'🏡','生意':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚' };
+const catBadge = { '招工':'招聘','租房':'出租','生意':'转让','二手车':'出售','交友':'征友','二手物品':'出售','服务':'服务','教育':'招生' };
+const catMap   = { worker:'招工', house:'租房', business:'生意', car:'二手车', dating:'交友', goods:'二手物品', service:'服务', edu:'教育' };
+
+let currentCat = 'all';
+let currentCity = '全部';
+let allListings = [...fallbackListings]; // 先用备用数据
+
+// ===== 从 Supabase 加载信息 =====
+async function loadListings() {
+  showLoading(true);
+  try {
+    let query = sb.from('listings')
+      .select('id, title, category, city, price, created_at, is_pinned')
+      .eq('status', 'approved')
+      .order('is_pinned', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(40);
+
+    if (currentCat !== 'all') {
+      const cat = catMap[currentCat];
+      if(cat) query = query.eq('category', cat);
+    }
+    if (currentCity !== '全部') query = query.eq('city', currentCity);
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      allListings = data.map(r => ({
+        id: r.id,
+        cat: Object.keys(catMap).find(k => catMap[k] === r.category) || 'goods',
+        city: r.city,
+        icon: catIcons[r.category] || '📋',
+        badge: catBadge[r.category] || '信息',
+        badgeType: r.is_pinned ? 'gold' : '',
+        title: r.title,
+        price: r.price || '面议',
+        unit: '',
+        tags: [r.category, r.city],
+        time: timeAgo(r.created_at)
+      }));
+    }
+  } catch(e) {
+    console.warn('加载失败，使用备用数据', e.message);
+  }
+  showLoading(false);
+  renderListings();
+}
+
+function showLoading(on) {
+  const grid = document.getElementById('listingsGrid');
+  if(on) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:32px;margin-bottom:10px">⏳</div>加载中…</div>';
+}
+
+function timeAgo(ts) {
+  const diff = (Date.now() - new Date(ts)) / 1000;
+  if(diff < 3600) return Math.floor(diff/60) + '分钟前';
+  if(diff < 86400) return Math.floor(diff/3600) + '小时前';
+  return Math.floor(diff/86400) + '天前';
+}
+
+function renderListings() {
+  const grid = document.getElementById('listingsGrid');
+  let filtered = allListings;
+  if(currentCat !== 'all') filtered = filtered.filter(l => l.cat === currentCat);
+  if(currentCity !== '全部') filtered = filtered.filter(l => l.city === currentCity);
+
+  if(filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:16px">暂无相关信息</div><div style="font-size:13px;margin-top:8px">试试其他条件或发布新信息</div></div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map((l,i) => `
+    <div class="listing-card" style="animation-delay:${i*0.07}s" onclick="viewListing(${l.id})">
+      <div class="listing-img">
+        ${l.icon}
+        <div class="listing-badge ${l.badgeType}">${l.badge}</div>
+      </div>
+      <div class="listing-body">
+        <div class="listing-title">${l.title}</div>
+        <div class="listing-tags">
+          ${l.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
+        </div>
+        <div class="listing-meta">
+          <div class="listing-price">${l.price}<span> ${l.unit}</span></div>
+          <div class="listing-loc">📍 ${l.city}</div>
+        </div>
+        <div style="font-size:11px;color:var(--ink-light);margin-top:6px">🕐 ${l.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCat(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.nav-cat').forEach(e => e.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const titles = {
+    all:'最新信息', worker:'招工求职', house:'租房买房',
+    business:'生意转让', car:'二手车', dating:'交友相亲',
+    goods:'二手物品', service:'生活服务', edu:'教育培训'
+  };
+  document.getElementById('listingTitle').textContent = titles[cat] || '最新信息';
+  loadListings();
+  document.getElementById('listingsGrid').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function filterCity(city, el) {
+  currentCity = city;
+  document.querySelectorAll('.city-tab').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  loadListings();
+}
+
+async function viewListing(id) {
+  // 浏览量 +1
+  await sb.from('listings').update({ view_count: sb.rpc('increment') }).eq('id', id);
+  showToast('正在查看详情…');
+}
+
+async function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if(!q) return;
+  showLoading(true);
+  try {
+    const { data, error } = await sb.from('listings')
+      .select('id, title, category, city, price, created_at, is_pinned')
+      .eq('status', 'approved')
+      .ilike('title', `%${q}%`)
+      .limit(40);
+    if(error) throw error;
+    if(data && data.length > 0) {
+      allListings = data.map(r => ({
+        id: r.id, cat: 'all', city: r.city,
+        icon: catIcons[r.category] || '📋',
+        badge: catBadge[r.category] || '信息',
+        badgeType: r.is_pinned ? 'gold' : '',
+        title: r.title, price: r.price || '面议', unit: '',
+        tags: [r.category, r.city], time: timeAgo(r.created_at)
+      }));
+      currentCat = 'all'; currentCity = '全部';
+      showLoading(false); renderListings();
+      showToast(`搜索"${q}" 找到 ${data.length} 条结果`);
+    } else {
+      showLoading(false);
+      document.getElementById('listingsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:48px">🔍</div><div style="margin-top:10px">未找到"'+q+'"相关信息</div></div>';
+    }
+  } catch(e) {
+    showLoading(false);
+    showToast('搜索失败，请重试', true);
+  }
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') doSearch();
+});
+
+// ===== 模态框 =====
+function openModal(name) {
+  document.getElementById(name+'Modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(name) {
+  document.getElementById(name+'Modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if(e.target === this) { this.classList.remove('open'); document.body.style.overflow = ''; }
+  });
+});
+
+// ===== 用户注册 =====
+async function submitRegister() {
+  const email    = document.getElementById('regEmail')?.value.trim();
+  const password = document.getElementById('regPassword')?.value;
+  const nickname = document.getElementById('regNickname')?.value.trim();
+  const city     = document.getElementById('regCity')?.value;
+  const phone    = document.getElementById('regPhone')?.value.trim();
+  if(!email || !password || !nickname) { showToast('⚠️ 请填写必填项', true); return; }
+  const btn = document.getElementById('regBtn');
+  btn.textContent = '注册中…'; btn.disabled = true;
+  const { error } = await sb.auth.signUp({
+    email, password,
+    options: { data: { nickname, city, phone } }
+  });
+  btn.textContent = '注册'; btn.disabled = false;
+  if(error) { showToast('注册失败：' + error.message, true); return; }
+  closeModal('register');
+  showToast('🎉 注册成功！请查收验证邮件后登录');
+}
+
+// ===== 用户登录 =====
+async function submitLogin() {
+  const email    = document.getElementById('loginEmail')?.value.trim();
+  const password = document.getElementById('loginPassword')?.value;
+  if(!email || !password) { showToast('⚠️ 请填写邮箱和密码', true); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = '登录中…'; btn.disabled = true;
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  btn.textContent = '登录'; btn.disabled = false;
+  if(error) { showToast('登录失败：' + error.message, true); return; }
+  currentUser = data.user;
+  closeModal('login');
+  showToast('👋 欢迎回来！');
+}
+
+// ===== 发布信息 =====
+async function submitPost() {
+  if(!currentUser) { closeModal('post'); openModal('login'); showToast('⚠️ 请先登录再发布', true); return; }
+  const cat   = document.getElementById('postCat').value;
+  const title = document.getElementById('postTitle').value.trim();
+  const desc  = document.getElementById('postDesc')?.value.trim();
+  const city  = document.getElementById('postCity')?.value;
+  const price = document.getElementById('postPrice')?.value.trim();
+  const contact = document.getElementById('postContact')?.value.trim();
+  if(!cat)   { showToast('⚠️ 请选择信息类别', true); return; }
+  if(!title) { showToast('⚠️ 请填写标题', true); return; }
+  if(!contact) { showToast('⚠️ 请填写联系方式', true); return; }
+  const catZh = catMap[cat] || cat;
+  const btn = document.getElementById('postBtn');
+  if(btn) { btn.textContent = '发布中…'; btn.disabled = true; }
+  const { error } = await sb.from('listings').insert([{
+    user_id: currentUser.id,
+    title, description: desc || title,
+    category: catZh, city: city || '巴塞罗那',
+    price: price || '面议', contact,
+    status: 'pending'
+  }]);
+  if(btn) { btn.textContent = '立即发布（免费）'; btn.disabled = false; }
+  if(error) { showToast('发布失败：' + error.message, true); return; }
+  closeModal('post');
+  showToast('🎉 发布成功！您的信息将在管理员审核后上线');
+}
+
+// ===== Toast =====
+let toastTimer;
+function showToast(msg, isError) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.background = isError ? '#DC2626' : '#16A34A';
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ===== 实时监听新信息上线 =====
+sb.channel('public-listings')
+  .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'listings' }, payload => {
+    if(payload.new.status === 'approved') loadListings();
+  })
+  .subscribe();
+
+// ===== 初始化 =====
+loadListings();
+</script>
+</body>
+</html>
