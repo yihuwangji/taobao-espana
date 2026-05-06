@@ -1012,7 +1012,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <div>© 2025 淘宝西班牙 · TaoBao España · 版权所有</div>
+    <div>© 2025 西班牙生活通· 版权所有</div>
     <div>西班牙华人生活服务平台 | 覆盖全西班牙15+城市</div>
   </div>
 </footer>
@@ -1040,10 +1040,12 @@
 
 <!-- ===== MODALS ===== -->
 <!-- Login Modal -->
+
 <div class="modal-overlay" id="loginModal">
   <div class="modal relative">
     <button class="modal-close" onclick="closeModal('login')">✕</button>
-    <h3>🏮 登录淘宝西班牙</h3>
+  ）
+    <h3>🏮 登录西班牙生活通</h3>
     <div class="form-group">
       <label>邮箱</label>
       <input type="email" id="loginEmail" placeholder="your@email.com">
@@ -1384,12 +1386,73 @@ function filterCity(city, el) {
   el.classList.add('active');
   loadListings();
 }
-
 async function viewListing(id) {
-  // 浏览量 +1
-  await sb.from('listings').update({ view_count: sb.rpc('increment') }).eq('id', id);
-  showToast('正在查看详情…');
-}
+  // 打开弹窗，先显示加载中
+  document.getElementById('detailContent').innerHTML = `
+    <div style="text-align:center;padding:40px 0;color:#999">
+      <div style="font-size:32px;margin-bottom:10px">⏳</div>
+      <div>加载中…</div>
+    </div>`;
+  openModal('detail');
+
+  try {
+    const { data, error } = await sb.from('listings')
+      .select('id, title, description, category, city, price, contact, created_at, is_pinned, view_count')
+      .eq('id', id)
+      .eq('status', 'approved')
+      .single();
+
+    if (error || !data) {
+      document.getElementById('detailContent').innerHTML =
+        '<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">😕</div><div style="margin-top:10px">信息加载失败</div></div>';
+      return;
+    }
+
+    const catIcons = {'招工':'👷','租房':'🏡','生意':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚'};
+    const icon = catIcons[data.category] || '📋';
+    const timeStr = new Date(data.created_at).toLocaleString('zh-CN');
+
+    document.getElementById('detailContent').innerHTML = `
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="font-size:36px">${icon}</span>
+          <div>
+            <span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">${data.category}</span>
+            <h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">${data.title}</h3>
+          </div>
+        </div>
+        ${data.description ? `<div style="background:#fafafa;border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">📝 详细描述</div>
+          <div style="font-size:14px;line-height:1.7;color:#333">${data.description}</div>
+        </div>` : ''}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div style="background:#fef3f2;border-radius:10px;padding:12px 14px">
+            <div style="font-size:11px;color:#999;margin-bottom:4px">💰 价格</div>
+            <div style="font-size:16px;font-weight:700;color:#c0392b">${data.price || '面议'} €</div>
+          </div>
+          <div style="background:#f0fdf4;border-radius:10px;padding:12px 14px">
+            <div style="font-size:11px;color:#999;margin-bottom:4px">📍 城市</div>
+            <div style="font-size:15px;font-weight:600;color:#166534">${data.city}</div>
+          </div>
+        </div>
+        <div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:12px;padding:16px;margin-bottom:14px">
+          <div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">📞 联系方式</div>
+          <div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">${data.contact || '未填写'}</div>
+          <div style="font-size:11px;color:#999;margin-top:6px">可通过微信 / 手机 / WhatsApp 联系</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#999;padding-top:10px;border-top:1px solid #f0f0f0">
+          <span>🕐 ${timeStr}</span>
+          <span>👁 ${(data.view_count || 0) + 1} 次浏览</span>
+        </div>
+      </div>`;
+
+    // 更新浏览量
+    sb.from('listings').update({ view_count: (data.view_count || 0) + 1 }).eq('id', id).then(() => {});
+
+  } catch(e) {
+    document.getElementById('detailContent').innerHTML =
+      `<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">⚠️</div><div>加载出错：${e.message}</div></div>`;
+  }
 
 async function doSearch() {
   const q = document.getElementById('searchInput').value.trim();
@@ -1528,4 +1591,10 @@ sb.channel('public-listings')
 loadListings();
 </script>
 </body>
+  <div class="modal-overlay" id="detailModal">
+  <div class="modal relative" style="max-width:560px">
+    <button class="modal-close" onclick="closeModal('detail')">✕</button>
+    <div id="detailContent">加载中…</div>
+  </div>
+</div>
 </html>
