@@ -1044,7 +1044,6 @@
 <div class="modal-overlay" id="loginModal">
   <div class="modal relative">
     <button class="modal-close" onclick="closeModal('login')">✕</button>
-  ）
     <h3>🏮 登录西班牙生活通</h3>
     <div class="form-group">
       <label>邮箱</label>
@@ -1537,6 +1536,9 @@ async function submitLogin() {
   btn.textContent = '登录'; btn.disabled = false;
   if(error) { showToast('登录失败：' + error.message, true); return; }
   currentUser = data.user;
+  document.querySelectorAll('.header-actions .btn-outline').forEach(b => b.style.display='none');
+  const loginBtn2 = document.querySelector('.header-actions .btn-gold');
+  if(loginBtn2) loginBtn2.textContent = '＋ 免费发布';
   closeModal('login');
   showToast('👋 欢迎回来！');
 }
