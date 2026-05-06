@@ -1452,6 +1452,7 @@ async function viewListing(id) {
     document.getElementById('detailContent').innerHTML =
       `<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">⚠️</div><div>加载出错：${e.message}</div></div>`;
   }
+}
 
 async function doSearch() {
   const q = document.getElementById('searchInput').value.trim();
