@@ -812,9 +812,9 @@
     <a href="#" class="nav-cat" onclick="filterCat('worker',this)">👷 招工求职</a>
     <a href="#" class="nav-cat" onclick="filterCat('house',this)">🏡 租房买房</a>
     <a href="#" class="nav-cat" onclick="filterCat('business',this)">🏪 生意转让</a>
-    <a href="#" class="nav-cat" onclick="filterCat('car',this)">🚗 二手车</a>
+    <a href="#" class="nav-cat" onclick="filterCat('wholesale',this)">🏪 批发市场</a>
     <a href="#" class="nav-cat" onclick="filterCat('dating',this)">💕 交友相亲</a>
-    <a href="#" class="nav-cat" onclick="filterCat('goods',this)">📦 二手物品</a>
+    <a href="#" class="nav-cat" onclick="filterCat('goods',this)">📦 二手物品/车</a>
     <a href="#" class="nav-cat" onclick="filterCat('service',this)">🛠 生活服务</a>
     <a href="#" class="nav-cat" onclick="filterCat('edu',this)">📚 教育培训</a>
   </nav>
@@ -869,10 +869,10 @@
       <span class="cat-name">生意转让</span>
       <span class="cat-count">389 条信息</span>
     </a>
-    <a href="#" class="cat-card" style="--cat-color:#7C3AED" onclick="filterCat('car',null);return false;">
-      <span class="cat-icon">🚗</span>
-      <span class="cat-name">二手车</span>
-      <span class="cat-count">856 条信息</span>
+    <a href="#" class="cat-card" style="--cat-color:#7C3AED" onclick="filterCat('wholesale',null);return false;">
+      <span class="cat-icon">🏪</span>
+      <span class="cat-name">批发市场</span>
+      <span class="cat-count">百元店·酒吧</span>
     </a>
     <a href="#" class="cat-card" style="--cat-color:#EC4899" onclick="filterCat('dating',null);return false;">
       <span class="cat-icon">💕</span>
@@ -881,8 +881,8 @@
     </a>
     <a href="#" class="cat-card" style="--cat-color:#F59E0B" onclick="filterCat('goods',null);return false;">
       <span class="cat-icon">📦</span>
-      <span class="cat-name">二手物品</span>
-      <span class="cat-count">3,210 条信息</span>
+      <span class="cat-name">二手物品/车</span>
+      <span class="cat-count">含二手车</span>
     </a>
     <a href="#" class="cat-card" style="--cat-color:#0891B2" onclick="filterCat('service',null);return false;">
       <span class="cat-icon">🛠</span>
@@ -1116,9 +1116,11 @@
         <option value="worker">👷 招工求职</option>
         <option value="house">🏡 租房买房</option>
         <option value="business">🏪 生意转让</option>
-        <option value="car">🚗 二手车</option>
+        <option value="wholesale">🏪 批发市场</option>
+        <option value="wholesale_100">💯 百元店/百货</option>
+        <option value="wholesale_bar">🍻 酒吧/Bar</option>
         <option value="dating">💕 交友相亲</option>
-        <option value="goods">📦 二手物品</option>
+        <option value="goods">📦 二手物品/车</option>
         <option value="service">🛠 生活服务</option>
         <option value="edu">📚 教育培训</option>
       </select>
@@ -1235,11 +1237,11 @@ const fallbackListings = [
     time:'5小时前'
   },
   {
-    id:4, cat:'car', city:'巴塞罗那',
-    icon:'🚙', badge:'出售', badgeType:'',
-    title:'2019年大众帕萨特出售，7万公里，保养记录完整，一手车',
-    price:'16,500', unit:'€',
-    tags:['一手车','7万公里','已验车'],
+    id:4, cat:'wholesale_100', city:'巴塞罗那',
+    icon:'💯', badge:'百货', badgeType:'',
+    title:'巴塞罗那批发百元店转让，货源稳定，日营业额高，接手即营业',
+    price:'15,000', unit:'€转让',
+    tags:['百元店','货源稳定','即接手'],
     time:'1天前'
   },
   {
@@ -1267,6 +1269,14 @@ const fallbackListings = [
     time:'1天前'
   },
   {
+    id:13, cat:'goods', city:'巴塞罗那',
+    icon:'🚗', badge:'出售', badgeType:'',
+    title:'2020年大众Golf出售，5万公里，车况良好，二手车',
+    price:'18,500', unit:'€',
+    tags:['二手车','5万公里','车况好'],
+    time:'2天前'
+  },
+  {
     id:8, cat:'house', city:'巴塞罗那',
     icon:'🛏', badge:'出租', badgeType:'blue',
     title:'巴塞罗那Eixample区单间出租，华人合租，近超市地铁',
@@ -1283,11 +1293,11 @@ const fallbackListings = [
     time:'2天前'
   },
   {
-    id:10, cat:'car', city:'马德里',
-    icon:'🚌', badge:'出售', badgeType:'',
-    title:'2021年丰田RAV4 Hybrid出售，3万公里，保险杠无划痕',
-    price:'29,000', unit:'€',
-    tags:['混合动力','低公里','保修中'],
+    id:10, cat:'wholesale_bar', city:'马德里',
+    icon:'🍻', badge:'Bar', badgeType:'green',
+    title:'马德里市中心酒吧转让，执照齐全，有固定客源，设备完好',
+    price:'35,000', unit:'€转让',
+    tags:['执照齐全','固定客源','市中心'],
     time:'1天前'
   },
   {
@@ -1309,9 +1319,9 @@ const fallbackListings = [
 ];
 
 // ===== 分类图标映射 =====
-const catIcons = { '招工':'👷','租房':'🏡','生意':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚' };
-const catBadge = { '招工':'招聘','租房':'出租','生意':'转让','二手车':'出售','交友':'征友','二手物品':'出售','服务':'服务','教育':'招生' };
-const catMap   = { worker:'招工', house:'租房', business:'生意', car:'二手车', dating:'交友', goods:'二手物品', service:'服务', edu:'教育' };
+const catIcons = { '招工':'👷','租房':'🏡','生意':'🏪','批发市场':'🏪','百元店/百货':'💯','酒吧/Bar':'🍻','交友':'💕','二手物品/车':'📦','服务':'🛠','教育':'📚' };
+const catBadge = { '招工':'招聘','租房':'出租','生意':'转让','批发市场':'批发','百元店/百货':'百货','酒吧/Bar':'Bar','交友':'征友','二手物品/车':'出售','服务':'服务','教育':'招生' };
+const catMap   = { worker:'招工', house:'租房', business:'生意', wholesale:'批发市场', wholesale_100:'百元店/百货', wholesale_bar:'酒吧/Bar', dating:'交友', goods:'二手物品/车', service:'服务', edu:'教育' };
 
 let currentCat = 'all';
 let currentCity = '全部';
@@ -1409,8 +1419,8 @@ function filterCat(cat, el) {
   if(el) el.classList.add('active');
   const titles = {
     all:'最新信息', worker:'招工求职', house:'租房买房',
-    business:'生意转让', car:'二手车', dating:'交友相亲',
-    goods:'二手物品', service:'生活服务', edu:'教育培训'
+    business:'生意转让', wholesale:'批发市场', wholesale_100:'百元店/百货', wholesale_bar:'酒吧/Bar',
+    dating:'交友相亲', goods:'二手物品/车', service:'生活服务', edu:'教育培训'
   };
   document.getElementById('listingTitle').textContent = titles[cat] || '最新信息';
   loadListings();
@@ -1445,7 +1455,7 @@ async function viewListing(id) {
       return;
     }
 
-    const catIcons = {'招工':'👷','租房':'🏡','生意':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚'};
+    const catIcons = {'招工':'👷','租房':'🏡','生意':'🏪','批发市场':'🏪','百元店/百货':'💯','酒吧/Bar':'🍻','交友':'💕','二手物品/车':'📦','服务':'🛠','教育':'📚'};
     const icon = catIcons[data.category] || '📋';
     const timeStr = new Date(data.created_at).toLocaleString('zh-CN');
 
