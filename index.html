@@ -786,7 +786,7 @@
     <div>
       <a href="#" onclick="openModal('login')">登录</a>
       <a href="#" onclick="openModal('register')">注册</a>
-      <a href="#">我的信息</a>
+      <a href="#" onclick="openModal('profile');return false;" id="myInfoLink">我的信息</a>
       <a href="#">帮助中心</a>
     </div>
   </div>
@@ -1054,6 +1054,7 @@
       <input type="password" id="loginPassword" placeholder="请输入密码">
     </div>
     <button id="loginBtn" class="btn-post" style="width:100%;padding:12px;font-size:16px;border-radius:8px;margin-top:8px" onclick="submitLogin()">登录</button>
+    <p style="text-align:center;margin-top:8px;font-size:13px"><a href="#" style="color:var(--ink-light)" onclick="openModal('forgot');closeModal('login');return false;">忘记密码？</a></p>
     <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--ink-light)">还没有账号？<a href="#" style="color:var(--red)" onclick="closeModal('login');openModal('register');return false;">立即注册</a></p>
   </div>
 </div>
@@ -1100,6 +1101,14 @@
   <div class="modal relative">
     <button class="modal-close" onclick="closeModal('post')">✕</button>
     <h3>📢 免费发布信息</h3>
+    <div id="postModeBar" style="display:flex;gap:8px;margin-bottom:14px;background:#f9f0e0;border-radius:8px;padding:4px">
+      <button onclick="setPostMode('member')" id="postModeBtn_member" style="flex:1;padding:7px;border:none;border-radius:6px;font-size:13px;cursor:pointer;background:var(--red);color:white;font-weight:600">🔑 已登录发布</button>
+      <button onclick="setPostMode('guest')" id="postModeBtn_guest" style="flex:1;padding:7px;border:none;border-radius:6px;font-size:13px;cursor:pointer;background:transparent;color:var(--ink-mid)">👤 游客快速发布</button>
+    </div>
+    <div id="guestNameGroup" class="form-group" style="display:none">
+      <label>您的昵称 *</label>
+      <input type="text" id="guestNickname" placeholder="如：阿华 / 小李">
+    </div>
     <div class="form-group">
       <label>信息类别</label>
       <select id="postCat" onchange="updatePostForm()">
@@ -1146,6 +1155,35 @@
     </div>
     <button id="postBtn" class="btn-post" style="width:100%;padding:12px;font-size:16px;border-radius:8px;margin-top:8px" onclick="submitPost()">🚀 立即发布（免费）</button>
     <p style="text-align:center;margin-top:10px;font-size:12px;color:var(--ink-light)">发布即表示同意 <a href="#" style="color:var(--red)">用户协议</a> 及 <a href="#" style="color:var(--red)">隐私政策</a></p>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal relative" style="max-width:480px">
+    <button class="modal-close" onclick="closeModal('profile')">✕</button>
+    <h3>👤 我的信息</h3>
+    <div id="profileContent" style="padding:8px 0">
+      <div style="text-align:center;color:#999;padding:20px">请先登录查看个人信息</div>
+    </div>
+    <div id="profileLoggedOut" style="margin-top:12px">
+      <button class="btn-post" style="width:100%;padding:10px;border-radius:8px" onclick="closeModal('profile');openModal('login')">立即登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal relative" style="max-width:400px">
+    <button class="modal-close" onclick="closeModal('forgot')">✕</button>
+    <h3>🔑 重置密码</h3>
+    <p style="font-size:13px;color:var(--ink-light);margin-bottom:16px">输入您注册时的邮箱，我们将发送重置密码链接。</p>
+    <div class="form-group">
+      <label>邮箱</label>
+      <input type="email" id="forgotEmail" placeholder="your@email.com">
+    </div>
+    <button id="forgotBtn" class="btn-post" style="width:100%;padding:12px;font-size:15px;border-radius:8px;margin-top:8px" onclick="submitForgot()">📧 发送重置邮件</button>
+    <p style="text-align:center;margin-top:12px;font-size:13px"><a href="#" style="color:var(--ink-light)" onclick="closeModal('forgot');openModal('login');return false;">← 返回登录</a></p>
   </div>
 </div>
 
@@ -1495,6 +1533,11 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
 function openModal(name) {
   document.getElementById(name+'Modal').classList.add('open');
   document.body.style.overflow = 'hidden';
+  if (name === 'profile') refreshProfile();
+  if (name === 'post') {
+    if (currentUser) setPostMode('member');
+    else setPostMode('guest');
+  }
 }
 function closeModal(name) {
   document.getElementById(name+'Modal').classList.remove('open');
@@ -1546,7 +1589,11 @@ async function submitLogin() {
 
 // ===== 发布信息 =====
 async function submitPost() {
-  if(!currentUser) { closeModal('post'); openModal('login'); showToast('⚠️ 请先登录再发布', true); return; }
+  // 游客模式路由
+  if (postMode === 'guest' || !currentUser) {
+    if (postMode !== 'guest') setPostMode('guest');
+    return submitGuestPost();
+  }
   const cat   = document.getElementById('postCat').value;
   const title = document.getElementById('postTitle').value.trim();
   const desc  = document.getElementById('postDesc')?.value.trim();
@@ -1570,6 +1617,120 @@ async function submitPost() {
   if(error) { showToast('发布失败：' + error.message, true); return; }
   closeModal('post');
   showToast('🎉 发布成功！您的信息将在管理员审核后上线');
+}
+
+// ===== 游客/会员发布模式 =====
+let postMode = 'auto'; // 'member' | 'guest' | 'auto'
+
+function setPostMode(mode) {
+  postMode = mode;
+  const mBar = document.getElementById('postModeBar');
+  if (!mBar) return;
+  document.getElementById('postModeBtn_member').style.background = mode === 'member' ? 'var(--red)' : 'transparent';
+  document.getElementById('postModeBtn_member').style.color = mode === 'member' ? 'white' : 'var(--ink-mid)';
+  document.getElementById('postModeBtn_guest').style.background = mode === 'guest' ? 'var(--red)' : 'transparent';
+  document.getElementById('postModeBtn_guest').style.color = mode === 'guest' ? 'white' : 'var(--ink-mid)';
+  document.getElementById('guestNameGroup').style.display = mode === 'guest' ? 'block' : 'none';
+}
+
+// ===== 我的信息 =====
+function refreshProfile() {
+  const box = document.getElementById('profileContent');
+  const loggedOutBox = document.getElementById('profileLoggedOut');
+  if (!box) return;
+  if (!currentUser) {
+    box.innerHTML = '<div style="text-align:center;color:#999;padding:20px">请先登录查看个人信息</div>';
+    if (loggedOutBox) loggedOutBox.style.display = 'block';
+    return;
+  }
+  if (loggedOutBox) loggedOutBox.style.display = 'none';
+  const meta = currentUser.user_metadata || {};
+  const nickname = meta.nickname || '未设置';
+  const city     = meta.city     || '未设置';
+  const phone    = meta.phone    || '未填写';
+  const email    = currentUser.email || '—';
+  const created  = currentUser.created_at ? new Date(currentUser.created_at).toLocaleDateString('zh-CN') : '—';
+  box.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid #f0e8d8">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🧑</div>
+        <div>
+          <div style="font-size:18px;font-weight:700;color:var(--ink)">${nickname}</div>
+          <div style="font-size:12px;color:var(--ink-light);margin-top:3px">📍 ${city}</div>
+        </div>
+      </div>
+      <div style="display:grid;gap:10px">
+        <div style="display:flex;justify-content:space-between;padding:10px 12px;background:#fdf6ec;border-radius:8px">
+          <span style="font-size:13px;color:var(--ink-light)">📧 邮箱</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">${email}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 12px;background:#fdf6ec;border-radius:8px">
+          <span style="font-size:13px;color:var(--ink-light)">📱 手机</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">${phone}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 12px;background:#fdf6ec;border-radius:8px">
+          <span style="font-size:13px;color:var(--ink-light)">🏙️ 城市</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">${city}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 12px;background:#fdf6ec;border-radius:8px">
+          <span style="font-size:13px;color:var(--ink-light)">📅 注册时间</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink)">${created}</span>
+        </div>
+      </div>
+      <button onclick="doLogout()" style="margin-top:4px;width:100%;padding:10px;border:1.5px solid #e0c9a6;border-radius:8px;background:white;color:var(--ink-mid);font-size:14px;cursor:pointer">🚪 退出登录</button>
+    </div>
+  `;
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  currentUser = null;
+  closeModal('profile');
+  document.querySelectorAll('.header-actions .btn-outline').forEach(b => b.style.display='');
+  showToast('👋 已退出登录');
+}
+
+// ===== 忘记密码 =====
+async function submitForgot() {
+  const email = document.getElementById('forgotEmail')?.value.trim();
+  if (!email) { showToast('⚠️ 请输入邮箱', true); return; }
+  const btn = document.getElementById('forgotBtn');
+  btn.textContent = '发送中…'; btn.disabled = true;
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.href
+  });
+  btn.textContent = '📧 发送重置邮件'; btn.disabled = false;
+  if (error) { showToast('发送失败：' + error.message, true); return; }
+  closeModal('forgot');
+  showToast('📧 重置邮件已发送，请查收邮箱！');
+}
+
+// ===== 游客发布 =====
+async function submitGuestPost() {
+  const cat     = document.getElementById('postCat').value;
+  const title   = document.getElementById('postTitle').value.trim();
+  const desc    = document.getElementById('postDesc')?.value.trim();
+  const city    = document.getElementById('postCity')?.value;
+  const price   = document.getElementById('postPrice')?.value.trim();
+  const contact = document.getElementById('postContact')?.value.trim();
+  const nickname = document.getElementById('guestNickname')?.value.trim();
+  if (!cat)      { showToast('⚠️ 请选择信息类别', true); return; }
+  if (!title)    { showToast('⚠️ 请填写标题', true); return; }
+  if (!contact)  { showToast('⚠️ 请填写联系方式', true); return; }
+  const catZh = catMap[cat] || cat;
+  const btn = document.getElementById('postBtn');
+  if (btn) { btn.textContent = '发布中…'; btn.disabled = true; }
+  const { error } = await sb.from('listings').insert([{
+    title, description: desc || title,
+    category: catZh, city: city || '巴塞罗那',
+    price: price || '面议', contact,
+    status: 'guest_pending',
+    user_id: null
+  }]);
+  if (btn) { btn.textContent = '🚀 立即发布（免费）'; btn.disabled = false; }
+  if (error) { showToast('发布失败：' + error.message, true); return; }
+  closeModal('post');
+  showToast('🎉 发布成功！信息将在审核后上线');
 }
 
 // ===== Toast =====
