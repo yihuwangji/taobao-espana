@@ -1339,8 +1339,14 @@ async function loadListings() {
       .limit(40);
 
     if (currentCat !== 'all') {
-      const cat = catMap[currentCat];
-      if(cat) query = query.eq('category', cat);
+      // 批发市场大分类：包含所有子分类
+      if (currentCat === 'wholesale') {
+        const wholesaleCats = [catMap['wholesale'], catMap['wholesale_100'], catMap['wholesale_bar']].filter(Boolean);
+        query = query.in('category', wholesaleCats);
+      } else {
+        const cat = catMap[currentCat];
+        if(cat) query = query.eq('category', cat);
+      }
     }
     if (currentCity !== '全部') query = query.eq('city', currentCity);
 
@@ -1384,7 +1390,13 @@ function timeAgo(ts) {
 function renderListings() {
   const grid = document.getElementById('listingsGrid');
   let filtered = allListings;
-  if(currentCat !== 'all') filtered = filtered.filter(l => l.cat === currentCat);
+  if(currentCat !== 'all') {
+    if (currentCat === 'wholesale') {
+      filtered = filtered.filter(l => l.cat === 'wholesale' || l.cat === 'wholesale_100' || l.cat === 'wholesale_bar');
+    } else {
+      filtered = filtered.filter(l => l.cat === currentCat);
+    }
+  }
   if(currentCity !== '全部') filtered = filtered.filter(l => l.city === currentCity);
 
   if(filtered.length === 0) {
