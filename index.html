@@ -1704,6 +1704,45 @@ function refreshProfile() {
   `;
 }
 
+// ===== 举报违规 =====
+async function submitReport() {
+  const title = document.getElementById('reportTitle')?.value.trim();
+  const type = document.getElementById('reportType')?.value;
+  const desc = document.getElementById('reportDesc')?.value.trim();
+  const contact = document.getElementById('reportContact')?.value.trim();
+
+  if (!title) { showToast('⚠️ 请填写违规内容标题或链接', true); return; }
+  if (!type) { showToast('⚠️ 请选择举报类型', true); return; }
+  if (!desc) { showToast('⚠️ 请填写详细说明', true); return; }
+
+  const btn = document.getElementById('reportBtn');
+  if (btn) { btn.textContent = '提交中…'; btn.disabled = true; }
+
+  const { error } = await sb.from('reports').insert([{
+    title,
+    type,
+    description: desc,
+    contact: contact || null,
+    status: 'pending',
+    created_at: new Date().toISOString()
+  }]);
+
+  if (btn) { btn.textContent = '🚨 提交举报'; btn.disabled = false; }
+
+  if (error) {
+    showToast('提交失败：' + error.message, true);
+    return;
+  }
+
+  document.getElementById('reportTitle').value = '';
+  document.getElementById('reportType').value = '';
+  document.getElementById('reportDesc').value = '';
+  document.getElementById('reportContact').value = '';
+
+  closeModal('reportViolation');
+  showToast('✅ 举报已提交！我们将在24小时内处理，感谢您的反馈。');
+}
+
 async function doLogout() {
   await sb.auth.signOut();
   currentUser = null;
@@ -1860,30 +1899,39 @@ loadListings();
 
 <!-- ===== 举报违规信息 MODAL ===== -->
 <div class="modal-overlay" id="reportViolationModal">
-  <div class="modal relative" style="max-width:480px">
+  <div class="modal relative" style="max-width:500px">
     <button class="modal-close" onclick="closeModal('reportViolation')">✕</button>
-    <h3 style="font-size:20px;font-weight:700;color:var(--red);margin-bottom:16px">🚨 举报违规信息</h3>
-    <div style="line-height:1.8;color:#333;font-size:14px">
-      <p style="margin-bottom:16px">如果您发现平台上存在以下违规内容，请立即向我们举报，我们将在24小时内处理：</p>
-      <div style="background:#fef3f2;border-radius:10px;padding:14px;margin-bottom:14px">
-        <div style="font-weight:700;color:#c0392b;margin-bottom:8px">🚫 违规类型包括：</div>
-        <ul style="padding-left:18px;margin:0;color:#555">
-          <li style="margin-bottom:4px">虚假招聘、诈骗信息</li>
-          <li style="margin-bottom:4px">色情、违法或暴力内容</li>
-          <li style="margin-bottom:4px">垃圾广告、重复发布</li>
-          <li style="margin-bottom:4px">侵犯他人隐私或个人信息</li>
-          <li style="margin-bottom:4px">其他违反法律法规的内容</li>
-        </ul>
+    <h3 style="font-size:20px;font-weight:700;color:var(--red);margin-bottom:4px">🚨 举报违规信息</h3>
+    <p style="font-size:13px;color:#999;margin-bottom:16px">发现违规内容？请填写以下信息，我们将在24小时内处理。</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:4px">📌 违规内容标题或链接 <span style="color:var(--red)">*</span></label>
+        <input id="reportTitle" type="text" placeholder="请填写被举报信息的标题或页面链接" style="width:100%;padding:10px 12px;border:1.5px solid #e0c9a6;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit">
       </div>
-      <div style="background:#fdf6ec;border-radius:10px;padding:14px;margin-bottom:14px">
-        <div style="font-weight:700;margin-bottom:8px">📬 举报方式：</div>
-        <div style="color:#555">
-          <p style="margin-bottom:6px"><strong>微信举报：</strong>espana_life（标注"举报"）</p>
-          <p style="margin-bottom:6px"><strong>邮件举报：</strong>report@espana-life.com</p>
-          <p style="margin-bottom:0">请附上违规信息的标题或链接，以便我们快速定位处理</p>
-        </div>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:4px">🚫 举报类型 <span style="color:var(--red)">*</span></label>
+        <select id="reportType" style="width:100%;padding:10px 12px;border:1.5px solid #e0c9a6;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit;background:#fff">
+          <option value="">— 请选择举报类型 —</option>
+          <option value="虚假招聘/诈骗">虚假招聘 / 诈骗信息</option>
+          <option value="色情/违法内容">色情 / 违法内容</option>
+          <option value="垃圾广告/重复发布">垃圾广告 / 重复发布</option>
+          <option value="侵犯隐私/个人信息">侵犯隐私 / 个人信息</option>
+          <option value="价格欺诈">价格欺诈</option>
+          <option value="其他违规">其他违规</option>
+        </select>
       </div>
-      <p style="font-size:12px;color:#999;text-align:center">我们承诺保护举报人隐私，感谢您维护平台健康环境！</p>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:4px">📝 详细说明 <span style="color:var(--red)">*</span></label>
+        <textarea id="reportDesc" placeholder="请详细描述违规情况，越详细越有助于我们快速处理..." rows="4" style="width:100%;padding:10px 12px;border:1.5px solid #e0c9a6;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit;resize:vertical"></textarea>
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:4px">📱 您的联系方式（选填）</label>
+        <input id="reportContact" type="text" placeholder="微信 / 手机 / 邮箱，方便我们回复处理结果" style="width:100%;padding:10px 12px;border:1.5px solid #e0c9a6;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit">
+      </div>
+      <button id="reportBtn" onclick="submitReport()" style="width:100%;padding:13px;background:var(--red);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px">
+        🚨 提交举报
+      </button>
+      <p style="font-size:11px;color:#999;text-align:center;margin-top:-4px">我们承诺保护举报人隐私，感谢您维护平台健康环境！</p>
     </div>
   </div>
 </div>
