@@ -787,7 +787,7 @@
       <a href="#" onclick="openModal('login')">登录</a>
       <a href="#" onclick="openModal('register')">注册</a>
       <a href="#" onclick="openModal('profile');return false;" id="myInfoLink">我的信息</a>
-      <a href="#">帮助中心</a>
+      <a href="#" onclick="openModal('helpCenter'); return false;">帮助中心</a>
     </div>
   </div>
   <div class="header-main">
@@ -1995,6 +1995,72 @@ loadListings();
       <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">七、政策更新</h4>
       <p style="margin-bottom:12px">本隐私政策可能定期更新，重大变更将通过平台通知告知用户。继续使用本平台即视为接受更新后的隐私政策。</p>
       <p style="font-size:12px;color:#999;text-align:center;padding-top:12px;border-top:1px solid #f0f0f0">如有疑问，请联系 contact@espana-life.com</p>
+    </div>
+  </div>
+</div>
+
+<!-- Help Center Modal -->
+<div class="modal-overlay" id="helpCenterModal">
+  <div class="modal relative" style="max-width:600px;">
+    <button class="modal-close" onclick="closeModal('helpCenter')">&#x2715;</button>
+    <h3>&#x1F198; 帮助中心</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
+      <button id="hc-howToPost" style="padding:16px;border:2px solid #e8e0d6;border-radius:12px;background:#fdf8f3;cursor:pointer;text-align:left;transition:all 0.2s;" onmouseover="this.style.borderColor='#c0392b';this.style.background='#fef5f5'" onmouseout="this.style.borderColor='#e8e0d6';this.style.background='#fdf8f3'" onclick="closeModal('helpCenter');setTimeout(function(){openModal('howToPost');},350);">
+        <div style="font-size:24px;margin-bottom:6px;">&#x1F4E2;</div>
+        <div style="font-weight:600;color:#2d1f0e;font-size:15px;">如何发布信息</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">快速发布指南</div>
+      </button>
+      <button id="hc-contactUs" style="padding:16px;border:2px solid #e8e0d6;border-radius:12px;background:#fdf8f3;cursor:pointer;text-align:left;transition:all 0.2s;" onmouseover="this.style.borderColor='#c0392b';this.style.background='#fef5f5'" onmouseout="this.style.borderColor='#e8e0d6';this.style.background='#fdf8f3'" onclick="closeModal('helpCenter');setTimeout(function(){openModal('contactUs');},350);">
+        <div style="font-size:24px;margin-bottom:6px;">&#x1F4DE;</div>
+        <div style="font-weight:600;color:#2d1f0e;font-size:15px;">联系我们</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">客服 &amp; 意见反馈</div>
+      </button>
+      <button id="hc-reportViolation" style="padding:16px;border:2px solid #e8e0d6;border-radius:12px;background:#fdf8f3;cursor:pointer;text-align:left;transition:all 0.2s;" onmouseover="this.style.borderColor='#c0392b';this.style.background='#fef5f5'" onmouseout="this.style.borderColor='#e8e0d6';this.style.background='#fdf8f3'" onclick="closeModal('helpCenter');setTimeout(function(){openModal('reportViolation');},350);">
+        <div style="font-size:24px;margin-bottom:6px;">&#x1F6A8;</div>
+        <div style="font-weight:600;color:#2d1f0e;font-size:15px;">举报违规信息</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">维护平台健康</div>
+      </button>
+      <button id="hc-userAgreement" style="padding:16px;border:2px solid #e8e0d6;border-radius:12px;background:#fdf8f3;cursor:pointer;text-align:left;transition:all 0.2s;" onmouseover="this.style.borderColor='#c0392b';this.style.background='#fef5f5'" onmouseout="this.style.borderColor='#e8e0d6';this.style.background='#fdf8f3'" onclick="closeModal('helpCenter');setTimeout(function(){openModal('userAgreement');},350);">
+        <div style="font-size:24px;margin-bottom:6px;">&#x1F4CB;</div>
+        <div style="font-weight:600;color:#2d1f0e;font-size:15px;">用户协议</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">使用条款</div>
+      </button>
+    </div>
+    <div style="border-top:2px solid #f0ebe3;padding-top:20px;margin-bottom:20px;">
+      <h4 style="font-size:16px;color:#2d1f0e;margin-bottom:16px;font-weight:700;">&#x2753; 常见问题</h4>
+      <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
+        <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F193; 发布信息需要收费吗？</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">完全免费！西班牙生活通坚持免费发布政策，注册用户和游客均可免费发布招工、租房、生意转让等各类信息。</div>
+      </div>
+      <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
+        <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x23F1; 发布后多久能上线？</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">信息提交后将经过人工审核，通常在 <strong>2-4 小时</strong>内审核完成上线。工作日审核更快，节假日可能稍有延迟。</div>
+      </div>
+      <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
+        <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F50D; 如何搜索我需要的信息？</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">可以使用顶部搜索框输入关键词（如“招厨师”、“巴塞罗那租房”），也可通过分类导航或城市筛选快速找到目标信息。</div>
+      </div>
+      <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
+        <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x270F;&#xFE0F; 发布后可以修改信息吗？</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">注册用户可在“我的信息”中管理和修改已发布的内容。游客发布的信息如需修改，请联系客服协助处理。</div>
+      </div>
+      <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
+        <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F6E1; 遇到诈骗信息怎么办？</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">发现违规或诈骗信息，请立即点击“举报违规信息”进行举报，我们将在 24 小时内处理。同时请提高警惕，不要向陆生人转账。</div>
+      </div>
+      <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
+        <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F511; 忘记密码怎么找回？</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">点击登录页面的“忘记密码？”，输入注册邮筱后，系统将自动发送密码重置链接到您的邮筱，按照邮件指引完成重置即可。</div>
+      </div>
+      <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
+        <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F30D; 平台覆盖哪些城市？</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">目前覆盖西班牙 15+ 城市，包括巴塞罗那、马德里、瓦伦西亚、毕尔巴鄂、塔维利亚、萨拉戈萨等主要城市，并持续扩展中。</div>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,#8b1a1a 0%,#c0392b 100%);border-radius:12px;padding:16px;color:white;text-align:center;">
+      <div style="font-weight:700;margin-bottom:6px;">仍有疑问？联系客服</div>
+      <div style="font-size:13px;opacity:0.9;">&#x1F4F1; 客服微信：espana_life &nbsp;|&nbsp; &#x1F4E7; contact@espana-life.com</div>
+      <div style="font-size:12px;opacity:0.75;margin-top:4px;">工作时间：9:00-22:00（西班牙时间）</div>
     </div>
   </div>
 </div>
