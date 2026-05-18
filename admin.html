@@ -1089,11 +1089,11 @@ tr:hover td { background: rgba(255,255,255,0.02); }
             <h4>🗄️ Supabase 配置</h4>
             <div class="config-row">
               <label>Project URL</label>
-              <input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co" value="">
+              <input type="text" id="sbUrl" readonly value="">
             </div>
             <div class="config-row">
-              <label>Anon Key</label>
-              <input type="password" id="sbKey" placeholder="eyJh…">
+              <label>连接权限</label>
+              <input type="text" id="sbKeyStatus" readonly value="公开客户端密钥 + 管理员账号权限">
             </div>
           </div>
           <div class="config-box">
@@ -1818,17 +1818,20 @@ function openPinModal() { openModal('pin'); }
 
 function saveSettings() {
   const url = document.getElementById('sbUrl').value;
-  const key = document.getElementById('sbKey').value;
   if(url) localStorage.setItem('sb_url', url);
-  if(key) localStorage.setItem('sb_key', key);
   showToast('💾 设置已保存', 'success');
 }
 
-function testConnection() {
+async function testConnection() {
   const url = document.getElementById('sbUrl').value;
   if(!url) { showToast('请先填写 Supabase URL', 'error'); return; }
   showToast('🔌 正在测试连接…', 'info');
-  setTimeout(() => showToast('✅ 连接成功！数据库正常', 'success'), 1500);
+  const { error } = await sb.from('profiles').select('id', { count:'exact', head:true });
+  if(error) {
+    showToast('连接失败：' + error.message, 'error');
+    return;
+  }
+  showToast('✅ 连接成功，管理员权限正常', 'success');
 }
 
 async function confirmLogout() {
@@ -1903,7 +1906,7 @@ function initDashboard() {
     dashboardInitialized = true;
   }
   document.getElementById('sbUrl').value = SUPABASE_URL;
-  document.getElementById('sbKey').value = '已使用公开 anon key，后台权限由登录账号控制';
+  document.getElementById('sbKeyStatus').value = '公开客户端密钥 + 管理员账号权限';
   loadRealStats();
   loadRealListings();
   loadRealReview();
