@@ -1190,7 +1190,7 @@ async function sbLog(action, type, id, note='') {
 // ═══════════ LOAD REAL DATA ═══════════
 async function loadRealListings() {
   const { data } = await sb.from('listings')
-    .select('id, title, category, city, status, created_at, profiles(nickname)')
+    .select('id, title, category, city, status, created_at, user_id, profiles(nickname)')
     .order('created_at', { ascending: false })
     .limit(50);
   if(data && data.length > 0) {
@@ -1198,7 +1198,7 @@ async function loadRealListings() {
     data.forEach(r => allListings.push({
       id: 'L'+r.id, _id: r.id,
       title: r.title, cat: r.category,
-      city: r.city, user: r.profiles?.nickname || '未知',
+      city: r.city, user: r.profiles?.nickname || (r.user_id ? '未知用户' : '游客发布'),
       status: { pending:'待审核', approved:'已上线', rejected:'已下架', offline:'已下架' }[r.status] || r.status,
       time: new Date(r.created_at).toLocaleString('zh-CN')
     }));
@@ -1208,7 +1208,7 @@ async function loadRealListings() {
 
 async function loadRealReview() {
   const { data } = await sb.from('listings')
-    .select('id, title, category, city, description, contact, created_at, profiles(nickname, phone)')
+    .select('id, title, category, city, description, contact, created_at, user_id, profiles(nickname, phone)')
     .eq('status', 'pending')
     .order('created_at', { ascending: true });
   if(data) {
@@ -1216,7 +1216,7 @@ async function loadRealReview() {
     data.forEach(r => reviewItems.push({
       id: 'R'+r.id, _id: r.id,
       title: r.title, cat: r.category,
-      city: r.city, user: r.profiles?.nickname || '未知',
+      city: r.city, user: r.profiles?.nickname || (r.user_id ? '未知用户' : '游客发布'),
       contact: r.contact || r.profiles?.phone || '—',
       time: new Date(r.created_at).toLocaleString('zh-CN'),
       desc: r.description || ''
@@ -1228,16 +1228,16 @@ async function loadRealReview() {
 
 async function loadRealReports() {
   const { data } = await sb.from('reports')
-    .select('id, reason, status, created_at, listings(title), profiles(nickname)')
+    .select('id, title, type, description, contact, reason, detail, status, created_at, listings(title), profiles(nickname)')
     .order('created_at', { ascending: false })
     .limit(30);
   if(data) {
     reportItems.length = 0;
     data.forEach(r => reportItems.push({
       id: '#'+r.id, _id: r.id,
-      listing: r.listings?.title || '已删除',
-      reason: r.reason,
-      reporter: r.profiles?.nickname || '匿名',
+      listing: r.title || r.listings?.title || '未关联具体信息',
+      reason: r.type || r.reason || r.description || r.detail || '未填写',
+      reporter: r.profiles?.nickname || r.contact || '匿名',
       status: { pending:'未处理', processing:'处理中', resolved:'已处理', dismissed:'已驳回' }[r.status] || r.status,
       time: new Date(r.created_at).toLocaleString('zh-CN')
     }));

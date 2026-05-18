@@ -1195,16 +1195,16 @@
       <label>信息类别</label>
       <select id="postCat" onchange="updatePostForm()">
         <option value="">— 请选择类别 —</option>
-        <option value="worker">👷 招工求职</option>
-        <option value="house">🏡 租房买房</option>
-        <option value="business">🏪 生意转让</option>
-        <option value="wholesale">🏪 批发市场</option>
-        <option value="wholesale_100">💯 百元店/百货</option>
-        <option value="wholesale_bar">🍻 酒吧/Bar</option>
-        <option value="dating">💕 交友相亲</option>
-        <option value="goods">📦 二手物品/车</option>
-        <option value="service">🛠 生活服务</option>
-        <option value="edu">📚 教育培训</option>
+        <option value="招工">👷 招工求职</option>
+        <option value="租房">🏡 租房买房</option>
+        <option value="生意">🏪 生意转让</option>
+        <option value="生意">🏪 批发市场</option>
+        <option value="生意">💯 百元店/百货</option>
+        <option value="生意">🍻 酒吧/Bar</option>
+        <option value="交友">💕 交友相亲</option>
+        <option value="二手物品">📦 二手物品/车</option>
+        <option value="服务">🛠 生活服务</option>
+        <option value="教育">📚 教育培训</option>
       </select>
     </div>
     <div class="form-group">
@@ -1247,7 +1247,7 @@
   <div class="modal relative" style="max-width:480px">
     <button class="modal-close" onclick="closeModal('profile')">✕</button>
     <h3>👤 我的信息</h3>
-    <div id="profileContent" style="padding:8px 0;display:none;"><div id="profileHeader" style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #eee;"><div id="profileAvatar" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#e09518,#f5c842);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-weight:bold;flex-shrink:0;">👤</div><div><div id="profileName" style="font-size:18px;font-weight:bold;color:#333;">用户</div><div id="profileCity" style="font-size:12px;color:#888;">📍 --</div></div><div style="display:flex;gap:18px;margin-left:auto;text-align:center;"><div><div id="statPostCount" style="font-size:20px;font-weight:bold;color:#e09518;">0</div><div style="font-size:11px;color:#888;">我的发布</div></div><div><div id="statViewCount" style="font-size:20px;font-weight:bold;color:#e09518;">0</div><div style="font-size:11px;color:#888;">总浏览量</div></div></div></div><div id="vipStatusBar" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#fffbe6,#fff3cd);border:1.5px solid #f5c842;border-radius:12px;padding:12px 16px;margin-bottom:16px;"><div style="font-size:28px;">💎</div><div style="flex:1;"><div id="vipStatusTitle" style="font-weight:bold;font-size:15px;color:#c0830a;">普通用户</div><div id="vipStatusSub" style="font-size:12px;color:#888;margin-top:2px;">升级VIP，享置顶展示和更多特权</div></div><div><span id="vipBadge" style="background:#eee;color:#888;font-size:11px;font-weight:bold;padding:3px 10px;border-radius:20px;">FREE</span><br><button id="vipUpgradeBtn" onclick="openVipUpgrade()" style="margin-top:8px;padding:6px 14px;font-size:12px;font-weight:bold;background:linear-gradient(135deg,#c0830a,#e09518);color:#fff;border:none;border-radius:8px;cursor:pointer;">升级VIP</button></div></div><div style="display:flex;border-bottom:2px solid #eee;margin-bottom:16px;" id="profileTabBar"><button onclick="switchProfileTab('listings',this)" style="padding:8px 18px;font-size:13px;cursor:pointer;border:none;background:none;color:#e09518;font-weight:500;border-bottom:2px solid #e09518;margin-bottom:-2px;">📋 我的信息</button><button onclick="switchProfileTab('account',this)" style="padding:8px 18px;font-size:13px;cursor:pointer;border:none;background:none;color:#888;font-weight:500;">⚙️ 账户设置</button></div><div id="myListingsPanel"><div style="text-align:center;padding:30px;color:#aaa;">⏳ 加载中…</div></div><div id="editListingPanel" style="display:none;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><button onclick="cancelEdit()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#888;">←</button><strong>编辑信息</strong></div><select id="editCat" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:10px;"><option value="worker">招工求职</option><option value="house">租房买房</option><option value="business">生意转让</option><option value="wholesale">批发市场</option><option value="dating">交友相亲</option><option value="goods">二手物品</option><option value="service">生活服务</option><option value="edu">教育培训</option></select><input id="editTitle" type="text" placeholder="标题 *" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:10px;"><textarea id="editDesc" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;height:80px;margin-bottom:10px;"></textarea><div style="display:flex;gap:10px;margin-bottom:10px;"><select id="editCity" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;"><option>巴塞罗那</option><option>马德里</option><option>瓦伦西亚</option><option>毕尔巴鄂</option><option>塞维利亚</option><option>萨拉戈萨</option><option>其他</option></select><input id="editPrice" type="text" placeholder="价格" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;"></div><input id="editContact" type="text" placeholder="联系方式 *" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;"><input type="hidden" id="editListingId"><div style="display:flex;gap:10px;"><button onclick="cancelEdit()" style="flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;background:#eee;">取消</button><button id="editSaveBtn" onclick="saveEdit()" style="flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;background:#e09518;color:#fff;font-weight:bold;">💾 保存</button></div></div><div id="accountPanel" style="display:none;"><input id="accNickname" type="text" placeholder="昵称" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;"><input id="accPhone" type="text" placeholder="手机" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;"><select id="accCity" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;"><option>巴塞罗那</option><option>马德里</option><option>瓦伦西亚</option><option>毕尔巴鄂</option><option>塞维利亚</option><option>萨拉戈萨</option><option>其他</option></select><input id="accEmail" type="email" disabled style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;background:#f5f5f5;color:#999;"><button id="saveAccountBtn" onclick="saveAccount()" style="width:100%;padding:10px;background:#e09518;color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-bottom:10px;">✅ 保存设置</button><button onclick="doLogout()" style="width:100%;padding:9px;background:#fff;color:#c62828;border:1.5px solid #c62828;border-radius:8px;font-weight:bold;cursor:pointer;">🚪 退出登录</button></div></div>
+    <div id="profileContent" style="padding:8px 0;display:none;"><div id="profileHeader" style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #eee;"><div id="profileAvatar" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#e09518,#f5c842);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-weight:bold;flex-shrink:0;">👤</div><div><div id="profileName" style="font-size:18px;font-weight:bold;color:#333;">用户</div><div id="profileCity" style="font-size:12px;color:#888;">📍 --</div></div><div style="display:flex;gap:18px;margin-left:auto;text-align:center;"><div><div id="statPostCount" style="font-size:20px;font-weight:bold;color:#e09518;">0</div><div style="font-size:11px;color:#888;">我的发布</div></div><div><div id="statViewCount" style="font-size:20px;font-weight:bold;color:#e09518;">0</div><div style="font-size:11px;color:#888;">总浏览量</div></div></div></div><div id="vipStatusBar" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#fffbe6,#fff3cd);border:1.5px solid #f5c842;border-radius:12px;padding:12px 16px;margin-bottom:16px;"><div style="font-size:28px;">💎</div><div style="flex:1;"><div id="vipStatusTitle" style="font-weight:bold;font-size:15px;color:#c0830a;">普通用户</div><div id="vipStatusSub" style="font-size:12px;color:#888;margin-top:2px;">升级VIP，享置顶展示和更多特权</div></div><div><span id="vipBadge" style="background:#eee;color:#888;font-size:11px;font-weight:bold;padding:3px 10px;border-radius:20px;">FREE</span><br><button id="vipUpgradeBtn" onclick="openVipUpgrade()" style="margin-top:8px;padding:6px 14px;font-size:12px;font-weight:bold;background:linear-gradient(135deg,#c0830a,#e09518);color:#fff;border:none;border-radius:8px;cursor:pointer;">升级VIP</button></div></div><div style="display:flex;border-bottom:2px solid #eee;margin-bottom:16px;" id="profileTabBar"><button onclick="switchProfileTab('listings',this)" style="padding:8px 18px;font-size:13px;cursor:pointer;border:none;background:none;color:#e09518;font-weight:500;border-bottom:2px solid #e09518;margin-bottom:-2px;">📋 我的信息</button><button onclick="switchProfileTab('account',this)" style="padding:8px 18px;font-size:13px;cursor:pointer;border:none;background:none;color:#888;font-weight:500;">⚙️ 账户设置</button></div><div id="myListingsPanel"><div style="text-align:center;padding:30px;color:#aaa;">⏳ 加载中…</div></div><div id="editListingPanel" style="display:none;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><button onclick="cancelEdit()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#888;">←</button><strong>编辑信息</strong></div><select id="editCat" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:10px;"><option value="招工">招工求职</option><option value="租房">租房买房</option><option value="生意">生意转让</option><option value="生意">批发市场</option><option value="交友">交友相亲</option><option value="二手物品">二手物品</option><option value="服务">生活服务</option><option value="教育">教育培训</option></select><input id="editTitle" type="text" placeholder="标题 *" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:10px;"><textarea id="editDesc" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;height:80px;margin-bottom:10px;"></textarea><div style="display:flex;gap:10px;margin-bottom:10px;"><select id="editCity" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;"><option>巴塞罗那</option><option>马德里</option><option>瓦伦西亚</option><option>毕尔巴鄂</option><option>塞维利亚</option><option>萨拉戈萨</option><option>其他</option></select><input id="editPrice" type="text" placeholder="价格" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;"></div><input id="editContact" type="text" placeholder="联系方式 *" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;"><input type="hidden" id="editListingId"><div style="display:flex;gap:10px;"><button onclick="cancelEdit()" style="flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;background:#eee;">取消</button><button id="editSaveBtn" onclick="saveEdit()" style="flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;background:#e09518;color:#fff;font-weight:bold;">💾 保存</button></div></div><div id="accountPanel" style="display:none;"><input id="accNickname" type="text" placeholder="昵称" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;"><input id="accPhone" type="text" placeholder="手机" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;"><select id="accCity" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;"><option>巴塞罗那</option><option>马德里</option><option>瓦伦西亚</option><option>毕尔巴鄂</option><option>塞维利亚</option><option>萨拉戈萨</option><option>其他</option></select><input id="accEmail" type="email" disabled style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:12px;background:#f5f5f5;color:#999;"><button id="saveAccountBtn" onclick="saveAccount()" style="width:100%;padding:10px;background:#e09518;color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-bottom:10px;">✅ 保存设置</button><button onclick="doLogout()" style="width:100%;padding:9px;background:#fff;color:#c62828;border:1.5px solid #c62828;border-radius:8px;font-weight:bold;cursor:pointer;">🚪 退出登录</button></div></div>
     </div>
     <div id="profileLoggedOut" style="margin-top:12px">
       <button class="btn-post" style="width:100%;padding:10px;border-radius:8px" onclick="closeModal('profile');openModal('login')">立即登录</button>
@@ -1400,9 +1400,10 @@ const fallbackListings = [
 ];
 
 // ===== 分类图标映射 =====
-const catIcons = { '招工':'👷','租房':'🏡','生意':'🏪','批发市场':'🏪','百元店/百货':'💯','酒吧/Bar':'🍻','交友':'💕','二手物品/车':'📦','服务':'🛠','教育':'📚' };
-const catBadge = { '招工':'招聘','租房':'出租','生意':'转让','批发市场':'批发','百元店/百货':'百货','酒吧/Bar':'Bar','交友':'征友','二手物品/车':'出售','服务':'服务','教育':'招生' };
-const catMap   = { worker:'招工', house:'租房', business:'生意', wholesale:'批发市场', wholesale_100:'百元店/百货', wholesale_bar:'酒吧/Bar', dating:'交友', goods:'二手物品/车', service:'服务', edu:'教育' };
+const catIcons = { '招工':'👷','租房':'🏡','生意':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚' };
+const catBadge = { '招工':'招聘','租房':'出租','生意':'转让','二手车':'车辆','交友':'征友','二手物品':'出售','服务':'服务','教育':'招生' };
+const catMap   = { worker:'招工', house:'租房', business:'生意', wholesale:'生意', wholesale_100:'生意', wholesale_bar:'生意', dating:'交友', goods:'二手物品', service:'服务', edu:'教育' };
+const uiCatMap = { '招工':'worker', '租房':'house', '生意':'business', '二手车':'goods', '交友':'dating', '二手物品':'goods', '服务':'service', '教育':'edu' };
 
 let currentCat = 'all';
 let currentCity = '全部';
@@ -1437,7 +1438,7 @@ async function loadListings() {
     if (data && data.length > 0) {
       allListings = data.map(r => ({
         id: r.id,
-        cat: Object.keys(catMap).find(k => catMap[k] === r.category) || 'goods',
+        cat: uiCatMap[r.category] || 'goods',
         city: r.city,
         icon: catIcons[r.category] || '📋',
         badge: catBadge[r.category] || '信息',
@@ -1558,7 +1559,7 @@ async function viewListing(id) {
       return;
     }
 
-    const catIcons = {'招工':'👷','租房':'🏡','生意':'🏪','批发市场':'🏪','百元店/百货':'💯','酒吧/Bar':'🍻','交友':'💕','二手物品/车':'📦','服务':'🛠','教育':'📚'};
+    const catIcons = {'招工':'👷','租房':'🏡','生意':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚'};
     const icon = catIcons[data.category] || '📋';
     const timeStr = new Date(data.created_at).toLocaleString('zh-CN');
     const safeCategory = escapeHTML(data.category);
@@ -1818,8 +1819,11 @@ async function submitReport() {
   const { error } = await sb.from('reports').insert([{
     title,
     type,
+    reason: type,
     description: desc,
+    detail: desc,
     contact: contact || null,
+    reporter_id: currentUser?.id || null,
     status: 'pending',
     created_at: new Date().toISOString()
   }]);
@@ -1882,7 +1886,7 @@ async function submitGuestPost() {
     title, description: desc || title,
     category: catZh, city: city || '巴塞罗那',
     price: price || '面议', contact,
-    status: 'guest_pending',
+    status: 'pending',
     user_id: null
   }]);
   if (btn) { btn.textContent = '🚀 立即发布（免费）'; btn.disabled = false; }
