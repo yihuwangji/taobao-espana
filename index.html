@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>西班牙生活通 - 西班牙华人生活服务平台</title>
+<meta name="description" content="西班牙生活通面向西班牙华人社区，提供招工求职、租房买房、生意转让、二手物品、生活服务等本地分类信息发布与搜索。">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 
@@ -205,9 +206,10 @@
 
   /* ===== HERO BANNER ===== */
   .hero {
-    background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 50%, #C03030 100%);
-    padding: 40px 24px;
-    text-align: center;
+    background:
+      linear-gradient(135deg, rgba(158,28,28,0.96) 0%, rgba(212,43,43,0.94) 52%, rgba(198,48,48,0.94) 100%),
+      url('https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1600&q=80') center/cover;
+    padding: 54px 24px 34px;
     position: relative;
     overflow: hidden;
   }
@@ -237,21 +239,71 @@
     font-size: clamp(22px, 5vw, 38px);
     color: white;
     font-weight: 900;
-    letter-spacing: 3px;
+    letter-spacing: 0;
     margin-bottom: 10px;
     position: relative;
+    max-width: 860px;
+    line-height: 1.2;
   }
 
   .hero p {
-    color: rgba(255,255,255,0.8);
-    font-size: 15px;
+    color: rgba(255,255,255,0.88);
+    font-size: 16px;
     margin-bottom: 28px;
     position: relative;
+    max-width: 720px;
+    line-height: 1.7;
+  }
+
+  .hero-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.14);
+    color: var(--gold-light);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .hero-action {
+    border: 1.5px solid rgba(255,255,255,0.68);
+    border-radius: 8px;
+    color: white;
+    background: rgba(255,255,255,0.08);
+    padding: 11px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+
+  .hero-action.primary {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
   }
 
   .hero-stats {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 32px;
     flex-wrap: wrap;
     position: relative;
@@ -270,6 +322,33 @@
 
   /* ===== MAIN CATEGORIES ===== */
   .section { padding: 32px 24px; max-width: 1200px; margin: 0 auto; }
+
+  .trust-strip {
+    margin-top: -18px;
+    position: relative;
+    z-index: 3;
+  }
+
+  .trust-strip-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .trust-item {
+    background: white;
+    border: 1px solid rgba(158,28,28,0.12);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(80,34,15,0.08);
+  }
+
+  .trust-icon { font-size: 18px; flex-shrink: 0; }
+  .trust-title { font-weight: 700; font-size: 13px; color: var(--ink); }
+  .trust-text { font-size: 11px; color: var(--ink-light); margin-top: 2px; }
 
   .section-title {
     display: flex;
@@ -314,7 +393,7 @@
 
   .cat-card {
     background: white;
-    border-radius: 14px;
+    border-radius: 8px;
     padding: 22px 14px 18px;
     text-align: center;
     cursor: pointer;
@@ -374,7 +453,7 @@
 
   .listing-card {
     background: white;
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0,0,0,0.07);
     transition: all 0.25s;
@@ -497,7 +576,7 @@
   /* ===== POST AD BANNER ===== */
   .post-banner {
     background: linear-gradient(135deg, var(--gold) 0%, #E8911A 100%);
-    border-radius: 16px;
+    border-radius: 8px;
     padding: 28px 32px;
     display: flex;
     align-items: center;
@@ -741,6 +820,11 @@
     body { padding-bottom: 60px; }
     .post-banner { margin: 0 16px; }
     .section { padding: 24px 16px; }
+    .hero { padding: 36px 18px 28px; }
+    .hero-stats { gap: 16px; }
+    .stat { min-width: calc(50% - 16px); text-align: left; }
+    .trust-strip-grid { grid-template-columns: 1fr 1fr; }
+    .trust-item { padding: 10px; }
   }
 
   /* ===== ANIMATIONS ===== */
@@ -795,7 +879,7 @@
       <div class="logo-icon">🏮</div>
       <div class="logo-text">
         <h1>西班牙生活通</h1>
-        <span>西班牙生活通 · 华人第一信息平台</span>
+        <span>全西班牙华人分类信息平台</span>
       </div>
     </a>
     <div class="search-bar">
@@ -822,24 +906,31 @@
 
 <!-- ===== HERO ===== -->
 <div class="hero">
-  <h2>🏮 西班牙华人生活圈 · 信息发布与寻找一站搞定</h2>
-  <p>覆盖巴塞罗那、马德里、瓦伦西亚、毕尔巴鄂等全西班牙各大城市</p>
-  <div class="hero-stats">
-    <div class="stat">
-      <div class="stat-num">12,400+</div>
-      <div class="stat-label">有效信息</div>
+  <div class="hero-inner">
+    <div class="hero-kicker">🇪🇸 华人本地生活 · España</div>
+    <h2>在西班牙找工作、找房源、转让生意，一页搞定</h2>
+    <p>面向巴塞罗那、马德里、瓦伦西亚等城市的华人社区，发布招工、租房、二手、服务与生意转让信息，后台审核后展示。</p>
+    <div class="hero-actions">
+      <button class="hero-action primary" onclick="openModal('post')">免费发布信息</button>
+      <a class="hero-action" href="#listingsGrid">浏览最新信息</a>
     </div>
-    <div class="stat">
-      <div class="stat-num">8,800+</div>
-      <div class="stat-label">注册用户</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">15+</div>
-      <div class="stat-label">覆盖城市</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">每日更新</div>
-      <div class="stat-label">实时信息</div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">免费</div>
+        <div class="stat-label">基础发布</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">人工审核</div>
+        <div class="stat-label">减少虚假信息</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">15+</div>
+        <div class="stat-label">覆盖城市</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">中西双语</div>
+        <div class="stat-label">适合本地生活</div>
+      </div>
     </div>
   </div>
 </div>
@@ -847,24 +938,24 @@
 <!-- ===== MAIN CONTENT ===== -->
 <div style="max-width:1200px;margin:0 auto;">
 
-<!-- Categories -->
-<div class="section" style="padding:12px 24px;">
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-    <div class="info-card" style="--card-color:#D42B2B;padding:10px 12px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:16px;flex-shrink:0;">🆓</span>
-      <div><div style="font-weight:700;font-size:12px;color:#2d1f0e;">限时免费</div><div style="font-size:11px;color:#888;">新用户专享特权</div></div>
+<!-- Trust strip -->
+<div class="section trust-strip">
+  <div class="trust-strip-grid">
+    <div class="trust-item">
+      <span class="trust-icon">🆓</span>
+      <div><div class="trust-title">基础发布免费</div><div class="trust-text">适合招工、房源、二手信息</div></div>
     </div>
-    <div class="info-card" style="--card-color:#2563EB;padding:10px 12px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:16px;flex-shrink:0;">⚡</span>
-      <div><div style="font-weight:700;font-size:12px;color:#2d1f0e;">快速发布</div><div style="font-size:11px;color:#888;">1分钟即可</div></div>
+    <div class="trust-item">
+      <span class="trust-icon">🛡</span>
+      <div><div class="trust-title">先审核后展示</div><div class="trust-text">减少诈骗与重复广告</div></div>
     </div>
-    <div class="info-card" style="--card-color:#16A34A;padding:10px 12px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:16px;flex-shrink:0;">🇨🇳🇪🇸</span>
-      <div><div style="font-weight:700;font-size:12px;color:#2d1f0e;">双语支持</div><div style="font-size:11px;color:#888;">中西双语</div></div>
+    <div class="trust-item">
+      <span class="trust-icon">📱</span>
+      <div><div class="trust-title">手机端优先</div><div class="trust-text">适合微信/WhatsApp 转发</div></div>
     </div>
-    <div class="info-card" style="--card-color:#F59E0B;padding:10px 12px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:16px;flex-shrink:0;">📱</span>
-      <div><div style="font-weight:700;font-size:12px;color:#2d1f0e;">手机优化</div><div style="font-size:11px;color:#888;">随时随地</div></div>
+    <div class="trust-item">
+      <span class="trust-icon">🌍</span>
+      <div><div class="trust-title">覆盖主要城市</div><div class="trust-text">巴塞、马德里、瓦伦西亚等</div></div>
     </div>
   </div>
 </div>
@@ -960,7 +1051,7 @@
   <div class="footer-grid">
     <div class="footer-col">
       <div class="footer-logo">🏮 西班牙生活通</div>
-      <p style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.5);">西班牙最大华人生活服务信息平台，服务全西班牙华人社区。</p>
+      <p style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.5);">面向西班牙华人社区的本地分类信息平台，帮助用户更快找到工作、房源、服务与生意机会。</p>
     </div>
     <div class="footer-col">
       <h4>信息分类</h4>
@@ -1003,7 +1094,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <div>© 2025 西班牙生活通· 版权所有</div>
+    <div>© 2026 西班牙生活通 · 版权所有</div>
     <div>西班牙华人生活服务平台 | 覆盖全西班牙15+城市</div>
   </div>
 </footer>
@@ -1377,6 +1468,16 @@ function timeAgo(ts) {
   return Math.floor(diff/86400) + '天前';
 }
 
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[ch]));
+}
+
 function renderListings() {
   const grid = document.getElementById('listingsGrid');
   let filtered = allListings;
@@ -1397,19 +1498,19 @@ function renderListings() {
   grid.innerHTML = filtered.map((l,i) => `
     <div class="listing-card" style="animation-delay:${i*0.07}s" onclick="viewListing(${l.id})">
       <div class="listing-img">
-        ${l.icon}
-        <div class="listing-badge ${l.badgeType}">${l.badge}</div>
+        ${escapeHTML(l.icon)}
+        <div class="listing-badge ${escapeHTML(l.badgeType)}">${escapeHTML(l.badge)}</div>
       </div>
       <div class="listing-body">
-        <div class="listing-title">${l.title}</div>
+        <div class="listing-title">${escapeHTML(l.title)}</div>
         <div class="listing-tags">
-          ${l.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
+          ${l.tags.map(t=>`<span class="tag">${escapeHTML(t)}</span>`).join('')}
         </div>
         <div class="listing-meta">
-          <div class="listing-price">${l.price}<span> ${l.unit}</span></div>
-          <div class="listing-loc">📍 ${l.city}</div>
+          <div class="listing-price">${escapeHTML(l.price)}<span> ${escapeHTML(l.unit)}</span></div>
+          <div class="listing-loc">📍 ${escapeHTML(l.city)}</div>
         </div>
-        <div style="font-size:11px;color:var(--ink-light);margin-top:6px">🕐 ${l.time}</div>
+        <div style="font-size:11px;color:var(--ink-light);margin-top:6px">🕐 ${escapeHTML(l.time)}</div>
       </div>
     </div>
   `).join('');
@@ -1460,33 +1561,39 @@ async function viewListing(id) {
     const catIcons = {'招工':'👷','租房':'🏡','生意':'🏪','批发市场':'🏪','百元店/百货':'💯','酒吧/Bar':'🍻','交友':'💕','二手物品/车':'📦','服务':'🛠','教育':'📚'};
     const icon = catIcons[data.category] || '📋';
     const timeStr = new Date(data.created_at).toLocaleString('zh-CN');
+    const safeCategory = escapeHTML(data.category);
+    const safeTitle = escapeHTML(data.title);
+    const safeDescription = escapeHTML(data.description);
+    const safePrice = escapeHTML(data.price || '面议');
+    const safeCity = escapeHTML(data.city);
+    const safeContact = escapeHTML(data.contact || '未填写');
 
     document.getElementById('detailContent').innerHTML = `
       <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-          <span style="font-size:36px">${icon}</span>
+          <span style="font-size:36px">${escapeHTML(icon)}</span>
           <div>
-            <span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">${data.category}</span>
-            <h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">${data.title}</h3>
+            <span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">${safeCategory}</span>
+            <h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">${safeTitle}</h3>
           </div>
         </div>
-        ${data.description ? `<div style="background:#fafafa;border-radius:10px;padding:14px;margin-bottom:14px">
+        ${data.description ? `<div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px">
           <div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">📝 详细描述</div>
-          <div style="font-size:14px;line-height:1.7;color:#333">${data.description}</div>
+          <div style="font-size:14px;line-height:1.7;color:#333">${safeDescription}</div>
         </div>` : ''}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-          <div style="background:#fef3f2;border-radius:10px;padding:12px 14px">
+          <div style="background:#fef3f2;border-radius:8px;padding:12px 14px">
             <div style="font-size:11px;color:#999;margin-bottom:4px">💰 价格</div>
-            <div style="font-size:16px;font-weight:700;color:#c0392b">${data.price || '面议'} €</div>
+            <div style="font-size:16px;font-weight:700;color:#c0392b">${safePrice} €</div>
           </div>
-          <div style="background:#f0fdf4;border-radius:10px;padding:12px 14px">
+          <div style="background:#f0fdf4;border-radius:8px;padding:12px 14px">
             <div style="font-size:11px;color:#999;margin-bottom:4px">📍 城市</div>
-            <div style="font-size:15px;font-weight:600;color:#166534">${data.city}</div>
+            <div style="font-size:15px;font-weight:600;color:#166534">${safeCity}</div>
           </div>
         </div>
-        <div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px">
           <div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">📞 联系方式</div>
-          <div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">${data.contact || '未填写'}</div>
+          <div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">${safeContact}</div>
           <div style="font-size:11px;color:#999;margin-top:6px">可通过微信 / 手机 / WhatsApp 联系</div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px;color:#999;padding-top:10px;border-top:1px solid #f0f0f0">
@@ -1500,7 +1607,7 @@ async function viewListing(id) {
 
   } catch(e) {
     document.getElementById('detailContent').innerHTML =
-      `<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">⚠️</div><div>加载出错：${e.message}</div></div>`;
+      `<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">⚠️</div><div>加载出错：${escapeHTML(e.message)}</div></div>`;
   }
 }
 
@@ -1529,7 +1636,7 @@ async function doSearch() {
       showToast(`搜索"${q}" 找到 ${data.length} 条结果`);
     } else {
       showLoading(false);
-      document.getElementById('listingsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:48px">🔍</div><div style="margin-top:10px">未找到"'+q+'"相关信息</div></div>';
+      document.getElementById('listingsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:48px">🔍</div><div style="margin-top:10px">未找到“'+escapeHTML(q)+'”相关信息</div><button class="btn-post" style="margin-top:16px" onclick="openModal(&quot;post&quot;)">发布这条需求</button></div>';
     }
   } catch(e) {
     showLoading(false);
@@ -1806,10 +1913,7 @@ sb.channel('public-listings')
 loadListings();
 </script>
 
-  <div id="vipUpgradeModal" class="modal-overlay" style="display:none;"><div class="modal relative" style="max-width:480px;"><button class="modal-close" onclick="document.getElementById('vipUpgradeModal').style.display='none'">✕</button><h3>💎 升级VIP会员</h3><p style="color:#888;font-size:13px;margin-bottom:16px;">选择套餐，享置顶展示等专属特权</p><div id="vipPlanMonth" onclick="selectVipPlan('monthly')" style="border:2px solid #e09518;border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;background:#fffbf2;"><div style="display:flex;align-items:center;gap:12px;"><div style="font-size:20px;">📅</div><div style="flex:1;"><div style="font-weight:bold;">月付套餐</div><div style="font-size:12px;color:#888;">灵活订阅，随时可续</div></div><div style="font-size:22px;font-weight:bold;color:#e09518;">€9.9<span style="font-size:12px;color:#888;">/月</span></div></div></div><div id="vipPlanYear" onclick="selectVipPlan('yearly')" style="border:2px solid #e0e0e0;border-radius:12px;padding:14px;margin-bottom:16px;cursor:pointer;position:relative;"><div style="position:absolute;top:-10px;right:14px;background:linear-gradient(90deg,#e09518,#f5c842);color:#fff;font-size:11px;font-weight:bold;padding:2px 10px;border-radius:20px;">🎉 立省€50</div><div style="display:flex;align-items:center;gap:12px;"><div style="font-size:20px;">📆</div><div style="flex:1;"><div style="font-weight:bold;">年付套餐</div><div style="font-size:12px;color:#888;">相当于 <strong style="color:#e09518;">€5.7/月</strong></div><div style="font-size:11px;color:#aaa;text-decoration:line-through;">原价€118.8/年</div></div><div style="text-align:right;"><div style="font-size:22px;font-weight:bold;color:#e09518;">€68.8<span style="font-size:12px;color:#888;">/年</span></div><div style="font-size:12px;color:#e05a00;font-weight:bold;">节省€50</div></div></div></div><div style="background:#f9f9f9;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#555;"><div style="font-weight:bold;margin-bottom:6px;">VIP专属权益：</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"><div>⭐ 置顶优先展示</div><div>🔄 无限次刷新</div><div>💎 VIP专属标识</div><div>📅 展示30天</div><div>🚀 审核优先处理</div><div>📞 专属客服</div></div></div><div id="vip-pay-section" style="margin-top:16px"><style>#vip-pay-section .pay-methods{display:flex;gap:16px;justify-content:center;margin-bottom:14px}#vip-pay-section .pay-btn{flex:0 0 140px;max-width:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:2px solid #e0e0e0;border-radius:12px;padding:14px 6px;cursor:pointer;background:#fff;transition:all 0.2s}#vip-pay-section .pay-btn:hover,#vip-pay-section .pay-btn.selected{border-color:#c8960c;background:#fffbf0;box-shadow:0 4px 12px rgba(200,150,12,.15)}#vip-pay-section .pay-btn .pay-icon{font-size:28px;line-height:1}#vip-pay-section .pay-btn .pay-name{font-size:13px;color:#444;font-weight:600}#vip-pay-section .pay-btn .pay-badge{font-size:10px;background:#f0f0f0;border-radius:4px;padding:1px 5px;color:#888}#vip-pay-section .pay-form{display:none;background:#f9f9f9;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #eee}#vip-pay-section .pay-form.active{display:block}#vip-pay-section .pay-form input[type=email]{width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;margin-top:6px;background:#fff}#vip-pay-section .pay-form input:focus{border-color:#c8960c}#vip-pay-section .pay-form label{font-size:12px;color:#666;font-weight:500}#vip-pay-section .pay-form .form-row{margin-bottom:10px}#vip-pay-section .qr-box{width:130px;height:130px;border-radius:12px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;font-size:11px;text-align:center}#vip-pay-section .qr-box.bizum-qr{border:2px dashed #0082FF;background:#f0f6ff;color:#0082FF}#vip-pay-section .qr-box.wechat-qr{border:2px dashed #07C160;background:#f0fff4;color:#07C160}#vip-pay-section .qr-box img{width:100%;height:100%;object-fit:contain;border-radius:10px}#vip-pay-section .qr-box .qr-icon{font-size:36px}#vip-pay-section .amount-box{border-radius:10px;padding:10px 14px;margin:10px 0;text-align:center}#vip-pay-section .amount-box.bizum-amount{background:#f0f6ff;border:1.5px solid #0082FF}#vip-pay-section .amount-box.wechat-amount{background:#f0fff4;border:1.5px solid #07C160}#vip-pay-section .amount-label{font-size:11px;color:#888;margin-bottom:3px}#vip-pay-section .amount-num{font-size:28px;font-weight:800}#vip-pay-section .amount-num.blue{color:#0082FF}#vip-pay-section .amount-num.green{color:#07C160}#vip-pay-section .amount-sub{font-size:11px;color:#aaa;margin-top:2px}#vip-pay-section .amount-tip{font-size:10px;color:#bbb;margin-top:3px}#vip-pay-section .pay-submit-btn{width:100%;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;color:#fff;margin-top:4px}#vip-pay-section .pay-submit-btn.blue{background:linear-gradient(135deg,#0082FF,#0055cc)}#vip-pay-section .pay-submit-btn.green{background:linear-gradient(135deg,#07C160,#059e4e)}#vip-pay-section .pay-note{font-size:11px;color:#aaa;text-align:center;margin-top:8px}#vip-pay-section .pay-note span{color:#c8960c}#vip-pay-section .id-line{font-weight:700;font-size:13px;margin-top:4px;display:block}#vip-pay-section .id-line.blue{color:#0082FF}#vip-pay-section .id-line.green{color:#07C160}</style><div style="font-size:14px;color:#555;margin-bottom:10px;font-weight:600;text-align:center">🔐 选择支付方式</div><div class="pay-methods"><div class="pay-btn bizum" onclick="vipSelectPay('bizum')"><span class="pay-icon" style="color:#0082FF">📱</span><span class="pay-name">Bizum</span><span class="pay-badge">西班牙首选</span></div><div class="pay-btn wechat" onclick="vipSelectPay('wechat')"><span class="pay-icon" style="color:#07C160">💬</span><span class="pay-name">微信支付</span><span class="pay-badge">国内用户</span></div></div><div class="pay-form" id="vip-form-bizum"><div style="text-align:center"><div class="qr-box bizum-qr" id="bizum-qr-display"><span class="qr-icon">▦</span><span>二维码待上传</span></div><p style="font-size:12px;color:#555;margin:4px 0 2px">使用银行App扫码Bizum付款</p><span class="id-line blue">或直接转账至：<span id="bizum-phone-display">待设置</span></span></div><div class="amount-box bizum-amount"><div class="amount-label">当前套餐应付金额</div><div class="amount-num blue" id="bizum-eur-price">€68.8</div><div class="amount-sub" id="bizum-plan-label">年付套餐</div></div><div class="form-row"><label>📧 付款后请留下您的邮筱（用于激活）</label><input type="email" placeholder="your@email.com" /></div><button class="pay-submit-btn blue" id="bizum-submit-btn" onclick="vipSubmitPay('bizum')">✅ 我已完成 Bizum 付款 €68.8</button></div><div class="pay-form" id="vip-form-wechat"><div style="text-align:center"><div class="qr-box wechat-qr" id="wechat-qr-display"><span class="qr-icon">▦</span><span>收款码待上传</span></div><p style="font-size:12px;color:#555;margin:4px 0 2px">使用微信扫码付款</p><span class="id-line green">或搜索微信号：<span id="wechat-id-display">espana_life</span></span></div><div class="amount-box wechat-amount"><div class="amount-label">当前套餐应付金额（人民币）</div><div class="amount-num green" id="wechat-cny-price">￥528</div><div class="amount-sub" id="wechat-plan-label">年付套餐 · 对应 €68.8</div><div class="amount-tip">按实时汇獴1€≈7.8￥，取整定价</div></div><div class="form-row"><label>📧 付款后请留下您的邮筱（用于激活）</label><input type="email" placeholder="your@email.com" /></div><button class="pay-submit-btn green" id="wechat-submit-btn" onclick="vipSubmitPay('wechat')">✅ 我已完成微信付款 ￥528</button></div><p class="pay-note">付款后通常 <span>2小时内</span> 激活 · 如有问题联系 <span>espana_life</span></p></div><script>window.vipSelectPay=function(m){document.querySelectorAll('#vip-pay-section .pay-btn').forEach(function(b){b.classList.remove('selected')});document.querySelectorAll('#vip-pay-section .pay-form').forEach(function(f){f.classList.remove('active')});var btn=document.querySelector('#vip-pay-section .pay-btn.'+m);if(btn)btn.classList.add('selected');var form=document.getElementById('vip-form-'+m);if(form)form.classList.add('active')};window.vipUpdateAmounts=function(plan){var isY=plan!=='monthly';var eur=isY?'\u20ac68.8':'\u20ac9.9';var cny=isY?'\uffe5528':'\uffe579';var lbl=isY?'\u5e74\u4ed8\u5957\u9910':'\u6708\u4ed8\u5957\u9910';var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v};set('bizum-eur-price',eur);set('bizum-plan-label',lbl);set('bizum-submit-btn','\u2705 \u6211\u5df2\u5b8c\u6210 Bizum \u4ed8\u6b3e '+eur);set('wechat-cny-price',cny);set('wechat-plan-label',lbl+' \u00b7 \u5bf9\u5e94 '+eur);set('wechat-submit-btn','\u2705 \u6211\u5df2\u5b8c\u6210\u5fae\u4fe1\u4ed8\u6b3e '+cny);var bqr=localStorage.getItem('qr_bizum');var wqr=localStorage.getItem('qr_wechat');if(bqr){var bd=document.getElementById('bizum-qr-display');if(bd)bd.innerHTML='<img src="'+bqr+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;"/>'}var wph=localStorage.getItem('bizum_phone');if(wph){var bp=document.getElementById('bizum-phone-display');if(bp)bp.textContent=wph}if(wqr){var wd=document.getElementById('wechat-qr-display');if(wd)wd.innerHTML='<img src="'+wqr+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;"/>'}var wid=localStorage.getItem('wechat_id');if(wid){var wi=document.getElementById('wechat-id-display');if(wi)wi.textContent=wid}};window.vipSubmitPay=function(m){var isY=window._selectedVipPlan!=='monthly';var eur=isY?'\u20ac68.8':'\u20ac9.9';var cny=isY?'\uffe5528':'\uffe579';var lbl=isY?'\u5e74\u4ed8':'\u6708\u4ed8';var names={bizum:'Bizum',wechat:'\u5fae\u4fe1\u652f\u4ed8'};var amt=m==='wechat'?cny+'\uff08\u7ea6'+eur+'\uff09':eur;alert('\u2705 \u5df2\u63d0\u4ea4 '+names[m]+' \u4ed8\u6b3e\u7533\u8bf7\uff01
-\u5957\u9910\uff1a'+lbl+' '+amt+'
-
-\u6211\u4eec\u5c06\u57282\u5c0f\u65f6\u5185\u6838\u5b9e\u5e76\u6fc0\u6d3b\u60a8\u7684VIP\uff0c\u611f\u8c22\u652f\u6301\uff01')};var origSelectVip=window.selectVipPlan;window.selectVipPlan=function(p){origSelectVip&&origSelectVip(p);window._selectedVipPlan=p;window.vipUpdateAmounts&&window.vipUpdateAmounts(p)};document.addEventListener('DOMContentLoaded',function(){window.vipUpdateAmounts&&window.vipUpdateAmounts(window._selectedVipPlan||'yearly')});<\/script>
+  <div id="vipUpgradeModal" class="modal-overlay" style="display:none;"><div class="modal relative" style="max-width:480px;"><button class="modal-close" onclick="document.getElementById('vipUpgradeModal').style.display='none'">✕</button><h3>💎 升级VIP会员</h3><p style="color:#888;font-size:13px;margin-bottom:16px;">选择套餐，享置顶展示等专属特权</p><div id="vipPlanMonth" onclick="selectVipPlan('monthly')" style="border:2px solid #e09518;border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;background:#fffbf2;"><div style="display:flex;align-items:center;gap:12px;"><div style="font-size:20px;">📅</div><div style="flex:1;"><div style="font-weight:bold;">月付套餐</div><div style="font-size:12px;color:#888;">灵活订阅，随时可续</div></div><div style="font-size:22px;font-weight:bold;color:#e09518;">€9.9<span style="font-size:12px;color:#888;">/月</span></div></div></div><div id="vipPlanYear" onclick="selectVipPlan('yearly')" style="border:2px solid #e0e0e0;border-radius:12px;padding:14px;margin-bottom:16px;cursor:pointer;position:relative;"><div style="position:absolute;top:-10px;right:14px;background:linear-gradient(90deg,#e09518,#f5c842);color:#fff;font-size:11px;font-weight:bold;padding:2px 10px;border-radius:20px;">🎉 立省€50</div><div style="display:flex;align-items:center;gap:12px;"><div style="font-size:20px;">📆</div><div style="flex:1;"><div style="font-weight:bold;">年付套餐</div><div style="font-size:12px;color:#888;">相当于 <strong style="color:#e09518;">€5.7/月</strong></div><div style="font-size:11px;color:#aaa;text-decoration:line-through;">原价€118.8/年</div></div><div style="text-align:right;"><div style="font-size:22px;font-weight:bold;color:#e09518;">€68.8<span style="font-size:12px;color:#888;">/年</span></div><div style="font-size:12px;color:#e05a00;font-weight:bold;">节省€50</div></div></div></div><div style="background:#f9f9f9;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#555;"><div style="font-weight:bold;margin-bottom:6px;">VIP专属权益：</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"><div>⭐ 置顶优先展示</div><div>🔄 无限次刷新</div><div>💎 VIP专属标识</div><div>📅 展示30天</div><div>🚀 审核优先处理</div><div>📞 专属客服</div></div></div><div id="vip-pay-section" style="margin-top:16px"><style>#vip-pay-section .pay-methods{display:flex;gap:16px;justify-content:center;margin-bottom:14px}#vip-pay-section .pay-btn{flex:0 0 140px;max-width:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:2px solid #e0e0e0;border-radius:12px;padding:14px 6px;cursor:pointer;background:#fff;transition:all 0.2s}#vip-pay-section .pay-btn:hover,#vip-pay-section .pay-btn.selected{border-color:#c8960c;background:#fffbf0;box-shadow:0 4px 12px rgba(200,150,12,.15)}#vip-pay-section .pay-btn .pay-icon{font-size:28px;line-height:1}#vip-pay-section .pay-btn .pay-name{font-size:13px;color:#444;font-weight:600}#vip-pay-section .pay-btn .pay-badge{font-size:10px;background:#f0f0f0;border-radius:4px;padding:1px 5px;color:#888}#vip-pay-section .pay-form{display:none;background:#f9f9f9;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #eee}#vip-pay-section .pay-form.active{display:block}#vip-pay-section .pay-form input[type=email]{width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;margin-top:6px;background:#fff}#vip-pay-section .pay-form input:focus{border-color:#c8960c}#vip-pay-section .pay-form label{font-size:12px;color:#666;font-weight:500}#vip-pay-section .pay-form .form-row{margin-bottom:10px}#vip-pay-section .qr-box{width:130px;height:130px;border-radius:12px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;font-size:11px;text-align:center}#vip-pay-section .qr-box.bizum-qr{border:2px dashed #0082FF;background:#f0f6ff;color:#0082FF}#vip-pay-section .qr-box.wechat-qr{border:2px dashed #07C160;background:#f0fff4;color:#07C160}#vip-pay-section .qr-box img{width:100%;height:100%;object-fit:contain;border-radius:10px}#vip-pay-section .qr-box .qr-icon{font-size:36px}#vip-pay-section .amount-box{border-radius:10px;padding:10px 14px;margin:10px 0;text-align:center}#vip-pay-section .amount-box.bizum-amount{background:#f0f6ff;border:1.5px solid #0082FF}#vip-pay-section .amount-box.wechat-amount{background:#f0fff4;border:1.5px solid #07C160}#vip-pay-section .amount-label{font-size:11px;color:#888;margin-bottom:3px}#vip-pay-section .amount-num{font-size:28px;font-weight:800}#vip-pay-section .amount-num.blue{color:#0082FF}#vip-pay-section .amount-num.green{color:#07C160}#vip-pay-section .amount-sub{font-size:11px;color:#aaa;margin-top:2px}#vip-pay-section .amount-tip{font-size:10px;color:#bbb;margin-top:3px}#vip-pay-section .pay-submit-btn{width:100%;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;color:#fff;margin-top:4px}#vip-pay-section .pay-submit-btn.blue{background:linear-gradient(135deg,#0082FF,#0055cc)}#vip-pay-section .pay-submit-btn.green{background:linear-gradient(135deg,#07C160,#059e4e)}#vip-pay-section .pay-note{font-size:11px;color:#aaa;text-align:center;margin-top:8px}#vip-pay-section .pay-note span{color:#c8960c}#vip-pay-section .id-line{font-weight:700;font-size:13px;margin-top:4px;display:block}#vip-pay-section .id-line.blue{color:#0082FF}#vip-pay-section .id-line.green{color:#07C160}</style><div style="font-size:14px;color:#555;margin-bottom:10px;font-weight:600;text-align:center">🔐 选择支付方式</div><div class="pay-methods"><div class="pay-btn bizum" onclick="vipSelectPay('bizum')"><span class="pay-icon" style="color:#0082FF">📱</span><span class="pay-name">Bizum</span><span class="pay-badge">西班牙首选</span></div><div class="pay-btn wechat" onclick="vipSelectPay('wechat')"><span class="pay-icon" style="color:#07C160">💬</span><span class="pay-name">微信支付</span><span class="pay-badge">国内用户</span></div></div><div class="pay-form" id="vip-form-bizum"><div style="text-align:center"><div class="qr-box bizum-qr" id="bizum-qr-display"><span class="qr-icon">▦</span><span>请联系管理员获取 Bizum 收款码</span></div><p style="font-size:12px;color:#555;margin:4px 0 2px">使用银行App扫码Bizum付款</p><span class="id-line blue">或直接转账至：<span id="bizum-phone-display">请联系客服确认</span></span></div><div class="amount-box bizum-amount"><div class="amount-label">当前套餐应付金额</div><div class="amount-num blue" id="bizum-eur-price">€68.8</div><div class="amount-sub" id="bizum-plan-label">年付套餐</div></div><div class="form-row"><label>📧 付款后请留下您的邮箱（用于激活）</label><input type="email" placeholder="your@email.com" /></div><button class="pay-submit-btn blue" id="bizum-submit-btn" onclick="vipSubmitPay('bizum')">✅ 我已完成 Bizum 付款 €68.8</button></div><div class="pay-form" id="vip-form-wechat"><div style="text-align:center"><div class="qr-box wechat-qr" id="wechat-qr-display"><span class="qr-icon">▦</span><span>请联系管理员获取微信收款码</span></div><p style="font-size:12px;color:#555;margin:4px 0 2px">使用微信扫码付款</p><span class="id-line green">或搜索微信号：<span id="wechat-id-display">espana_life</span></span></div><div class="amount-box wechat-amount"><div class="amount-label">当前套餐应付金额（人民币）</div><div class="amount-num green" id="wechat-cny-price">￥528</div><div class="amount-sub" id="wechat-plan-label">年付套餐 · 对应 €68.8</div><div class="amount-tip">按实时汇率1€≈7.8￥，取整定价</div></div><div class="form-row"><label>📧 付款后请留下您的邮箱（用于激活）</label><input type="email" placeholder="your@email.com" /></div><button class="pay-submit-btn green" id="wechat-submit-btn" onclick="vipSubmitPay('wechat')">✅ 我已完成微信付款 ￥528</button></div><p class="pay-note">付款后通常 <span>2小时内</span> 激活 · 如有问题联系 <span>espana_life</span></p></div><script>window.vipSelectPay=function(m){document.querySelectorAll('#vip-pay-section .pay-btn').forEach(function(b){b.classList.remove('selected')});document.querySelectorAll('#vip-pay-section .pay-form').forEach(function(f){f.classList.remove('active')});var btn=document.querySelector('#vip-pay-section .pay-btn.'+m);if(btn)btn.classList.add('selected');var form=document.getElementById('vip-form-'+m);if(form)form.classList.add('active')};window.vipUpdateAmounts=function(plan){var isY=plan!=='monthly';var eur=isY?'\u20ac68.8':'\u20ac9.9';var cny=isY?'\uffe5528':'\uffe579';var lbl=isY?'\u5e74\u4ed8\u5957\u9910':'\u6708\u4ed8\u5957\u9910';var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v};set('bizum-eur-price',eur);set('bizum-plan-label',lbl);set('bizum-submit-btn','\u2705 \u6211\u5df2\u5b8c\u6210 Bizum \u4ed8\u6b3e '+eur);set('wechat-cny-price',cny);set('wechat-plan-label',lbl+' \u00b7 \u5bf9\u5e94 '+eur);set('wechat-submit-btn','\u2705 \u6211\u5df2\u5b8c\u6210\u5fae\u4fe1\u4ed8\u6b3e '+cny);var bqr=localStorage.getItem('qr_bizum');var wqr=localStorage.getItem('qr_wechat');if(bqr){var bd=document.getElementById('bizum-qr-display');if(bd)bd.innerHTML='<img src="'+bqr+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;"/>'}var wph=localStorage.getItem('bizum_phone');if(wph){var bp=document.getElementById('bizum-phone-display');if(bp)bp.textContent=wph}if(wqr){var wd=document.getElementById('wechat-qr-display');if(wd)wd.innerHTML='<img src="'+wqr+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;"/>'}var wid=localStorage.getItem('wechat_id');if(wid){var wi=document.getElementById('wechat-id-display');if(wi)wi.textContent=wid}};window.vipSubmitPay=function(m){var isY=window._selectedVipPlan!=='monthly';var eur=isY?'\u20ac68.8':'\u20ac9.9';var cny=isY?'\uffe5528':'\uffe579';var lbl=isY?'\u5e74\u4ed8':'\u6708\u4ed8';var names={bizum:'Bizum',wechat:'\u5fae\u4fe1\u652f\u4ed8'};var amt=m==='wechat'?cny+'\uff08\u7ea6'+eur+'\uff09':eur;alert('\u2705 \u5df2\u63d0\u4ea4 '+names[m]+' \u4ed8\u6b3e\u7533\u8bf7\uff01\n\u5957\u9910\uff1a'+lbl+' '+amt+'\n\n\u6211\u4eec\u5c06\u57282\u5c0f\u65f6\u5185\u6838\u5b9e\u5e76\u6fc0\u6d3b\u60a8\u7684VIP\uff0c\u611f\u8c22\u652f\u6301\uff01')};var origSelectVip=window.selectVipPlan;window.selectVipPlan=function(p){origSelectVip&&origSelectVip(p);window._selectedVipPlan=p;window.vipUpdateAmounts&&window.vipUpdateAmounts(p)};document.addEventListener('DOMContentLoaded',function(){window.vipUpdateAmounts&&window.vipUpdateAmounts(window._selectedVipPlan||'yearly')});</script>
   <style>#profileModal .modal{max-width:680px;width:95vw}.my-listing-card{border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:10px;transition:box-shadow .2s}.my-listing-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}.my-listing-card .mlc-title{font-weight:700;font-size:14px;color:#333;margin-bottom:4px}.my-listing-card .mlc-meta{font-size:11px;color:#999;display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}.mlc-status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}.mlc-status.approved{background:#e8f5e9;color:#2e7d32}.mlc-status.pending{background:#fff8e1;color:#f57f17}.mlc-status.rejected{background:#fce4ec;color:#c62828}.mlc-actions{display:flex;gap:8px}.mlc-btn{padding:4px 12px;font-size:11px;border-radius:6px;border:1px solid;cursor:pointer;font-weight:500}.mlc-btn.edit{border-color:#e09518;color:#e09518;background:#fffbf2}.mlc-btn.pin{border-color:#1565c0;color:#1565c0;background:#e3f2fd}.mlc-btn.del{border-color:#c62828;color:#c62828;background:#fce4ec}.mlc-btn:disabled{opacity:.5;cursor:not-allowed}</style>
   <script>
   window.getSb=function(){if(window._sbClient)return window._sbClient;window._sbClient=window.supabase.createClient('https://jfhpsxfnbpsvvtqsdvco.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmaHBzeGZuYnBzdnZ0cXNkdmNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5NzQyMzksImV4cCI6MjA5MzU1MDIzOX0.nxQsYf9dyxOu3olI3m6_f-RNd6G3hMKyeQXqxthuHxg');return window._sbClient;};
@@ -2062,15 +2166,15 @@ loadListings();
       </div>
       <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
         <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F6E1; 遇到诈骗信息怎么办？</div>
-        <div style="font-size:14px;color:#555;line-height:1.6;">发现违规或诈骗信息，请立即点击“举报违规信息”进行举报，我们将在 24 小时内处理。同时请提高警惕，不要向陆生人转账。</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">发现违规或诈骗信息，请立即点击“举报违规信息”进行举报，我们将在 24 小时内处理。同时请提高警惕，不要向陌生人转账。</div>
       </div>
       <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
         <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F511; 忘记密码怎么找回？</div>
-        <div style="font-size:14px;color:#555;line-height:1.6;">点击登录页面的“忘记密码？”，输入注册邮筱后，系统将自动发送密码重置链接到您的邮筱，按照邮件指引完成重置即可。</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">点击登录页面的“忘记密码？”，输入注册邮箱后，系统将自动发送密码重置链接到您的邮箱，按照邮件指引完成重置即可。</div>
       </div>
       <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
         <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F30D; 平台覆盖哪些城市？</div>
-        <div style="font-size:14px;color:#555;line-height:1.6;">目前覆盖西班牙 15+ 城市，包括巴塞罗那、马德里、瓦伦西亚、毕尔巴鄂、塔维利亚、萨拉戈萨等主要城市，并持续扩展中。</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">目前覆盖西班牙 15+ 城市，包括巴塞罗那、马德里、瓦伦西亚、毕尔巴鄂、塞维利亚、萨拉戈萨等主要城市，并持续扩展中。</div>
       </div>
     </div>
     <div style="background:linear-gradient(135deg,#8b1a1a 0%,#c0392b 100%);border-radius:12px;padding:16px;color:white;text-align:center;">
