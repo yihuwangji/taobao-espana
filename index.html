@@ -1425,6 +1425,8 @@ async function loadListings() {
       if (currentCat === 'wholesale') {
         const wholesaleCats = [catMap['wholesale'], catMap['wholesale_100'], catMap['wholesale_bar']].filter(Boolean);
         query = query.in('category', wholesaleCats);
+      } else if (currentCat === 'goods') {
+        query = query.in('category', ['二手物品', '二手车']);
       } else {
         const cat = catMap[currentCat];
         if(cat) query = query.eq('category', cat);
