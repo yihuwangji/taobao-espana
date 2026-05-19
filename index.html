@@ -322,25 +322,6 @@
     box-shadow: 0 10px 24px rgba(255,171,31,0.32);
   }
 
-  .hero-stats {
-    display: flex;
-    justify-content: flex-start;
-    gap: 32px;
-    flex-wrap: wrap;
-    position: relative;
-  }
-
-  .stat {
-    text-align: center;
-  }
-  .stat-num {
-    font-family: 'Noto Serif SC', serif;
-    font-size: 28px;
-    font-weight: 900;
-    color: var(--gold);
-  }
-  .stat-label { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
-
   .wechat-save-guide {
     max-width: 1200px;
     margin: 16px auto 0;
@@ -1143,24 +1124,6 @@
       font-size: 16px;
       text-align: center;
     }
-    .hero-stats {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-    .stat {
-      min-width: 0;
-      padding: 9px 10px;
-      text-align: left;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 8px;
-    }
-    .stat-num {
-      font-size: 18px;
-      line-height: 1.2;
-    }
-    .stat-label { font-size: 11px; }
     .wechat-save-guide {
       margin-top: 10px;
       padding: 0 10px;
@@ -1517,24 +1480,6 @@
     <div class="hero-actions">
       <button class="hero-action primary" onclick="openModal('post')">马上发布</button>
       <a class="hero-action" href="#listingsGrid">最新信息</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat">
-        <div class="stat-num">免费</div>
-        <div class="stat-label">基础发布</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">人工审核</div>
-        <div class="stat-label">减少虚假信息</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">15+</div>
-        <div class="stat-label">覆盖城市</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">中西双语</div>
-        <div class="stat-label">适合本地生活</div>
-      </div>
     </div>
   </div>
 </div>
