@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>西班牙生活通 - 西班牙华人生活服务平台</title>
 <meta name="description" content="西班牙生活通面向西班牙华人社区，提供招工求职、租房买房、生意转让、二手物品、生活服务等本地分类信息发布与搜索。">
 <style>
@@ -814,17 +814,299 @@
   .mobile-nav-item.active, .mobile-nav-item:hover { color: var(--red); }
   .mobile-nav-item span:first-child { font-size: 22px; }
 
-  @media (max-width: 640px) {
-    .mobile-nav { display: block; }
+  @media (max-width: 760px) {
+    html { scroll-padding-top: 130px; }
+    body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+    .header-top {
+      padding: 6px 14px;
+      justify-content: center;
+      text-align: center;
+    }
+    .header-top > div:first-child {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 11px;
+    }
+    .header-top > div:last-child,
     .header-actions { display: none; }
-    body { padding-bottom: 60px; }
-    .post-banner { margin: 0 16px; }
-    .section { padding: 24px 16px; }
-    .hero { padding: 36px 18px 28px; }
-    .hero-stats { gap: 16px; }
-    .stat { min-width: calc(50% - 16px); text-align: left; }
-    .trust-strip-grid { grid-template-columns: 1fr 1fr; }
-    .trust-item { padding: 10px; }
+    .header-main {
+      padding: 10px 14px 12px;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      font-size: 22px;
+    }
+    .logo-text h1 {
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+    .logo-text span { font-size: 10px; }
+    .search-bar {
+      order: 3;
+      flex-basis: 100%;
+      max-width: none;
+      min-width: 0;
+    }
+    .search-bar input {
+      min-width: 0;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    .search-bar button {
+      min-width: 46px;
+      padding: 0 13px;
+      font-size: 0;
+    }
+    .search-bar button::before {
+      content: '🔍';
+      font-size: 16px;
+    }
+    .nav-cats {
+      padding: 0 12px;
+      scroll-snap-type: x proximity;
+    }
+    .nav-cat {
+      padding: 10px 12px;
+      font-size: 12px;
+      scroll-snap-align: start;
+    }
+    .hero {
+      padding: 28px 16px 22px;
+      background-position: center top;
+    }
+    .hero::before,
+    .hero::after { display: none; }
+    .hero-kicker {
+      margin-bottom: 10px;
+      font-size: 11px;
+    }
+    .hero h2 {
+      max-width: 320px;
+      font-size: 25px;
+      line-height: 1.18;
+    }
+    .hero p {
+      max-width: 96%;
+      margin-bottom: 18px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .hero-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .hero-action {
+      padding: 11px 8px;
+      font-size: 13px;
+      text-align: center;
+    }
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .stat {
+      min-width: 0;
+      padding: 9px 10px;
+      text-align: left;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 8px;
+    }
+    .stat-num {
+      font-size: 18px;
+      line-height: 1.2;
+    }
+    .stat-label { font-size: 11px; }
+    .section { padding: 22px 14px; }
+    .trust-strip {
+      margin-top: -10px;
+      padding-top: 0;
+    }
+    .trust-strip-grid {
+      display: flex;
+      grid-template-columns: none;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scroll-snap-type: x proximity;
+    }
+    .trust-item {
+      min-width: 220px;
+      padding: 10px;
+      scroll-snap-align: start;
+    }
+    .section-title {
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .section-title h3 { font-size: 18px; }
+    .section-title .see-all {
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .cat-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .cat-card {
+      min-height: 96px;
+      padding: 13px 8px 10px;
+      animation: none;
+    }
+    .cat-icon {
+      margin-bottom: 8px;
+      font-size: 28px;
+    }
+    .cat-name { font-size: 14px; }
+    .city-tabs {
+      flex-wrap: nowrap;
+      gap: 8px;
+      margin: -2px -14px 16px;
+      padding: 0 14px 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .city-tabs::-webkit-scrollbar,
+    .trust-strip-grid::-webkit-scrollbar { display: none; }
+    .city-tab {
+      flex: 0 0 auto;
+      padding: 7px 12px;
+      font-size: 12px;
+    }
+    .listings-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .listing-card {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      min-height: 112px;
+      animation: none;
+    }
+    .listing-img {
+      height: 100%;
+      min-height: 112px;
+      font-size: 32px;
+    }
+    .listing-body {
+      min-width: 0;
+      padding: 11px 12px;
+    }
+    .listing-title {
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    .listing-meta {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .listing-price { font-size: 16px; }
+    .listing-tags {
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .tag {
+      padding: 2px 6px;
+      font-size: 10px;
+    }
+    .post-banner {
+      align-items: stretch;
+      margin: 2px 14px 0;
+      padding: 20px 16px;
+    }
+    .post-banner h3 { font-size: 20px; }
+    .post-banner p {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .btn-post {
+      width: 100%;
+      padding: 12px 16px;
+    }
+    footer {
+      margin-top: 32px;
+      padding: 30px 16px calc(82px + env(safe-area-inset-bottom));
+    }
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 18px;
+    }
+    .footer-col:first-child { grid-column: 1 / -1; }
+    .footer-bottom {
+      display: block;
+      line-height: 1.8;
+    }
+    .modal-overlay {
+      align-items: flex-end;
+      padding: 0;
+    }
+    .modal {
+      width: 100%;
+      max-width: none !important;
+      max-height: 88svh;
+      border-radius: 16px 16px 0 0;
+      padding: 24px 18px calc(20px + env(safe-area-inset-bottom));
+    }
+    .modal h3 {
+      padding-right: 36px;
+      font-size: 18px;
+    }
+    .modal-close {
+      top: 14px;
+      right: 14px;
+    }
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .mobile-nav {
+      display: block;
+      padding: 7px 0 calc(7px + env(safe-area-inset-bottom));
+    }
+    .mobile-nav-items { justify-content: space-evenly; }
+    .mobile-nav-item {
+      flex: 1;
+      min-width: 0;
+      padding: 4px 0;
+      font-size: 10.5px;
+    }
+    .mobile-nav-item span:first-child { font-size: 20px; }
+    .toast {
+      left: 14px;
+      right: 14px;
+      bottom: calc(76px + env(safe-area-inset-bottom));
+      padding: 12px 14px;
+      font-size: 13px;
+    }
+    #helpCenterModal .modal [style*="grid-template-columns:1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+    #vip-pay-section .pay-methods {
+      gap: 8px !important;
+    }
+    #vip-pay-section .pay-btn {
+      flex: 1 1 0 !important;
+      max-width: none !important;
+    }
+    #vipUpgradeModal .modal { max-height: 92svh; }
+  }
+
+  @media (max-width: 380px) {
+    .hero h2 { font-size: 23px; }
+    .cat-card { padding: 12px 6px 9px; }
+    .listing-card { grid-template-columns: 88px minmax(0, 1fr); }
+    .listing-img { min-height: 106px; }
+    .footer-grid { grid-template-columns: 1fr; }
   }
 
   /* ===== ANIMATIONS ===== */
@@ -1114,7 +1396,7 @@
     <a href="#" class="mobile-nav-item" onclick="filterCat('dating',null);return false;">
       <span>💕</span><span>交友</span>
     </a>
-    <a href="#" class="mobile-nav-item">
+    <a href="#" class="mobile-nav-item" onclick="openModal('profile');return false;">
       <span>👤</span><span>我的</span>
     </a>
   </div>

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>淘宝西班牙 · 管理后台</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -690,13 +690,181 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 @media (max-width: 768px) {
   :root { --sidebar-w: 0px; }
-  .sidebar { transform: translateX(-220px); width: 220px; }
+  body {
+    display: block;
+    min-width: 0;
+  }
+  .sidebar {
+    width: 220px;
+    z-index: 120;
+    transform: translateX(-220px);
+    box-shadow: 18px 0 40px rgba(0,0,0,0.35);
+  }
   .sidebar.open { transform: translateX(0); }
-  .main { margin-left: 0; }
-  .mobile-toggle { display: flex; }
-  .content { padding: 16px; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .dash-grid { grid-template-columns: 1fr; }
+  .main {
+    min-width: 0;
+    margin-left: 0;
+  }
+  .mobile-toggle {
+    display: flex;
+    min-width: 40px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+  }
+  .topbar {
+    height: auto;
+    min-height: 56px;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .topbar-left {
+    min-width: 0;
+    align-items: flex-start;
+  }
+  .page-title { font-size: 15px; }
+  .page-breadcrumb {
+    max-width: 190px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+  .topbar-right {
+    max-width: 46%;
+    margin-left: auto;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .topbar-right .topbar-btn {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  .topbar-right .topbar-btn:nth-child(2) { display: none; }
+  .content {
+    overflow-x: hidden;
+    padding: 12px;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .stat-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 10px;
+    align-items: center;
+    padding: 14px;
+  }
+  .stat-card-icon {
+    grid-row: 1 / span 3;
+    margin-bottom: 0;
+    font-size: 24px;
+  }
+  .stat-card-val { font-size: 24px; }
+  .dash-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .card {
+    overflow-x: auto;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .card-header {
+    align-items: stretch;
+    padding: 12px;
+  }
+  .card-title { width: 100%; }
+  .card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 8px;
+  }
+  .card-actions .search-input,
+  .card-actions .select-input,
+  .card-actions .btn {
+    width: 100%;
+  }
+  table { min-width: 720px; }
+  th, td { padding: 10px 12px; }
+  .pagination {
+    min-width: 720px;
+    padding: 10px 12px;
+  }
+  .chart-container { padding: 14px 12px; }
+  .chart-bar-row { gap: 8px; }
+  .chart-bar-label {
+    width: 64px;
+    font-size: 11px;
+  }
+  .chart-bar-val { width: 44px; }
+  .activity-list { padding: 0 12px 12px; }
+  .config-row {
+    display: block;
+    margin-bottom: 12px;
+  }
+  .config-row label {
+    display: block;
+    width: auto;
+    margin-bottom: 6px;
+  }
+  .config-row input,
+  .config-row select {
+    width: 100%;
+  }
+  .modal-overlay {
+    align-items: flex-end;
+    z-index: 220;
+    padding: 0;
+  }
+  .modal {
+    width: 100%;
+    max-width: none;
+    max-height: 88svh;
+    border-radius: 16px 16px 0 0;
+    padding: 24px 16px calc(18px + env(safe-area-inset-bottom));
+  }
+  .modal-footer {
+    position: sticky;
+    bottom: calc(-18px - env(safe-area-inset-bottom));
+    flex-direction: column-reverse;
+    background: var(--surface);
+  }
+  .modal-footer .btn {
+    width: 100%;
+    padding: 10px 14px;
+  }
+  .auth-gate {
+    align-items: center;
+    padding: 14px;
+  }
+  .auth-card {
+    width: 100%;
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+  .toast {
+    left: 12px;
+    right: 12px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    max-width: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar { padding: 8px 10px; }
+  .topbar-right { max-width: 48%; }
+  .topbar-right .topbar-btn { font-size: 10.5px; }
+  .content { padding: 10px; }
+  .card-actions { grid-template-columns: 1fr; }
+  table,
+  .pagination { min-width: 680px; }
 }
 </style>
 </head>
