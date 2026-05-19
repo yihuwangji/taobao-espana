@@ -1130,29 +1130,33 @@
     .wechat-save-title { font-size: 14px; }
     .wechat-save-text { font-size: 12px; }
     .wechat-corner-guide {
-      top: calc(env(safe-area-inset-top) + 154px);
-      right: 6px;
-      width: 176px;
+      top: calc(env(safe-area-inset-top) + 4px);
+      right: 4px;
+      width: 48px;
+      height: 46px;
     }
     .wechat-corner-arrow {
-      right: 4px;
-      top: -106px;
-      width: 86px;
-      height: 110px;
+      right: 0;
+      top: 0;
+      width: 48px;
+      height: 46px;
     }
     .wechat-corner-arrow::before {
-      top: 66px;
-      width: 104px;
+      top: 26px;
+      right: 6px;
+      width: 42px;
       height: 3px;
-      transform: rotate(-52deg);
+      transform: rotate(-38deg);
     }
     .wechat-corner-arrow::after {
+      right: 0;
+      top: 7px;
       width: 11px;
       height: 11px;
       border-top-width: 3px;
       border-right-width: 3px;
     }
-    .wechat-corner-card { padding: 8px 9px 8px 11px; }
+    .wechat-corner-card { display: none; }
     .wechat-corner-title { font-size: 12px; }
     .wechat-corner-text { font-size: 11px; }
     .content-shell {
