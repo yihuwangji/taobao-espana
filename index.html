@@ -934,6 +934,17 @@
 
   .modal-overlay.open .modal { transform: translateY(0); }
 
+  #reportViolationModal {
+    align-items: flex-start;
+    overflow-y: auto;
+    padding-top: max(20px, calc(env(safe-area-inset-top) + 20px));
+    padding-bottom: 20px;
+  }
+
+  #reportViolationModal .modal {
+    max-height: calc(100svh - 40px - env(safe-area-inset-top));
+  }
+
   .modal h3 {
     font-family: 'Noto Serif SC', serif;
     font-size: 20px;
@@ -1342,6 +1353,16 @@
     .modal-close {
       top: 14px;
       right: 14px;
+    }
+    #reportViolationModal {
+      align-items: flex-start;
+      padding: calc(env(safe-area-inset-top) + 12px) 12px 12px;
+    }
+    #reportViolationModal .modal {
+      max-width: 500px !important;
+      max-height: calc(100svh - 24px - env(safe-area-inset-top));
+      border-radius: 16px;
+      padding: 20px 16px calc(18px + env(safe-area-inset-bottom));
     }
     .form-row {
       grid-template-columns: 1fr;
