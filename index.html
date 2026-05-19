@@ -389,11 +389,10 @@
   .wechat-corner-guide {
     display: none;
     position: fixed;
-    top: calc(env(safe-area-inset-top) + 6px);
+    top: calc(env(safe-area-inset-top) + 128px);
     right: 8px;
     z-index: 110;
     width: 190px;
-    padding-top: 34px;
     pointer-events: none;
   }
 
@@ -401,22 +400,22 @@
 
   .wechat-corner-arrow {
     position: absolute;
-    top: 2px;
+    top: -88px;
     right: 6px;
-    width: 82px;
-    height: 34px;
+    width: 96px;
+    height: 92px;
   }
 
   .wechat-corner-arrow::before {
     content: '';
     position: absolute;
     right: 8px;
-    top: 18px;
-    width: 72px;
+    top: 52px;
+    width: 96px;
     height: 4px;
     background: #07C160;
     border-radius: 999px;
-    transform: rotate(-28deg);
+    transform: rotate(-46deg);
     transform-origin: right center;
     box-shadow: 0 2px 8px rgba(7,193,96,0.28);
   }
@@ -425,7 +424,7 @@
     content: '';
     position: absolute;
     right: 2px;
-    top: 5px;
+    top: 4px;
     width: 13px;
     height: 13px;
     border-top: 4px solid #07C160;
@@ -1131,19 +1130,21 @@
     .wechat-save-title { font-size: 14px; }
     .wechat-save-text { font-size: 12px; }
     .wechat-corner-guide {
-      top: calc(env(safe-area-inset-top) + 4px);
+      top: calc(env(safe-area-inset-top) + 154px);
       right: 6px;
       width: 176px;
-      padding-top: 30px;
     }
     .wechat-corner-arrow {
       right: 4px;
-      width: 74px;
-      height: 30px;
+      top: -106px;
+      width: 86px;
+      height: 110px;
     }
     .wechat-corner-arrow::before {
-      width: 64px;
+      top: 66px;
+      width: 104px;
       height: 3px;
+      transform: rotate(-52deg);
     }
     .wechat-corner-arrow::after {
       width: 11px;
