@@ -407,29 +407,37 @@
   }
 
   .wechat-corner-arrow::before {
-    content: '';
+    content: '...';
     position: absolute;
-    right: 8px;
-    top: 52px;
-    width: 96px;
-    height: 4px;
-    background: #07C160;
+    right: 0;
+    top: 0;
+    min-width: 24px;
+    height: 18px;
+    padding: 0 6px 3px;
+    background: #fff;
+    color: #057b3f;
+    border: 1px solid #bdebd0;
     border-radius: 999px;
-    transform: rotate(-46deg);
-    transform-origin: right center;
-    box-shadow: 0 2px 8px rgba(7,193,96,0.28);
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 14px;
+    text-align: center;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.14);
   }
 
   .wechat-corner-arrow::after {
     content: '';
     position: absolute;
-    right: 2px;
-    top: 4px;
-    width: 13px;
-    height: 13px;
-    border-top: 4px solid #07C160;
-    border-right: 4px solid #07C160;
-    transform: rotate(-18deg);
+    right: 13px;
+    top: 24px;
+    width: 62px;
+    height: 38px;
+    border-top: 2px solid #07C160;
+    border-right: 2px solid #07C160;
+    border-radius: 0 32px 0 0;
+    transform: rotate(-7deg);
+    opacity: 0.92;
   }
 
   .wechat-corner-card {
@@ -1136,25 +1144,29 @@
       height: auto;
     }
     .wechat-corner-arrow {
-      right: 4px;
-      top: -22px;
-      width: 48px;
+      right: -2px;
+      top: -25px;
+      width: 42px;
       height: 30px;
     }
     .wechat-corner-arrow::before {
-      top: 18px;
-      right: 6px;
-      width: 44px;
-      height: 3px;
-      transform: rotate(-32deg);
+      top: 0;
+      right: 0;
+      min-width: 21px;
+      height: 16px;
+      padding: 0 5px 3px;
+      font-size: 13px;
+      line-height: 13px;
     }
     .wechat-corner-arrow::after {
-      right: 0;
-      top: 5px;
-      width: 11px;
-      height: 11px;
-      border-top-width: 3px;
-      border-right-width: 3px;
+      right: 10px;
+      top: 19px;
+      width: 28px;
+      height: 18px;
+      border-top-width: 2px;
+      border-right-width: 2px;
+      border-radius: 0 22px 0 0;
+      transform: rotate(-8deg);
     }
     .wechat-corner-card {
       display: block;
