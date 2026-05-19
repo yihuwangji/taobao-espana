@@ -294,28 +294,32 @@
 
   .hero-actions {
     display: flex;
-    gap: 12px;
+    gap: 14px;
     flex-wrap: wrap;
-    margin-bottom: 28px;
+    margin-bottom: 30px;
   }
 
   .hero-action {
-    border: 1.5px solid rgba(255,255,255,0.68);
-    border-radius: 8px;
-    color: white;
-    background: rgba(255,255,255,0.08);
-    padding: 11px 18px;
-    font-size: 14px;
-    font-weight: 700;
+    min-width: 138px;
+    border: 2px solid rgba(255,255,255,0.82);
+    border-radius: 10px;
+    color: #fff;
+    background: rgba(255,255,255,0.14);
+    padding: 15px 24px;
+    font-size: 17px;
+    font-weight: 900;
     text-decoration: none;
     cursor: pointer;
     font-family: 'Noto Sans SC', sans-serif;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.16);
   }
 
   .hero-action.primary {
     background: var(--gold);
     border-color: var(--gold);
     color: var(--ink);
+    box-shadow: 0 10px 24px rgba(255,171,31,0.32);
   }
 
   .hero-stats {
@@ -1130,12 +1134,13 @@
     .hero-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 18px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
     .hero-action {
-      padding: 11px 8px;
-      font-size: 13px;
+      min-width: 0;
+      padding: 14px 8px;
+      font-size: 16px;
       text-align: center;
     }
     .hero-stats {
@@ -1510,8 +1515,8 @@
     <h2>在西班牙找工作、找房源、转让生意，一页搞定</h2>
     <p>面向巴塞罗那、马德里、瓦伦西亚等城市的华人社区，发布招工、租房、二手、服务与生意转让信息，后台审核后展示。</p>
     <div class="hero-actions">
-      <button class="hero-action primary" onclick="openModal('post')">免费发布信息</button>
-      <a class="hero-action" href="#listingsGrid">浏览最新信息</a>
+      <button class="hero-action primary" onclick="openModal('post')">马上发布</button>
+      <a class="hero-action" href="#listingsGrid">最新信息</a>
     </div>
     <div class="hero-stats">
       <div class="stat">
