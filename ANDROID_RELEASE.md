@@ -20,6 +20,7 @@
 - 新应用和更新需提交 Android App Bundle (`.aab`)。
 - 新应用和更新需 target Android 15 / API 35 或更高。
 - 新应用需加入 Play App Signing。
+- 如果 Google Play 开发者账号是 2023-11-13 之后创建的个人账号，正式发布前通常需要至少 12 名测试者连续参与封闭测试 14 天。
 
 ## 本仓库已完成
 
