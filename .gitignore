@@ -15,3 +15,4 @@ android-twa/app/build/
 # Local tooling caches and downloads
 android-commandlinetools.zip
 .bubblewrap-answers.txt
+supabase/.temp/
