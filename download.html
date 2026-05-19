@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#D42B2B">
+<title>下载安卓APP - 西班牙生活通</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    color: #2b1b12;
+    background: #fff8ed;
+  }
+  .page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #9e1c1c;
+    color: #fff;
+    padding: 14px 18px;
+  }
+  .topbar {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 800;
+  }
+  .brand img {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+  .home-link {
+    color: rgba(255,255,255,0.82);
+    text-decoration: none;
+    font-size: 14px;
+  }
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 34px 18px 28px;
+  }
+  .download-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) 240px;
+    gap: 28px;
+    align-items: center;
+    padding: 30px;
+    border: 1px solid #f0d2a7;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 14px 34px rgba(116, 57, 20, 0.12);
+  }
+  .kicker {
+    display: inline-flex;
+    margin-bottom: 12px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #fff1d7;
+    color: #9e1c1c;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  h1 {
+    margin-bottom: 10px;
+    font-size: 32px;
+    line-height: 1.18;
+    letter-spacing: 0;
+  }
+  p {
+    color: #6f5a4b;
+    line-height: 1.75;
+    font-size: 15px;
+  }
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+  }
+  .download-btn,
+  .secondary-btn {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    padding: 0 18px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 15px;
+  }
+  .download-btn {
+    background: #d42b2b;
+    color: #fff;
+  }
+  .secondary-btn {
+    border: 1px solid #d9b679;
+    color: #6f3b00;
+    background: #fffaf1;
+  }
+  .app-card {
+    padding: 22px 18px;
+    border-radius: 8px;
+    background: #1f1814;
+    color: #fff;
+    text-align: center;
+  }
+  .app-card img {
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+    margin-bottom: 12px;
+  }
+  .app-name {
+    font-weight: 900;
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .version {
+    color: rgba(255,255,255,0.68);
+    font-size: 13px;
+  }
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .note {
+    padding: 14px;
+    border: 1px solid #efd8b6;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.68);
+  }
+  .note strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+  .note span {
+    color: #745f4d;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  footer {
+    padding: 18px;
+    color: #846c59;
+    font-size: 13px;
+    text-align: center;
+  }
+  @media (max-width: 720px) {
+    header { padding: 12px 14px; }
+    .home-link { font-size: 13px; }
+    main { padding: 22px 14px 24px; }
+    .download-panel {
+      grid-template-columns: 1fr;
+      padding: 22px 16px;
+      gap: 20px;
+    }
+    h1 { font-size: 26px; }
+    .actions { flex-direction: column; }
+    .download-btn,
+    .secondary-btn { width: 100%; }
+    .notes { grid-template-columns: 1fr; }
+    .app-card { order: -1; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="topbar">
+        <a class="brand" href="/">
+          <img src="/assets/icons/icon-192.png" alt="">
+          <span>西班牙生活通</span>
+        </a>
+        <a class="home-link" href="/">返回首页</a>
+      </div>
+    </header>
+    <main>
+      <section class="download-panel">
+        <div>
+          <div class="kicker">Android APK</div>
+          <h1>下载西班牙生活通安卓APP</h1>
+          <p>适合安卓手机直接安装使用。安装后打开的是官方线上站点，发布、浏览和账号数据都会与网页端同步。</p>
+          <div class="actions">
+            <a class="download-btn" href="/downloads/xibanyalife-1.0.0.apk" download>立即下载APK</a>
+            <a class="secondary-btn" href="/">先浏览网页版</a>
+          </div>
+        </div>
+        <div class="app-card">
+          <img src="/assets/icons/icon-192.png" alt="">
+          <div class="app-name">西班牙生活通</div>
+          <div class="version">版本 1.0.0 · 约 1.1 MB</div>
+        </div>
+      </section>
+      <section class="notes" aria-label="安装说明">
+        <div class="note">
+          <strong>安装提示</strong>
+          <span>下载后如果系统提示风险，请确认来源为本站，并允许浏览器安装未知来源应用。</span>
+        </div>
+        <div class="note">
+          <strong>官方来源</strong>
+          <span>只建议从 taobao-espana.vercel.app 下载，避免安装他人转发的未知版本。</span>
+        </div>
+        <div class="note">
+          <strong>数据同步</strong>
+          <span>APP 与网页使用同一套 Supabase 数据，信息发布和审核状态保持一致。</span>
+        </div>
+      </section>
+    </main>
+    <footer>© 2026 西班牙生活通 · Android 安装包仅供用户自愿下载安装</footer>
+  </div>
+</body>
+</html>

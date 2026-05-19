@@ -4,6 +4,8 @@ android-release/
 *.jks
 *.aab
 *.apk
+!downloads/
+!downloads/*.apk
 
 # Android/Gradle build output
 .gradle/
