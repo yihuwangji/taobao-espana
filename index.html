@@ -461,8 +461,8 @@
   /* ===== LISTINGS GRID ===== */
   .listings-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px;
   }
 
   .listing-card {
@@ -482,13 +482,13 @@
 
   .listing-img {
     width: 100%;
-    height: 160px;
+    height: 106px;
     object-fit: cover;
     background: linear-gradient(135deg, #f0e8d8, #e8d8c0);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 48px;
+    font-size: 36px;
     position: relative;
   }
 
@@ -550,10 +550,10 @@
     color: #04783d;
   }
 
-  .listing-body { padding: 14px; }
+  .listing-body { padding: 11px 12px 12px; }
 
   .listing-title {
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     color: var(--ink);
     margin-bottom: 6px;
@@ -568,11 +568,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
+    margin-top: 6px;
   }
 
   .listing-price {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 900;
     color: var(--red);
     font-family: 'Noto Serif SC', serif;
@@ -591,7 +591,7 @@
   .listing-tags {
     display: flex;
     gap: 5px;
-    margin-top: 8px;
+    margin-top: 6px;
     flex-wrap: wrap;
   }
 
@@ -601,6 +601,19 @@
     border-radius: 20px;
     background: #F0EBE3;
     color: var(--ink-mid);
+  }
+
+  .listing-open-hint {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f2e8dc;
+    color: var(--red-dark);
+    font-size: 12px;
+    font-weight: 800;
   }
 
   /* ===== CITY TABS ===== */
@@ -1043,14 +1056,14 @@
     }
     .listing-card {
       display: grid;
-      grid-template-columns: 96px minmax(0, 1fr);
-      min-height: 112px;
+      grid-template-columns: 82px minmax(0, 1fr);
+      min-height: 100px;
       animation: none;
     }
     .listing-img {
       height: 100%;
-      min-height: 112px;
-      font-size: 32px;
+      min-height: 100px;
+      font-size: 28px;
     }
     .listing-body {
       min-width: 0;
@@ -1058,7 +1071,7 @@
     }
     .listing-title {
       margin-bottom: 4px;
-      font-size: 14px;
+      font-size: 13px;
     }
     .listing-meta {
       align-items: flex-start;
@@ -1066,7 +1079,7 @@
       gap: 4px;
       margin-top: 6px;
     }
-    .listing-price { font-size: 16px; }
+    .listing-price { font-size: 15px; }
     .listing-tags {
       gap: 4px;
       margin-top: 6px;
@@ -1074,6 +1087,17 @@
     .tag {
       padding: 2px 6px;
       font-size: 10px;
+    }
+    .listing-share {
+      right: 6px;
+      top: 6px;
+      padding: 3px 6px;
+      font-size: 10px;
+    }
+    .listing-open-hint {
+      margin-top: 6px;
+      padding-top: 6px;
+      font-size: 11px;
     }
     .post-banner {
       align-items: stretch;
@@ -1160,8 +1184,8 @@
   @media (max-width: 380px) {
     .hero h2 { font-size: 23px; }
     .cat-card { padding: 12px 6px 9px; }
-    .listing-card { grid-template-columns: 88px minmax(0, 1fr); }
-    .listing-img { min-height: 106px; }
+    .listing-card { grid-template-columns: 78px minmax(0, 1fr); }
+    .listing-img { min-height: 96px; }
     .footer-grid { grid-template-columns: 1fr; }
   }
 
@@ -1953,7 +1977,10 @@ function renderListings() {
           <div class="listing-price">${escapeHTML(l.price)}<span> ${escapeHTML(l.unit)}</span></div>
           <div class="listing-loc">📍 ${escapeHTML(l.city)}</div>
         </div>
-        <div style="font-size:11px;color:var(--ink-light);margin-top:6px">🕐 ${escapeHTML(l.time)}</div>
+        <div class="listing-open-hint">
+          <span>🕐 ${escapeHTML(l.time)}</span>
+          <span>点开看详情 ›</span>
+        </div>
       </div>
     </div>
   `).join('');
@@ -2386,7 +2413,7 @@ loadListings().then(handleInitialDeepLink);
 </script>
 
   <div id="vipUpgradeModal" class="modal-overlay" style="display:none;"><div class="modal relative" style="max-width:480px;"><button class="modal-close" onclick="document.getElementById('vipUpgradeModal').style.display='none'">✕</button><h3>💎 升级VIP会员</h3><p style="color:#888;font-size:13px;margin-bottom:16px;">选择套餐，享置顶展示等专属特权</p><div id="vipPlanMonth" onclick="selectVipPlan('monthly')" style="border:2px solid #e09518;border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;background:#fffbf2;"><div style="display:flex;align-items:center;gap:12px;"><div style="font-size:20px;">📅</div><div style="flex:1;"><div style="font-weight:bold;">月付套餐</div><div style="font-size:12px;color:#888;">灵活订阅，随时可续</div></div><div style="font-size:22px;font-weight:bold;color:#e09518;">€9.9<span style="font-size:12px;color:#888;">/月</span></div></div></div><div id="vipPlanYear" onclick="selectVipPlan('yearly')" style="border:2px solid #e0e0e0;border-radius:12px;padding:14px;margin-bottom:16px;cursor:pointer;position:relative;"><div style="position:absolute;top:-10px;right:14px;background:linear-gradient(90deg,#e09518,#f5c842);color:#fff;font-size:11px;font-weight:bold;padding:2px 10px;border-radius:20px;">🎉 立省€50</div><div style="display:flex;align-items:center;gap:12px;"><div style="font-size:20px;">📆</div><div style="flex:1;"><div style="font-weight:bold;">年付套餐</div><div style="font-size:12px;color:#888;">相当于 <strong style="color:#e09518;">€5.7/月</strong></div><div style="font-size:11px;color:#aaa;text-decoration:line-through;">原价€118.8/年</div></div><div style="text-align:right;"><div style="font-size:22px;font-weight:bold;color:#e09518;">€68.8<span style="font-size:12px;color:#888;">/年</span></div><div style="font-size:12px;color:#e05a00;font-weight:bold;">节省€50</div></div></div></div><div style="background:#f9f9f9;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#555;"><div style="font-weight:bold;margin-bottom:6px;">VIP专属权益：</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"><div>⭐ 置顶优先展示</div><div>🔄 无限次刷新</div><div>💎 VIP专属标识</div><div>📅 展示30天</div><div>🚀 审核优先处理</div><div>📞 专属客服</div></div></div><div id="vip-pay-section" style="margin-top:16px"><style>#vip-pay-section .pay-methods{display:flex;gap:16px;justify-content:center;margin-bottom:14px}#vip-pay-section .pay-btn{flex:0 0 140px;max-width:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:2px solid #e0e0e0;border-radius:12px;padding:14px 6px;cursor:pointer;background:#fff;transition:all 0.2s}#vip-pay-section .pay-btn:hover,#vip-pay-section .pay-btn.selected{border-color:#c8960c;background:#fffbf0;box-shadow:0 4px 12px rgba(200,150,12,.15)}#vip-pay-section .pay-btn .pay-icon{font-size:28px;line-height:1}#vip-pay-section .pay-btn .pay-name{font-size:13px;color:#444;font-weight:600}#vip-pay-section .pay-btn .pay-badge{font-size:10px;background:#f0f0f0;border-radius:4px;padding:1px 5px;color:#888}#vip-pay-section .pay-form{display:none;background:#f9f9f9;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #eee}#vip-pay-section .pay-form.active{display:block}#vip-pay-section .pay-form input[type=email]{width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;margin-top:6px;background:#fff}#vip-pay-section .pay-form input:focus{border-color:#c8960c}#vip-pay-section .pay-form label{font-size:12px;color:#666;font-weight:500}#vip-pay-section .pay-form .form-row{margin-bottom:10px}#vip-pay-section .qr-box{width:130px;height:130px;border-radius:12px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;font-size:11px;text-align:center}#vip-pay-section .qr-box.bizum-qr{border:2px dashed #0082FF;background:#f0f6ff;color:#0082FF}#vip-pay-section .qr-box.wechat-qr{border:2px dashed #07C160;background:#f0fff4;color:#07C160}#vip-pay-section .qr-box img{width:100%;height:100%;object-fit:contain;border-radius:10px}#vip-pay-section .qr-box .qr-icon{font-size:36px}#vip-pay-section .amount-box{border-radius:10px;padding:10px 14px;margin:10px 0;text-align:center}#vip-pay-section .amount-box.bizum-amount{background:#f0f6ff;border:1.5px solid #0082FF}#vip-pay-section .amount-box.wechat-amount{background:#f0fff4;border:1.5px solid #07C160}#vip-pay-section .amount-label{font-size:11px;color:#888;margin-bottom:3px}#vip-pay-section .amount-num{font-size:28px;font-weight:800}#vip-pay-section .amount-num.blue{color:#0082FF}#vip-pay-section .amount-num.green{color:#07C160}#vip-pay-section .amount-sub{font-size:11px;color:#aaa;margin-top:2px}#vip-pay-section .amount-tip{font-size:10px;color:#bbb;margin-top:3px}#vip-pay-section .pay-submit-btn{width:100%;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;color:#fff;margin-top:4px}#vip-pay-section .pay-submit-btn.blue{background:linear-gradient(135deg,#0082FF,#0055cc)}#vip-pay-section .pay-submit-btn.green{background:linear-gradient(135deg,#07C160,#059e4e)}#vip-pay-section .pay-note{font-size:11px;color:#aaa;text-align:center;margin-top:8px}#vip-pay-section .pay-note span{color:#c8960c}#vip-pay-section .id-line{font-weight:700;font-size:13px;margin-top:4px;display:block}#vip-pay-section .id-line.blue{color:#0082FF}#vip-pay-section .id-line.green{color:#07C160}</style><div style="font-size:14px;color:#555;margin-bottom:10px;font-weight:600;text-align:center">🔐 选择支付方式</div><div class="pay-methods"><div class="pay-btn bizum" onclick="vipSelectPay('bizum')"><span class="pay-icon" style="color:#0082FF">📱</span><span class="pay-name">Bizum</span><span class="pay-badge">西班牙首选</span></div><div class="pay-btn wechat" onclick="vipSelectPay('wechat')"><span class="pay-icon" style="color:#07C160">💬</span><span class="pay-name">微信支付</span><span class="pay-badge">国内用户</span></div></div><div class="pay-form" id="vip-form-bizum"><div style="text-align:center"><div class="qr-box bizum-qr" id="bizum-qr-display"><span class="qr-icon">▦</span><span>请联系管理员获取 Bizum 收款码</span></div><p style="font-size:12px;color:#555;margin:4px 0 2px">使用银行App扫码Bizum付款</p><span class="id-line blue">或直接转账至：<span id="bizum-phone-display">请联系客服确认</span></span></div><div class="amount-box bizum-amount"><div class="amount-label">当前套餐应付金额</div><div class="amount-num blue" id="bizum-eur-price">€68.8</div><div class="amount-sub" id="bizum-plan-label">年付套餐</div></div><div class="form-row"><label>📧 付款后请留下您的邮箱（用于激活）</label><input type="email" placeholder="your@email.com" /></div><button class="pay-submit-btn blue" id="bizum-submit-btn" onclick="vipSubmitPay('bizum')">✅ 我已完成 Bizum 付款 €68.8</button></div><div class="pay-form" id="vip-form-wechat"><div style="text-align:center"><div class="qr-box wechat-qr" id="wechat-qr-display"><span class="qr-icon">▦</span><span>请联系管理员获取微信收款码</span></div><p style="font-size:12px;color:#555;margin:4px 0 2px">使用微信扫码付款</p><span class="id-line green">或搜索微信号：<span id="wechat-id-display">espana_life</span></span></div><div class="amount-box wechat-amount"><div class="amount-label">当前套餐应付金额（人民币）</div><div class="amount-num green" id="wechat-cny-price">￥528</div><div class="amount-sub" id="wechat-plan-label">年付套餐 · 对应 €68.8</div><div class="amount-tip">按实时汇率1€≈7.8￥，取整定价</div></div><div class="form-row"><label>📧 付款后请留下您的邮箱（用于激活）</label><input type="email" placeholder="your@email.com" /></div><button class="pay-submit-btn green" id="wechat-submit-btn" onclick="vipSubmitPay('wechat')">✅ 我已完成微信付款 ￥528</button></div><p class="pay-note">付款后通常 <span>2小时内</span> 激活 · 如有问题联系 <span>espana_life</span></p></div><script>window.vipSelectPay=function(m){document.querySelectorAll('#vip-pay-section .pay-btn').forEach(function(b){b.classList.remove('selected')});document.querySelectorAll('#vip-pay-section .pay-form').forEach(function(f){f.classList.remove('active')});var btn=document.querySelector('#vip-pay-section .pay-btn.'+m);if(btn)btn.classList.add('selected');var form=document.getElementById('vip-form-'+m);if(form)form.classList.add('active')};window.vipUpdateAmounts=function(plan){var isY=plan!=='monthly';var eur=isY?'\u20ac68.8':'\u20ac9.9';var cny=isY?'\uffe5528':'\uffe579';var lbl=isY?'\u5e74\u4ed8\u5957\u9910':'\u6708\u4ed8\u5957\u9910';var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v};set('bizum-eur-price',eur);set('bizum-plan-label',lbl);set('bizum-submit-btn','\u2705 \u6211\u5df2\u5b8c\u6210 Bizum \u4ed8\u6b3e '+eur);set('wechat-cny-price',cny);set('wechat-plan-label',lbl+' \u00b7 \u5bf9\u5e94 '+eur);set('wechat-submit-btn','\u2705 \u6211\u5df2\u5b8c\u6210\u5fae\u4fe1\u4ed8\u6b3e '+cny);var bqr=localStorage.getItem('qr_bizum');var wqr=localStorage.getItem('qr_wechat');if(bqr){var bd=document.getElementById('bizum-qr-display');if(bd)bd.innerHTML='<img src="'+bqr+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;"/>'}var wph=localStorage.getItem('bizum_phone');if(wph){var bp=document.getElementById('bizum-phone-display');if(bp)bp.textContent=wph}if(wqr){var wd=document.getElementById('wechat-qr-display');if(wd)wd.innerHTML='<img src="'+wqr+'" style="width:100%;height:100%;object-fit:contain;border-radius:10px;"/>'}var wid=localStorage.getItem('wechat_id');if(wid){var wi=document.getElementById('wechat-id-display');if(wi)wi.textContent=wid}};window.vipSubmitPay=function(m){var isY=window._selectedVipPlan!=='monthly';var eur=isY?'\u20ac68.8':'\u20ac9.9';var cny=isY?'\uffe5528':'\uffe579';var lbl=isY?'\u5e74\u4ed8':'\u6708\u4ed8';var names={bizum:'Bizum',wechat:'\u5fae\u4fe1\u652f\u4ed8'};var amt=m==='wechat'?cny+'\uff08\u7ea6'+eur+'\uff09':eur;alert('\u2705 \u5df2\u63d0\u4ea4 '+names[m]+' \u4ed8\u6b3e\u7533\u8bf7\uff01\n\u5957\u9910\uff1a'+lbl+' '+amt+'\n\n\u6211\u4eec\u5c06\u57282\u5c0f\u65f6\u5185\u6838\u5b9e\u5e76\u6fc0\u6d3b\u60a8\u7684VIP\uff0c\u611f\u8c22\u652f\u6301\uff01')};var origSelectVip=window.selectVipPlan;window.selectVipPlan=function(p){origSelectVip&&origSelectVip(p);window._selectedVipPlan=p;window.vipUpdateAmounts&&window.vipUpdateAmounts(p)};document.addEventListener('DOMContentLoaded',function(){window.vipUpdateAmounts&&window.vipUpdateAmounts(window._selectedVipPlan||'yearly')});</script>
-  <style>#profileModal .modal{max-width:680px;width:95vw}.my-listing-card{border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:10px;transition:box-shadow .2s}.my-listing-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}.my-listing-card .mlc-title{font-weight:700;font-size:14px;color:#333;margin-bottom:4px}.my-listing-card .mlc-meta{font-size:11px;color:#999;display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}.mlc-status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}.mlc-status.approved{background:#e8f5e9;color:#2e7d32}.mlc-status.pending{background:#fff8e1;color:#f57f17}.mlc-status.rejected{background:#fce4ec;color:#c62828}.mlc-actions{display:flex;gap:8px}.mlc-btn{padding:4px 12px;font-size:11px;border-radius:6px;border:1px solid;cursor:pointer;font-weight:500}.mlc-btn.edit{border-color:#e09518;color:#e09518;background:#fffbf2}.mlc-btn.pin{border-color:#1565c0;color:#1565c0;background:#e3f2fd}.mlc-btn.del{border-color:#c62828;color:#c62828;background:#fce4ec}.mlc-btn:disabled{opacity:.5;cursor:not-allowed}</style>
+  <style>#profileModal .modal{max-width:680px;width:95vw}.my-listing-card{border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:10px;transition:box-shadow .2s}.my-listing-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}.my-listing-card .mlc-title{font-weight:700;font-size:14px;color:#333;margin-bottom:4px}.my-listing-card .mlc-meta{font-size:11px;color:#999;display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}.mlc-status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}.mlc-status.approved{background:#e8f5e9;color:#2e7d32}.mlc-status.pending{background:#fff8e1;color:#f57f17}.mlc-status.rejected{background:#fce4ec;color:#c62828}.mlc-actions{display:flex;gap:8px;flex-wrap:wrap}.mlc-btn{padding:4px 12px;font-size:11px;border-radius:6px;border:1px solid;cursor:pointer;font-weight:500}.mlc-btn.view{border-color:#2e7d32;color:#2e7d32;background:#e8f5e9}.mlc-btn.edit{border-color:#e09518;color:#e09518;background:#fffbf2}.mlc-btn.pin{border-color:#1565c0;color:#1565c0;background:#e3f2fd}.mlc-btn.del{border-color:#c62828;color:#c62828;background:#fce4ec}.mlc-btn:disabled{opacity:.5;cursor:not-allowed}</style>
   <script>
   window.getSb=function(){if(window._sbClient)return window._sbClient;window._sbClient=window.supabase.createClient('https://jfhpsxfnbpsvvtqsdvco.supabase.co','sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta');return window._sbClient;};
   window._selectedPlan='free';window._vipPeriod='monthly';window._selectedVipPlan='monthly';
@@ -2396,7 +2423,8 @@ loadListings().then(handleInitialDeepLink);
   window.selectVipPlan=function(p){window._selectedVipPlan=p;var m=document.getElementById('vipPlanMonth'),y=document.getElementById('vipPlanYear');if(p==='monthly'){if(m){m.style.border='2px solid #e09518';m.style.background='#fffbf2';}if(y){y.style.border='2px solid #e0e0e0';y.style.background='#fff';}}else{if(y){y.style.border='2px solid #e09518';y.style.background='#fffbf2';}if(m){m.style.border='2px solid #e0e0e0';m.style.background='#fff';}}};
   window.confirmVipUpgrade=function(){var p=window._selectedVipPlan,pr=p==='yearly'?'€68.8/年':'€9.9/月';navigator.clipboard&&navigator.clipboard.writeText('espana_life').catch(function(){});var v=document.getElementById('vipUpgradeModal');if(v)v.style.display='none';var t=document.getElementById('toast');if(t){t.textContent='客服微信espana_life已复制，请添加后完成'+pr+'付款';t.style.display='block';setTimeout(function(){t.style.display='none';},4000);}};
   window.switchProfileTab=function(tab,btn){document.querySelectorAll('#profileTabBar button').forEach(function(b){b.style.color='#888';b.style.borderBottom='none';});if(btn){btn.style.color='#e09518';btn.style.borderBottom='2px solid #e09518';}var lp=document.getElementById('myListingsPanel'),ep=document.getElementById('editListingPanel'),ap=document.getElementById('accountPanel');if(lp)lp.style.display=tab==='listings'?'block':'none';if(ep)ep.style.display='none';if(ap)ap.style.display=tab==='account'?'block':'none';if(tab==='listings')window.loadMyListings&&window.loadMyListings();};
-  window.loadMyListings=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var panel=document.getElementById('myListingsPanel');if(!panel)return;panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">⏳ 加载中…</div>';var r=await sb.from('listings').select('*').eq('user_id',sess.user.id).order('created_at',{ascending:false});if(r.error){panel.innerHTML='<div style="color:#c62828;padding:20px;">❌ '+r.error.message+'</div>';return;}if(!r.data||!r.data.length){panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">📭 暂无发布记录</div>';return;}var tv=r.data.reduce(function(s,d){return s+(d.view_count||0);},0);['statPostCount','statViewCount'].forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=i===0?r.data.length:tv;});var cn={worker:'招工',house:'租房',business:'生意转让',wholesale:'批发',dating:'交友',goods:'二手',service:'生活',edu:'教育'};var sm={approved:{l:'已上线',c:'approved'},pending:{l:'审核中',c:'pending'},rejected:{l:'已拒绝',c:'rejected'}};panel.innerHTML=r.data.map(function(item){var s=sm[item.status]||{l:item.status,c:'pending'};var dt=new Date(item.created_at).toLocaleDateString('zh-CN');return '<div class="my-listing-card"><div class="mlc-title">'+item.title+(item.is_pinned?' 📌':'')+'</div><div class="mlc-meta"><span>'+(cn[item.category]||item.category)+'</span><span>📍'+(item.city||'')+'</span><span>👁'+(item.view_count||0)+'</span><span>'+dt+'</span><span class="mlc-status '+s.c+'">'+s.l+'</span>'+(item.reject_reason?'<span style="color:#c62828;">拒绝:'+item.reject_reason+'</span>':'')+'</div><div class="mlc-actions"><button class="mlc-btn edit" onclick="startEdit('+item.id+')">✏️ 编辑</button>'+(!item.is_pinned?'<button class="mlc-btn pin" onclick="pinListing('+item.id+',this)">📌 置顶</button>':'<button class="mlc-btn pin" disabled>已置顶</button>')+'<button class="mlc-btn del" onclick="deleteListing('+item.id+',this)">🗑 删除</button></div></div>';}).join('');};
+  window.loadMyListings=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var panel=document.getElementById('myListingsPanel');if(!panel)return;panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">⏳ 加载中…</div>';var r=await sb.from('listings').select('*').eq('user_id',sess.user.id).order('created_at',{ascending:false});if(r.error){panel.innerHTML='<div style="color:#c62828;padding:20px;">❌ '+r.error.message+'</div>';return;}if(!r.data||!r.data.length){panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">📭 暂无发布记录</div>';return;}var tv=r.data.reduce(function(s,d){return s+(d.view_count||0);},0);['statPostCount','statViewCount'].forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=i===0?r.data.length:tv;});var cn={worker:'招工',house:'租房',business:'生意转让',wholesale:'批发',dating:'交友',goods:'二手',service:'生活',edu:'教育'};var sm={approved:{l:'已上线',c:'approved'},pending:{l:'审核中',c:'pending'},rejected:{l:'已拒绝',c:'rejected'}};panel.innerHTML=r.data.map(function(item){var s=sm[item.status]||{l:item.status,c:'pending'};var dt=new Date(item.created_at).toLocaleDateString('zh-CN');return '<div class="my-listing-card"><div class="mlc-title">'+item.title+(item.is_pinned?' 📌':'')+'</div><div class="mlc-meta"><span>'+(cn[item.category]||item.category)+'</span><span>📍'+(item.city||'')+'</span><span>👁'+(item.view_count||0)+'</span><span>'+dt+'</span><span class="mlc-status '+s.c+'">'+s.l+'</span>'+(item.reject_reason?'<span style="color:#c62828;">拒绝:'+item.reject_reason+'</span>':'')+'</div><div class="mlc-actions"><button class="mlc-btn view" onclick="viewMyListing('+item.id+')">查看详情</button><button class="mlc-btn edit" onclick="startEdit('+item.id+')">✏️ 编辑</button>'+(!item.is_pinned?'<button class="mlc-btn pin" onclick="pinListing('+item.id+',this)">📌 置顶</button>':'<button class="mlc-btn pin" disabled>已置顶</button>')+'<button class="mlc-btn del" onclick="deleteListing('+item.id+',this)">🗑 删除</button></div></div>';}).join('');};
+  window.viewMyListing=async function(id){var sb=window.getSb();var content=document.getElementById('detailContent');if(!content)return;content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px;margin-bottom:10px">⏳</div><div>加载中…</div></div>';openModal('detail');var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999">信息加载失败</div>';return;}var d=r.data;var safe=function(v){return escapeHTML(v||'')};var sm={approved:'已上线',pending:'审核中',rejected:'已拒绝',offline:'已下线'};content.innerHTML='<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="font-size:34px">📋</span><div><span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">'+safe(d.category)+'</span><h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">'+safe(d.title)+'</h3></div></div><div style="background:#fff8e1;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:#8a5a00;font-size:13px;font-weight:700">状态：'+(sm[d.status]||safe(d.status))+(d.reject_reason?' · 原因：'+safe(d.reject_reason):'')+'</div><div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">详细描述</div><div style="font-size:14px;line-height:1.7;color:#333;white-space:pre-wrap">'+safe(d.description||'暂无描述')+'</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:#fef3f2;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">价格</div><div style="font-size:16px;font-weight:700;color:#c0392b">'+safe(d.price||'面议')+' €</div></div><div style="background:#f0fdf4;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">城市</div><div style="font-size:15px;font-weight:600;color:#166534">'+safe(d.city)+'</div></div></div><div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px"><div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">联系方式</div><div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">'+safe(d.contact||'未填写')+'</div></div><div class="detail-actions"><button class="detail-action" onclick="startEdit('+d.id+');closeModal(&quot;detail&quot;)">编辑这条信息</button></div></div>';};
   window.startEdit=async function(id){var sb=window.getSb();var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){alert('加载失败');return;}document.getElementById('myListingsPanel').style.display='none';document.getElementById('editListingPanel').style.display='block';['editListingId','editCat','editTitle','editDesc','editCity','editPrice','editContact'].forEach(function(eid){var el=document.getElementById(eid);if(!el)return;var key={editListingId:'id',editCat:'category',editTitle:'title',editDesc:'description',editCity:'city',editPrice:'price',editContact:'contact'}[eid];if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=r.data[key]||'';else if(el.tagName==='SELECT')el.value=r.data[key]||'';});};
   window.cancelEdit=function(){document.getElementById('editListingPanel').style.display='none';document.getElementById('myListingsPanel').style.display='block';};
   window.saveEdit=async function(){var sb=window.getSb();var id=document.getElementById('editListingId').value;var btn=document.getElementById('editSaveBtn');btn.disabled=true;btn.textContent='保存中…';var u={category:document.getElementById('editCat').value,title:document.getElementById('editTitle').value,description:document.getElementById('editDesc').value,city:document.getElementById('editCity').value,price:document.getElementById('editPrice').value,contact:document.getElementById('editContact').value,status:'pending',updated_at:new Date().toISOString()};if(!u.title||!u.contact){alert('标题和联系方式不能为空');btn.disabled=false;btn.textContent='💾 保存';return;}var r=await sb.from('listings').update(u).eq('id',id);btn.disabled=false;btn.textContent='💾 保存';if(r.error){alert('保存失败');return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 已保存，等待审核';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}window.cancelEdit();window.loadMyListings();};
