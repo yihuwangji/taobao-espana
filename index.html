@@ -41,7 +41,7 @@
 
   body {
     font-family: 'Noto Sans SC', sans-serif;
-    background: var(--cream);
+    background: #fff;
     color: var(--ink);
     overflow-x: hidden;
   }
@@ -335,7 +335,17 @@
   .stat-label { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
 
   /* ===== MAIN CATEGORIES ===== */
-  .section { padding: 32px 24px; max-width: 1200px; margin: 0 auto; }
+  .content-shell {
+    max-width: 1200px;
+    margin: 22px auto 0;
+    background: #fff;
+    border: 1px solid #eadfce;
+    border-radius: 12px;
+    box-shadow: 0 14px 34px rgba(80,34,15,0.1);
+    overflow: hidden;
+  }
+
+  .section { padding: 30px 24px; max-width: 1200px; margin: 0 auto; }
 
   .trust-strip {
     margin-top: -18px;
@@ -412,8 +422,8 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.25s;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    border: 2px solid transparent;
+    box-shadow: 0 8px 22px rgba(80,34,15,0.08);
+    border: 1.5px solid #f0e5d5;
     text-decoration: none;
     display: block;
     position: relative;
@@ -469,7 +479,8 @@
     background: white;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    box-shadow: 0 10px 26px rgba(80,34,15,0.1);
+    border: 1.5px solid #eadfce;
     transition: all 0.25s;
     cursor: pointer;
     position: relative;
@@ -641,30 +652,6 @@
     color: white;
     border-color: var(--red);
   }
-
-  /* ===== POST AD BANNER ===== */
-  .post-banner {
-    background: linear-gradient(135deg, var(--gold) 0%, #E8911A 100%);
-    border-radius: 8px;
-    padding: 28px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin: 0 24px;
-    box-shadow: 0 4px 20px rgba(245,166,35,0.35);
-  }
-
-  .post-banner h3 {
-    font-family: 'Noto Serif SC', serif;
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--ink);
-    margin-bottom: 4px;
-  }
-
-  .post-banner p { color: var(--ink-mid); font-size: 14px; }
 
   .btn-post {
     padding: 12px 28px;
@@ -994,6 +981,11 @@
       line-height: 1.2;
     }
     .stat-label { font-size: 11px; }
+    .content-shell {
+      margin: 12px 10px 0;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(80,34,15,0.1);
+    }
     .section { padding: 22px 14px; }
     .trust-strip {
       margin-top: -10px;
@@ -1098,16 +1090,6 @@
       margin-top: 6px;
       padding-top: 6px;
       font-size: 11px;
-    }
-    .post-banner {
-      align-items: stretch;
-      margin: 2px 14px 0;
-      padding: 20px 16px;
-    }
-    .post-banner h3 { font-size: 20px; }
-    .post-banner p {
-      font-size: 13px;
-      line-height: 1.5;
     }
     .btn-post {
       width: 100%;
@@ -1250,7 +1232,6 @@
       <button onclick="doSearch()">🔍 搜索</button>
     </div>
     <div class="header-actions">
-      <button class="btn-outline" onclick="openModal('login')">登录</button>
       <button class="btn-gold" onclick="openModal('post')">＋ 发布信息</button>
     </div>
   </div>
@@ -1276,7 +1257,6 @@
     <div class="hero-actions">
       <button class="hero-action primary" onclick="openModal('post')">免费发布信息</button>
       <a class="hero-action" href="#listingsGrid">浏览最新信息</a>
-      <a class="hero-action" href="/download">下载安卓APP</a>
     </div>
     <div class="hero-stats">
       <div class="stat">
@@ -1300,7 +1280,7 @@
 </div>
 
 <!-- ===== MAIN CONTENT ===== -->
-<div style="max-width:1200px;margin:0 auto;">
+<main class="content-shell">
 
 <!-- Trust strip -->
 <div class="section trust-strip">
@@ -1395,20 +1375,7 @@
   <div class="listings-grid" id="listingsGrid"></div>
 </div>
 
-</div>
-
-<!-- ===== POST BANNER ===== -->
-<div class="post-banner">
-  <div>
-    <h3>🚀 发布您的信息</h3>
-    <p>招工、找房、转让生意、卖车… 一键发布，精准触达西班牙华人社区</p>
-  </div>
-  <button class="btn-post" onclick="openModal('post')">立即发布信息 →</button>
-</div>
-
-<div style="max-width:1200px;margin:0 auto;">
-
-<!-- Info cards --></div>
+</main>
 
 <!-- ===== FOOTER ===== -->
 <footer>
@@ -1774,6 +1741,25 @@ let currentCat = 'all';
 let currentCity = '全部';
 let allListings = [...fallbackListings]; // 先用备用数据
 
+function normalizeDedupeValue(value) {
+  return String(value ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function dedupeListingRows(rows) {
+  const seen = new Set();
+  return rows.filter(row => {
+    const key = [
+      row.title,
+      row.category,
+      row.city,
+      row.price || ''
+    ].map(normalizeDedupeValue).join('|');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 // ===== 从 Supabase 加载信息 =====
 async function loadListings() {
   showLoading(true);
@@ -1803,7 +1789,8 @@ async function loadListings() {
     if (error) throw error;
 
     if (data && data.length > 0) {
-      allListings = data.map(r => ({
+      const uniqueRows = dedupeListingRows(data);
+      allListings = uniqueRows.map(r => ({
         id: r.id,
         cat: uiCatMap[r.category] || 'goods',
         city: r.city,
@@ -2099,7 +2086,8 @@ async function doSearch() {
       .limit(40);
     if(error) throw error;
     if(data && data.length > 0) {
-      allListings = data.map(r => ({
+      const uniqueRows = dedupeListingRows(data);
+      allListings = uniqueRows.map(r => ({
         id: r.id, cat: 'all', city: r.city,
         icon: catIcons[r.category] || '📋',
         badge: catBadge[r.category] || '信息',
@@ -2109,7 +2097,7 @@ async function doSearch() {
       }));
       currentCat = 'all'; currentCity = '全部';
       showLoading(false); renderListings();
-      showToast(`搜索"${q}" 找到 ${data.length} 条结果`);
+      showToast(`搜索"${q}" 找到 ${uniqueRows.length} 条结果`);
     } else {
       showLoading(false);
       document.getElementById('listingsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:48px">🔍</div><div style="margin-top:10px">未找到“'+escapeHTML(q)+'”相关信息</div><button class="btn-post" style="margin-top:16px" onclick="openModal(&quot;post&quot;)">发布这条需求</button></div>';
