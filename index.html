@@ -386,6 +386,86 @@
 
   .wechat-save-text strong { color: #057b3f; }
 
+  .wechat-corner-guide {
+    display: none;
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 6px);
+    right: 8px;
+    z-index: 110;
+    width: 190px;
+    padding-top: 34px;
+    pointer-events: none;
+  }
+
+  body.is-wechat .wechat-corner-guide { display: block; }
+
+  .wechat-corner-arrow {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    width: 82px;
+    height: 34px;
+  }
+
+  .wechat-corner-arrow::before {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 18px;
+    width: 72px;
+    height: 4px;
+    background: #07C160;
+    border-radius: 999px;
+    transform: rotate(-28deg);
+    transform-origin: right center;
+    box-shadow: 0 2px 8px rgba(7,193,96,0.28);
+  }
+
+  .wechat-corner-arrow::after {
+    content: '';
+    position: absolute;
+    right: 2px;
+    top: 5px;
+    width: 13px;
+    height: 13px;
+    border-top: 4px solid #07C160;
+    border-right: 4px solid #07C160;
+    transform: rotate(-18deg);
+  }
+
+  .wechat-corner-card {
+    background: rgba(255,255,255,0.96);
+    border: 1.5px solid #bdebd0;
+    border-left: 5px solid #07C160;
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.16);
+    padding: 9px 10px 9px 12px;
+  }
+
+  .wechat-corner-title {
+    color: #057b3f;
+    font-size: 13px;
+    font-weight: 900;
+    margin-bottom: 2px;
+  }
+
+  .wechat-corner-text {
+    color: #2d1f0e;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .wechat-corner-dots {
+    display: inline-block;
+    padding: 0 5px 2px;
+    margin: 0 1px;
+    border-radius: 999px;
+    background: #f0fff6;
+    color: #057b3f;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+
   /* ===== MAIN CATEGORIES ===== */
   .content-shell {
     max-width: 1200px;
@@ -1050,6 +1130,30 @@
     }
     .wechat-save-title { font-size: 14px; }
     .wechat-save-text { font-size: 12px; }
+    .wechat-corner-guide {
+      top: calc(env(safe-area-inset-top) + 4px);
+      right: 6px;
+      width: 176px;
+      padding-top: 30px;
+    }
+    .wechat-corner-arrow {
+      right: 4px;
+      width: 74px;
+      height: 30px;
+    }
+    .wechat-corner-arrow::before {
+      width: 64px;
+      height: 3px;
+    }
+    .wechat-corner-arrow::after {
+      width: 11px;
+      height: 11px;
+      border-top-width: 3px;
+      border-right-width: 3px;
+    }
+    .wechat-corner-card { padding: 8px 9px 8px 11px; }
+    .wechat-corner-title { font-size: 12px; }
+    .wechat-corner-text { font-size: 11px; }
     .content-shell {
       margin: 12px 10px 0;
       border-radius: 10px;
@@ -1275,6 +1379,13 @@
 </style>
 </head>
 <body>
+<div class="wechat-corner-guide" aria-hidden="true">
+  <div class="wechat-corner-arrow"></div>
+  <div class="wechat-corner-card">
+    <div class="wechat-corner-title">微信里点这里</div>
+    <div class="wechat-corner-text">右上角 <span class="wechat-corner-dots">...</span><br>添加到收藏</div>
+  </div>
+</div>
 
 <!-- ===== HEADER ===== -->
 <header>
@@ -1354,7 +1465,7 @@
     <div>
       <div class="wechat-save-title">微信里下次找不到？先收藏本站</div>
       <div class="wechat-save-text">
-        在微信浏览器右上角点 <strong>...</strong>，选择 <strong>添加到收藏</strong>；想放到手机桌面，就选 <strong>添加到桌面</strong>。
+        看右上角绿色箭头，点微信浏览器的 <strong>...</strong>，选择 <strong>添加到收藏</strong>；想放到手机桌面，就选 <strong>添加到桌面</strong>。
       </div>
     </div>
   </div>
@@ -1918,6 +2029,11 @@ function isWeChatBrowser() {
   return /MicroMessenger/i.test(navigator.userAgent);
 }
 
+function applyWeChatBrowserHints() {
+  const forceGuide = new URLSearchParams(window.location.search).has('wechat_guide');
+  document.body.classList.toggle('is-wechat', isWeChatBrowser() || forceGuide);
+}
+
 function getListingShareUrl(id) {
   return new URL(`/s/${encodeURIComponent(id)}`, window.location.origin).toString();
 }
@@ -2230,7 +2346,10 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
     if(e.target === this) { this.classList.remove('open'); syncModalScrollLock(); }
   });
 });
-document.addEventListener('DOMContentLoaded', syncModalScrollLock);
+document.addEventListener('DOMContentLoaded', function() {
+  syncModalScrollLock();
+  applyWeChatBrowserHints();
+});
 window.addEventListener('pageshow', syncModalScrollLock);
 
 // ===== 用户注册 =====
