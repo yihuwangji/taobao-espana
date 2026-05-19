@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#D42B2B">
+<title>离线 - 西班牙生活通</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: #fdf6ec;
+    color: #1a0a00;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  main {
+    width: min(420px, 100%);
+    background: #fff;
+    border: 1px solid rgba(158, 28, 28, 0.12);
+    border-radius: 12px;
+    padding: 28px 22px;
+    box-shadow: 0 14px 38px rgba(80, 34, 15, 0.12);
+  }
+  .icon {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    background: #f5a623;
+    font-size: 30px;
+  }
+  h1 { margin: 0 0 10px; font-size: 24px; }
+  p { margin: 0 0 18px; color: #7a5c3f; line-height: 1.6; }
+  button {
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    background: #d42b2b;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="icon">🏮</div>
+  <h1>当前处于离线状态</h1>
+  <p>请检查网络连接。已打开过的首页内容可能仍可浏览，发布、登录和最新数据需要联网。</p>
+  <button onclick="location.reload()">重新连接</button>
+</main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{
+  "name": "西班牙生活通",
+  "short_name": "生活通",
+  "description": "面向西班牙华人社区的本地分类信息平台，提供招工、租房、生意转让、二手物品和生活服务。",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#FDF6EC",
+  "theme_color": "#D42B2B",
+  "categories": ["lifestyle", "shopping", "social"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "发布信息",
+      "short_name": "发布",
+      "url": "/?action=post",
+      "description": "快速发布招工、房源、二手和服务信息",
+      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "最新信息",
+      "short_name": "最新",
+      "url": "/#listingsGrid",
+      "description": "查看西班牙华人社区最新分类信息",
+      "icons": [{ "src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}
