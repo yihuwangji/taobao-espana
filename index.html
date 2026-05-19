@@ -423,34 +423,63 @@
     text-align: center;
     letter-spacing: 1px;
     box-shadow: 0 5px 14px rgba(0,0,0,0.16);
+    z-index: 2;
   }
 
-  .wechat-corner-arrow::before {
-    content: '';
-    position: absolute;
-    right: 15px;
-    top: 23px;
-    width: 66px;
-    height: 42px;
-    border-top: 7px solid #07C160;
-    border-right: 7px solid #07C160;
-    border-radius: 0 34px 0 0;
-    transform: rotate(-9deg) skewX(-7deg);
-    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));
-  }
-
-  .wechat-corner-arrow::after {
-    content: '';
+  .wechat-sketch-arrow {
     position: absolute;
     right: 6px;
-    top: 18px;
-    width: 0;
-    height: 0;
-    border-left: 16px solid #07C160;
-    border-top: 11px solid transparent;
-    border-bottom: 11px solid transparent;
-    transform: rotate(-38deg);
+    top: 13px;
+    width: 86px;
+    height: 70px;
+    overflow: visible;
     filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));
+    z-index: 1;
+  }
+
+  .wechat-sketch-outline {
+    fill: none;
+    stroke: rgba(255,255,255,0.95);
+    stroke-width: 13;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .wechat-sketch-main,
+  .wechat-sketch-rub {
+    fill: none;
+    stroke: #e62821;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .wechat-sketch-main { stroke-width: 8; }
+
+  .wechat-sketch-rub {
+    stroke-width: 3;
+    opacity: 0.78;
+    stroke-dasharray: 10 6;
+  }
+
+  .wechat-sketch-head-outline {
+    fill: rgba(255,255,255,0.95);
+    stroke: rgba(255,255,255,0.95);
+    stroke-width: 6;
+    stroke-linejoin: round;
+  }
+
+  .wechat-sketch-head {
+    fill: #e62821;
+    stroke: #e62821;
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .wechat-sketch-head-line {
+    fill: none;
+    stroke: rgba(255,255,255,0.5);
+    stroke-width: 2;
+    stroke-linecap: round;
   }
 
   .wechat-corner-card {
@@ -1161,9 +1190,9 @@
     }
     .wechat-corner-arrow {
       right: -2px;
-      top: -34px;
-      width: 58px;
-      height: 44px;
+      top: -38px;
+      width: 74px;
+      height: 56px;
     }
     .wechat-menu-dots {
       top: 0;
@@ -1175,23 +1204,17 @@
       line-height: 13px;
       border-width: 1px;
     }
-    .wechat-corner-arrow::before {
-      right: 12px;
-      top: 18px;
-      width: 35px;
-      height: 20px;
-      border-top-width: 6px;
-      border-right-width: 6px;
-      border-radius: 0 24px 0 0;
-      transform: rotate(-10deg) skewX(-8deg);
+    .wechat-sketch-arrow {
+      right: 3px;
+      top: 11px;
+      width: 69px;
+      height: 54px;
     }
-    .wechat-corner-arrow::after {
-      right: 5px;
-      top: 14px;
-      border-left-width: 13px;
-      border-top-width: 9px;
-      border-bottom-width: 9px;
-      transform: rotate(-38deg);
+    .wechat-sketch-outline { stroke-width: 12; }
+    .wechat-sketch-main { stroke-width: 8; }
+    .wechat-sketch-rub { stroke-width: 3; }
+    .wechat-sketch-head-outline {
+      stroke-width: 5;
     }
     .wechat-corner-card {
       display: block;
@@ -1430,7 +1453,19 @@
 </head>
 <body>
 <div class="wechat-corner-guide" aria-hidden="true">
-  <div class="wechat-corner-arrow"><span class="wechat-menu-dots">...</span></div>
+  <div class="wechat-corner-arrow">
+    <svg class="wechat-sketch-arrow" viewBox="0 0 88 70" focusable="false" aria-hidden="true">
+      <path class="wechat-sketch-outline" d="M8 57 C31 58 48 47 57 26" />
+      <path class="wechat-sketch-main" d="M8 57 C31 58 48 47 57 26" />
+      <path class="wechat-sketch-rub" d="M11 53 C31 54 45 43 53 28" />
+      <path class="wechat-sketch-rub" d="M7 61 C33 61 51 50 60 29" />
+      <path class="wechat-sketch-head-outline" d="M51 18 L76 9 L68 35 Z" />
+      <path class="wechat-sketch-head" d="M51 18 L76 9 L68 35 Z" />
+      <path class="wechat-sketch-head-line" d="M58 20 L70 15" />
+      <path class="wechat-sketch-head-line" d="M58 25 L68 22" />
+    </svg>
+    <span class="wechat-menu-dots">...</span>
+  </div>
   <div class="wechat-corner-card">
     <div class="wechat-corner-title">微信里点这里</div>
     <div class="wechat-corner-text">右上角 <span class="wechat-corner-dots">...</span><br>添加到收藏</div>
