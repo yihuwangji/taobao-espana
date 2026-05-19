@@ -2117,7 +2117,14 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
 });
 
 // ===== 模态框 =====
+function ensureModalRoot(modal) {
+  if (modal && modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
+  }
+}
+
 function syncModalScrollLock() {
+  document.querySelectorAll('.modal-overlay').forEach(ensureModalRoot);
   const hasOpenModal = !!document.querySelector('.modal-overlay.open');
   document.body.style.overflow = hasOpenModal ? 'hidden' : '';
 }
@@ -2125,6 +2132,7 @@ function syncModalScrollLock() {
 function openModal(name) {
   const modal = document.getElementById(name+'Modal');
   if (!modal) return;
+  ensureModalRoot(modal);
   modal.classList.add('open');
   syncModalScrollLock();
   if (name === 'profile') refreshProfile();
@@ -2140,6 +2148,7 @@ function closeModal(name) {
   syncModalScrollLock();
 }
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  ensureModalRoot(overlay);
   overlay.addEventListener('click', function(e) {
     if(e.target === this) { this.classList.remove('open'); syncModalScrollLock(); }
   });
@@ -2434,7 +2443,6 @@ loadListings().then(handleInitialDeepLink);
   window.refreshProfile=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;var pc=document.getElementById('profileContent'),lo=document.getElementById('profileLoggedOut');if(!sess){if(pc)pc.style.display='none';if(lo)lo.style.display='block';return;}if(pc)pc.style.display='block';if(lo)lo.style.display='none';var r=await sb.from('profiles').select('*').eq('id',sess.user.id).single();if(r.data){var d=r.data;var av=document.getElementById('profileAvatar');if(av)av.textContent=(d.nickname||'U').charAt(0).toUpperCase();var pn=document.getElementById('profileName');if(pn)pn.textContent=d.nickname||'用户';var pc2=document.getElementById('profileCity');if(pc2)pc2.textContent='📍 '+(d.city||'--');var spc=document.getElementById('statPostCount');if(spc)spc.textContent=d.post_count||0;var an=document.getElementById('accNickname');if(an)an.value=d.nickname||'';var ap=document.getElementById('accPhone');if(ap)ap.value=d.phone||'';var ac=document.getElementById('accCity');if(ac)ac.value=d.city||'巴塞罗那';var ae=document.getElementById('accEmail');if(ae)ae.value=sess.user.email||'';var vu=d.vip_until?new Date(d.vip_until):null,isVip=vu&&vu>new Date();var vt=document.getElementById('vipStatusTitle'),vs=document.getElementById('vipStatusSub'),vb=document.getElementById('vipBadge'),vub=document.getElementById('vipUpgradeBtn');if(isVip){if(vt)vt.textContent='💎 VIP会员';if(vs)vs.textContent='到期：'+vu.toLocaleDateString('zh-CN');if(vb){vb.textContent='VIP';vb.style.background='linear-gradient(135deg,#c0830a,#f5c842)';vb.style.color='#fff';}if(vub)vub.textContent='续费VIP';}else{if(vt)vt.textContent='普通用户';if(vs)vs.textContent='升级VIP，享置顶展示和更多特权';if(vb){vb.textContent='FREE';vb.style.background='#eee';vb.style.color='#888';}if(vub)vub.textContent='升级VIP';}}window.loadMyListings();};
   document.addEventListener('DOMContentLoaded',function(){var pb=document.getElementById('postBtn');if(pb)pb.innerHTML='🚀 立即发布（限时免费）';var origOpen=window.openModal;window.openModal=function(type){origOpen&&origOpen(type);if(type==='profile')setTimeout(function(){window.refreshProfile&&window.refreshProfile();},50);};});
   </script>
-</body>
   <div class="modal-overlay" id="detailModal">
   <div class="modal relative" style="max-width:560px">
     <button class="modal-close" onclick="closeModal('detail')">✕</button>
@@ -2696,4 +2704,5 @@ window.addEventListener('load', function() {
   }
 });
 </script>
+</body>
 </html>
