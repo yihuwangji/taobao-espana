@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v1';
+const CACHE_NAME = 'espana-life-v2';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -30,6 +30,8 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET') return;
   if (url.pathname.startsWith('/admin')) return;
+  if (url.pathname.startsWith('/api/')) return;
+  if (url.pathname.startsWith('/s/')) return;
   if (url.hostname.includes('supabase.co')) return;
 
   if (request.mode === 'navigate') {

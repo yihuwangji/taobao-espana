@@ -4,6 +4,7 @@
     { "src": "/admin", "dest": "/admin.html" },
     { "src": "/download", "dest": "/download.html" },
     { "src": "/privacy", "dest": "/privacy.html" },
+    { "src": "/s/([^/]+)", "dest": "/api/share?id=$1" },
     { "src": "/", "dest": "/index.html" }
   ],
   "headers": [
