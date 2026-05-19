@@ -1,0 +1,61 @@
+{
+  "packageId": "com.xibanyalife.app",
+  "host": "taobao-espana.vercel.app",
+  "name": "西班牙生活通",
+  "launcherName": "生活通",
+  "display": "standalone",
+  "themeColor": "#D42B2B",
+  "themeColorDark": "#9E1C1C",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "backgroundColor": "#FDF6EC",
+  "enableNotifications": true,
+  "startUrl": "/?source=twa",
+  "iconUrl": "https://taobao-espana.vercel.app/assets/icons/icon-512.png",
+  "maskableIconUrl": "https://taobao-espana.vercel.app/assets/icons/icon-maskable-512.png",
+  "monochromeIconUrl": "",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "../android-release/xibanyalife-upload.keystore",
+    "alias": "android"
+  },
+  "appVersion": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "发布信息",
+      "shortName": "发布",
+      "url": "/?action=post",
+      "chosenIconUrl": "https://taobao-espana.vercel.app/assets/icons/icon-192.png"
+    },
+    {
+      "name": "最新信息",
+      "shortName": "最新",
+      "url": "/#listingsGrid",
+      "chosenIconUrl": "https://taobao-espana.vercel.app/assets/icons/icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://taobao-espana.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://taobao-espana.vercel.app/",
+  "minSdkVersion": 23,
+  "shareTarget": null,
+  "orientation": "portrait-primary",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": ["standalone", "minimal-ui"]
+}

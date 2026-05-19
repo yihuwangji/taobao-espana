@@ -1,0 +1,17 @@
+# Local secrets and release artifacts
+android-release/
+*.keystore
+*.jks
+*.aab
+*.apk
+
+# Android/Gradle build output
+.gradle/
+build/
+android-twa/.gradle/
+android-twa/build/
+android-twa/app/build/
+
+# Local tooling caches and downloads
+android-commandlinetools.zip
+.bubblewrap-answers.txt

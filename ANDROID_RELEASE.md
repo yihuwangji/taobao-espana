@@ -31,40 +31,34 @@
 - 移动端竖屏体验优化
 - 独立隐私政策页面：`privacy.html`
 
-## 本机还缺
+## 本机已生成
 
-当前 Windows 环境没有检测到 Java/JDK，也没有 Android SDK，所以暂时不能直接构建 `.aab`。
+当前 Windows 环境已经安装并配置：
 
-安装后执行：
+- JDK 17：`C:\Program Files\Eclipse Adoptium\jdk-17.0.19.10-hotspot`
+- Android SDK：`%LOCALAPPDATA%\Android\Sdk`
+- Bubblewrap TWA 工程：`android-twa/`
 
-```powershell
-winget install EclipseAdoptium.Temurin.17.JDK
-winget install Google.AndroidStudio
-npm install -g @bubblewrap/cli
+已生成的 Google Play 上传包：
+
+```text
+android-release/xibanyalife-1.0.0-1-release.aab
 ```
 
-用 Bubblewrap 初始化 TWA：
+已生成的通用 Android 安装包：
 
-```powershell
-bubblewrap init --manifest https://taobao-espana.vercel.app/manifest.webmanifest
+```text
+android-release/xibanyalife-1.0.0-1-release.apk
 ```
 
-初始化时建议填写：
+签名密钥保存在本机且已被 `.gitignore` 排除：
 
-- Package ID: `com.xibanyalife.app`
-- App name: `西班牙生活通`
-- Launcher name: `生活通`
-- Host: `taobao-espana.vercel.app`
-- Start URL: `/`
-- Orientation: `portrait`
-
-构建上架包：
-
-```powershell
-bubblewrap build
+```text
+android-release/xibanyalife-upload.keystore
+android-release/keystore-credentials.txt
 ```
 
-生成 `.aab` 后上传到 Play Console。
+不要删除 `android-release/keystore-credentials.txt`。以后发布更新必须使用同一个 upload key，否则 Google Play 会拒绝同包名更新。
 
 ## Digital Asset Links
 
@@ -74,7 +68,19 @@ TWA 必须在网站放置：
 /.well-known/assetlinks.json
 ```
 
-这个文件需要 Android 签名证书的 SHA-256 指纹。生成签名密钥后，再把 `android/assetlinks.template.json` 里的占位符替换成真实指纹，并部署到 Vercel。
+这个文件需要 Android 签名证书的 SHA-256 指纹。本仓库已经添加：
+
+```text
+.well-known/assetlinks.json
+```
+
+当前 upload key SHA-256：
+
+```text
+0D:0C:5F:75:86:76:02:4F:C4:8F:30:D1:3E:6E:18:41:8E:E1:CB:CB:B7:BE:E4:69:ED:D3:45:74:DF:C1:09:BE
+```
+
+如果 Google Play Console 启用 Play App Signing 后显示的“应用签名证书”SHA-256 与上面不同，应把 `.well-known/assetlinks.json` 中的指纹替换为 Play Console 的应用签名证书指纹，再重新部署 Vercel。
 
 ## 上架文案草稿
 
