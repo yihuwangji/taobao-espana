@@ -44,6 +44,9 @@
     background: #fff;
     color: var(--ink);
     overflow-x: hidden;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* ===== HEADER ===== */
@@ -749,11 +752,12 @@
     justify-content: center;
     padding: 20px;
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, visibility 0.3s;
   }
 
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal-overlay.open { opacity: 1; visibility: visible; pointer-events: all; }
 
   .modal {
     background: white;
@@ -2113,11 +2117,16 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
 });
 
 // ===== 模态框 =====
+function syncModalScrollLock() {
+  const hasOpenModal = !!document.querySelector('.modal-overlay.open');
+  document.body.style.overflow = hasOpenModal ? 'hidden' : '';
+}
+
 function openModal(name) {
   const modal = document.getElementById(name+'Modal');
   if (!modal) return;
   modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  syncModalScrollLock();
   if (name === 'profile') refreshProfile();
   if (name === 'post') {
     if (currentUser) setPostMode('member');
@@ -2128,13 +2137,15 @@ function closeModal(name) {
   const modal = document.getElementById(name+'Modal');
   if (!modal) return;
   modal.classList.remove('open');
-  document.body.style.overflow = '';
+  syncModalScrollLock();
 }
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', function(e) {
-    if(e.target === this) { this.classList.remove('open'); document.body.style.overflow = ''; }
+    if(e.target === this) { this.classList.remove('open'); syncModalScrollLock(); }
   });
 });
+document.addEventListener('DOMContentLoaded', syncModalScrollLock);
+window.addEventListener('pageshow', syncModalScrollLock);
 
 // ===== 用户注册 =====
 async function submitRegister() {
