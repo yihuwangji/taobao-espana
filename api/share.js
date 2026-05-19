@@ -73,6 +73,10 @@ function openTarget() {
 if (!/MicroMessenger/i.test(navigator.userAgent)) {
   setTimeout(openTarget, 350);
 }
+document.addEventListener('DOMContentLoaded', function () {
+  var btn = document.getElementById('open-detail-btn');
+  if (btn) btn.addEventListener('click', openTarget);
+});
 </script>
 <style>
 body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fff8ed;color:#2b1b12;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
@@ -89,8 +93,8 @@ a,button{display:flex;align-items:center;justify-content:center;width:100%;min-h
   <img src="${escapeHTML(imageUrl)}" alt="">
   <h1>${escapeHTML(title)}</h1>
   <p>${escapeHTML(description)}</p>
-  <a href="${escapeHTML(targetUrl)}" target="_self" rel="noopener">打开查看详情</a>
-  <p class="hint">微信里请点按钮查看详情；外部浏览器会自动打开。</p>
+  <a id="open-detail-btn" href="${escapeHTML(targetUrl)}" target="_self" rel="noopener">打开查看详情</a>
+  <p class="hint">微信里请点上方按钮查看详情；如果没有跳转，请复制链接到浏览器打开。</p>
 </main>
 </body>
 </html>`);
