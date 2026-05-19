@@ -406,41 +406,56 @@
     height: 92px;
   }
 
-  .wechat-corner-arrow::before {
-    content: '...';
+  .wechat-menu-dots {
     position: absolute;
     right: 0;
     top: 0;
-    min-width: 24px;
-    height: 18px;
-    padding: 0 6px 3px;
+    min-width: 28px;
+    height: 20px;
+    padding: 0 7px 4px;
     background: #fff;
     color: #057b3f;
-    border: 1px solid #bdebd0;
+    border: 1.5px solid #bdebd0;
     border-radius: 999px;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 900;
-    line-height: 14px;
+    line-height: 15px;
     text-align: center;
     letter-spacing: 1px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+    box-shadow: 0 5px 14px rgba(0,0,0,0.16);
+  }
+
+  .wechat-corner-arrow::before {
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 23px;
+    width: 66px;
+    height: 42px;
+    border-top: 7px solid #07C160;
+    border-right: 7px solid #07C160;
+    border-radius: 0 34px 0 0;
+    transform: rotate(-9deg) skewX(-7deg);
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));
   }
 
   .wechat-corner-arrow::after {
     content: '';
     position: absolute;
-    right: 13px;
-    top: 24px;
-    width: 62px;
-    height: 38px;
-    border-top: 2px solid #07C160;
-    border-right: 2px solid #07C160;
-    border-radius: 0 32px 0 0;
-    transform: rotate(-7deg);
-    opacity: 0.92;
+    right: 6px;
+    top: 18px;
+    width: 0;
+    height: 0;
+    border-left: 16px solid #07C160;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    transform: rotate(-38deg);
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));
   }
 
   .wechat-corner-card {
+    box-sizing: border-box;
+    width: 100%;
     background: rgba(255,255,255,0.96);
     border: 1.5px solid #bdebd0;
     border-left: 5px solid #07C160;
@@ -1139,34 +1154,44 @@
     .wechat-save-text { font-size: 12px; }
     .wechat-corner-guide {
       top: calc(env(safe-area-inset-top) + 42px);
-      right: 12px;
-      width: 112px;
+      right: 8px;
+      width: 126px;
+      max-width: calc(100vw - 210px);
       height: auto;
     }
     .wechat-corner-arrow {
       right: -2px;
-      top: -25px;
-      width: 42px;
-      height: 30px;
+      top: -34px;
+      width: 58px;
+      height: 44px;
     }
-    .wechat-corner-arrow::before {
+    .wechat-menu-dots {
       top: 0;
       right: 0;
-      min-width: 21px;
-      height: 16px;
-      padding: 0 5px 3px;
-      font-size: 13px;
+      min-width: 23px;
+      height: 17px;
+      padding: 0 6px 4px;
+      font-size: 14px;
       line-height: 13px;
+      border-width: 1px;
+    }
+    .wechat-corner-arrow::before {
+      right: 12px;
+      top: 18px;
+      width: 35px;
+      height: 20px;
+      border-top-width: 6px;
+      border-right-width: 6px;
+      border-radius: 0 24px 0 0;
+      transform: rotate(-10deg) skewX(-8deg);
     }
     .wechat-corner-arrow::after {
-      right: 10px;
-      top: 19px;
-      width: 28px;
-      height: 18px;
-      border-top-width: 2px;
-      border-right-width: 2px;
-      border-radius: 0 22px 0 0;
-      transform: rotate(-8deg);
+      right: 5px;
+      top: 14px;
+      border-left-width: 13px;
+      border-top-width: 9px;
+      border-bottom-width: 9px;
+      transform: rotate(-38deg);
     }
     .wechat-corner-card {
       display: block;
@@ -1405,7 +1430,7 @@
 </head>
 <body>
 <div class="wechat-corner-guide" aria-hidden="true">
-  <div class="wechat-corner-arrow"></div>
+  <div class="wechat-corner-arrow"><span class="wechat-menu-dots">...</span></div>
   <div class="wechat-corner-card">
     <div class="wechat-corner-title">微信里点这里</div>
     <div class="wechat-corner-text">右上角 <span class="wechat-corner-dots">...</span><br>添加到收藏</div>
