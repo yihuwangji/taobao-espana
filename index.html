@@ -1980,6 +1980,7 @@ function filterCity(city, el) {
   loadListings();
 }
 async function viewListing(id) {
+  if (!id) return;
   // 打开弹窗，先显示加载中
   document.getElementById('detailContent').innerHTML = `
     <div style="text-align:center;padding:40px 0;color:#999">
@@ -2098,7 +2099,9 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
 
 // ===== 模态框 =====
 function openModal(name) {
-  document.getElementById(name+'Modal').classList.add('open');
+  const modal = document.getElementById(name+'Modal');
+  if (!modal) return;
+  modal.classList.add('open');
   document.body.style.overflow = 'hidden';
   if (name === 'profile') refreshProfile();
   if (name === 'post') {
@@ -2107,7 +2110,9 @@ function openModal(name) {
   }
 }
 function closeModal(name) {
-  document.getElementById(name+'Modal').classList.remove('open');
+  const modal = document.getElementById(name+'Modal');
+  if (!modal) return;
+  modal.classList.remove('open');
   document.body.style.overflow = '';
 }
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
@@ -2363,9 +2368,13 @@ sb.channel('public-listings')
 // ===== 初始化 =====
 async function handleInitialDeepLink() {
   const params = new URLSearchParams(window.location.search);
-  const listingId = params.get('listing');
+  const listingId = params.get('listing') || (location.pathname.match(/^\/s\/(\d+)/)?.[1] || '');
   if (listingId) {
     await viewListing(listingId);
+    const canonicalPath = '/?listing=' + encodeURIComponent(listingId);
+    if (location.pathname !== '/') {
+      history.replaceState(null, '', canonicalPath);
+    }
     return;
   }
   if (params.get('action') === 'post' && typeof openModal === 'function') {

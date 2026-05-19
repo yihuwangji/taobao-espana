@@ -44,7 +44,7 @@ module.exports = async function handler(req, res) {
   const description = listing
     ? [listing.category, listing.city, listing.price ? `${listing.price} €` : '面议', compact(listing.description).slice(0, 70)].filter(Boolean).join(' · ')
     : '面向西班牙华人社区的招工、租房、生意转让、二手和生活服务信息平台。';
-  const targetUrl = `${SITE_URL}/?listing=${encodeURIComponent(numericId || '')}`;
+  const targetUrl = numericId ? `${SITE_URL}/?listing=${encodeURIComponent(numericId)}` : SITE_URL;
   const shareUrl = numericId ? `${SITE_URL}/s/${encodeURIComponent(numericId)}` : SITE_URL;
   const imageUrl = `${SITE_URL}/assets/icons/icon-512.png`;
 
@@ -63,14 +63,25 @@ module.exports = async function handler(req, res) {
 <meta property="og:description" content="${escapeHTML(description)}">
 <meta property="og:image" content="${escapeHTML(imageUrl)}">
 <meta property="og:url" content="${escapeHTML(shareUrl)}">
+<link rel="canonical" href="${escapeHTML(targetUrl)}">
 <meta name="theme-color" content="#D42B2B">
+<script>
+window.__TARGET_URL__ = ${JSON.stringify(targetUrl)};
+function openTarget() {
+  window.location.href = window.__TARGET_URL__;
+}
+if (!/MicroMessenger/i.test(navigator.userAgent)) {
+  setTimeout(openTarget, 350);
+}
+</script>
 <style>
 body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fff8ed;color:#2b1b12;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
 .card{width:min(92vw,420px);background:white;border:1px solid #f0d2a7;border-radius:10px;padding:22px;box-shadow:0 12px 34px rgba(116,57,20,.14)}
 img{width:64px;height:64px;border-radius:16px;margin-bottom:12px}
 h1{font-size:20px;line-height:1.35;margin:0 0 10px}
 p{font-size:14px;color:#6f5a4b;line-height:1.65;margin:0 0 16px}
-a{display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:8px;background:#d42b2b;color:white;text-decoration:none;font-weight:800}
+.hint{font-size:12px;color:#8a7564;margin-top:10px;text-align:center}
+a,button{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;border:0;border-radius:8px;background:#d42b2b;color:white;text-decoration:none;font-weight:800;font-size:15px;font-family:inherit}
 </style>
 </head>
 <body>
@@ -78,11 +89,9 @@ a{display:flex;align-items:center;justify-content:center;min-height:44px;border-
   <img src="${escapeHTML(imageUrl)}" alt="">
   <h1>${escapeHTML(title)}</h1>
   <p>${escapeHTML(description)}</p>
-  <a href="${escapeHTML(targetUrl)}">打开查看详情</a>
+  <a href="${escapeHTML(targetUrl)}" target="_self" rel="noopener">打开查看详情</a>
+  <p class="hint">微信里请点按钮查看详情；外部浏览器会自动打开。</p>
 </main>
-<script>
-setTimeout(function(){ location.replace(${JSON.stringify(targetUrl)}); }, 700);
-</script>
 </body>
 </html>`);
 };
