@@ -2463,7 +2463,10 @@ async function submitRegister() {
   if(!registerResponse.ok) {
     btn.textContent = '注册';
     btn.disabled = false;
-    showToast('注册失败：' + (registerData.message || '请稍后再试'), true);
+    const message = registerData.error === 'missing_service_role'
+      ? '注册服务正在配置，请联系客服处理。'
+      : (registerData.message || '请稍后再试');
+    showToast('注册失败：' + message, true);
     return;
   }
   const email = registerData.email || authEmailFromPhone(phone);
