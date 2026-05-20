@@ -821,6 +821,19 @@
     border-color: var(--red);
   }
 
+  .province-select {
+    min-width: min(100%, 280px);
+    border-radius: 10px;
+    padding: 8px 12px;
+    background: white;
+  }
+
+  .province-select.active {
+    background: white;
+    color: var(--ink);
+    border-color: var(--red);
+  }
+
   .btn-post {
     padding: 12px 28px;
     background: var(--red);
@@ -1251,11 +1264,11 @@
     }
     .cat-name { font-size: 14px; }
     .city-tabs {
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       gap: 8px;
-      margin: -2px -14px 16px;
-      padding: 0 14px 4px;
-      overflow-x: auto;
+      margin: -2px 0 16px;
+      padding: 0 0 4px;
+      overflow-x: visible;
       scrollbar-width: none;
     }
     .city-tabs::-webkit-scrollbar,
@@ -1264,6 +1277,11 @@
       flex: 0 0 auto;
       padding: 7px 12px;
       font-size: 12px;
+    }
+    .province-select {
+      flex: 1 1 100%;
+      width: 100%;
+      min-width: 0;
     }
     .listings-grid {
       grid-template-columns: 1fr;
@@ -1550,7 +1568,7 @@
     </div>
     <div class="trust-item">
       <span class="trust-icon">🌍</span>
-      <div><div class="trust-title">覆盖主要城市</div><div class="trust-text">巴塞、马德里、瓦伦西亚等</div></div>
+      <div><div class="trust-title">覆盖全西省份</div><div class="trust-text">Madrid、Barcelona、Valencia 等</div></div>
     </div>
   </div>
 </div>
@@ -1612,15 +1630,12 @@
     <a href="#" class="see-all">查看更多 →</a>
   </div>
 
-  <!-- City filter -->
+  <!-- Province filter -->
   <div class="city-tabs">
-    <button class="city-tab active" onclick="filterCity('全部',this)">🌐 全部城市</button>
-    <button class="city-tab" onclick="filterCity('巴塞罗那',this)">🏙 巴塞罗那</button>
-    <button class="city-tab" onclick="filterCity('马德里',this)">🏛 马德里</button>
-    <button class="city-tab" onclick="filterCity('瓦伦西亚',this)">🌊 瓦伦西亚</button>
-    <button class="city-tab" onclick="filterCity('毕尔巴鄂',this)">⛰ 毕尔巴鄂</button>
-    <button class="city-tab" onclick="filterCity('塞维利亚',this)">🌸 塞维利亚</button>
-    <button class="city-tab" onclick="filterCity('萨拉戈萨',this)">🕌 萨拉戈萨</button>
+    <button class="city-tab active" onclick="filterCity('全部',this)">🌐 Todas las provincias</button>
+    <select id="provinceFilter" class="city-tab province-select" onchange="filterCity(this.value,this)" aria-label="Provincia">
+      <option value="全部">Seleccionar provincia</option>
+    </select>
   </div>
 
   <div class="listings-grid" id="listingsGrid"></div>
@@ -1678,7 +1693,7 @@
   </div>
   <div class="footer-bottom">
     <div>© 2026 西班牙生活通 · 版权所有</div>
-    <div>西班牙华人生活服务平台 | 覆盖全西班牙15+城市</div>
+    <div>西班牙华人生活服务平台 | 覆盖西班牙省份/地区</div>
   </div>
 </footer>
 
@@ -1738,16 +1753,8 @@
       <input type="tel" id="regPhone" placeholder="+34 6XX XXX XXX" autocomplete="tel" inputmode="tel">
     </div>
     <div class="form-group">
-      <label>所在城市</label>
-      <select id="regCity">
-        <option>巴塞罗那</option>
-        <option>马德里</option>
-        <option>瓦伦西亚</option>
-        <option>毕尔巴鄂</option>
-        <option>塞维利亚</option>
-        <option>萨拉戈萨</option>
-        <option>其他</option>
-      </select>
+      <label>所在省份/地区</label>
+      <select id="regCity"></select>
     </div>
     <div class="form-group">
       <label>4位密码</label>
@@ -1792,7 +1799,7 @@
     </div>
     <div class="form-group">
       <label>标题</label>
-      <input type="text" placeholder="简洁明了的标题，例如：巴塞罗那招中餐厨师一名" id="postTitle">
+      <input type="text" placeholder="简洁明了的标题，例如：Barcelona招中餐厨师一名" id="postTitle">
     </div>
     <div class="form-group">
       <label>详细描述</label>
@@ -1800,16 +1807,8 @@
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>城市</label>
-        <select id="postCity">
-          <option>巴塞罗那</option>
-          <option>马德里</option>
-          <option>瓦伦西亚</option>
-          <option>毕尔巴鄂</option>
-          <option>塞维利亚</option>
-          <option>萨拉戈萨</option>
-          <option>其他</option>
-        </select>
+        <label>省份/地区</label>
+        <select id="postCity"></select>
       </div>
       <div class="form-group">
         <label>价格/薪资（€）</label>
@@ -1992,6 +1991,82 @@ let currentCat = 'all';
 let currentCity = '全部';
 let allListings = [...fallbackListings]; // 先用备用数据
 
+const SPAIN_PROVINCES_BY_POPULATION = [
+  'Madrid','Barcelona','Valencia','Alicante','Sevilla','Málaga','Murcia','Cádiz',
+  'Islas Baleares','Las Palmas','Vizcaya','A Coruña','Santa Cruz de Tenerife',
+  'Asturias','Zaragoza','Pontevedra','Granada','Tarragona','Girona','Córdoba',
+  'Almería','Toledo','Guipúzcoa','Navarra','Badajoz','Castellón','Jaén',
+  'Cantabria','Huelva','Valladolid','Ciudad Real','Lleida','León','Albacete',
+  'Cáceres','Burgos','Álava','Salamanca','La Rioja','Lugo','Ourense',
+  'Guadalajara','Huesca','Cuenca','Zamora','Ávila','Palencia','Segovia',
+  'Teruel','Soria','Melilla','Ceuta'
+];
+
+const LEGACY_PROVINCE_MAP = {
+  '巴塞罗那': 'Barcelona',
+  '马德里': 'Madrid',
+  '瓦伦西亚': 'Valencia',
+  '毕尔巴鄂': 'Vizcaya',
+  '塞维利亚': 'Sevilla',
+  '萨拉戈萨': 'Zaragoza',
+  '其他': 'Madrid'
+};
+
+const PROVINCE_ALIASES = {
+  Barcelona: ['巴塞罗那'],
+  Madrid: ['马德里', '其他'],
+  Valencia: ['瓦伦西亚'],
+  Vizcaya: ['毕尔巴鄂', 'Bilbao', 'Bizkaia'],
+  Sevilla: ['塞维利亚'],
+  Zaragoza: ['萨拉戈萨'],
+  Alicante: ['Alicante/Alacant'],
+  Castellón: ['Castelló', 'Castellón de la Plana'],
+  Girona: ['Gerona'],
+  Lleida: ['Lérida'],
+  'Islas Baleares': ['Illes Balears', 'Baleares'],
+  'A Coruña': ['La Coruña'],
+  Guipúzcoa: ['Gipuzkoa'],
+  Álava: ['Araba', 'Araba/Álava']
+};
+
+function normalizeProvinceName(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  if (LEGACY_PROVINCE_MAP[raw]) return LEGACY_PROVINCE_MAP[raw];
+  if (SPAIN_PROVINCES_BY_POPULATION.includes(raw)) return raw;
+  const found = Object.entries(PROVINCE_ALIASES).find(([, aliases]) => aliases.includes(raw));
+  return found ? found[0] : raw;
+}
+
+function provinceQueryValues(province) {
+  const normalized = normalizeProvinceName(province);
+  const values = [normalized, ...(PROVINCE_ALIASES[normalized] || [])];
+  return [...new Set(values.filter(Boolean))];
+}
+
+function provinceOptionsHtml(selected = '', includeAll = false) {
+  const normalizedSelected = normalizeProvinceName(selected) || 'Barcelona';
+  const allOption = includeAll ? '<option value="全部">Todas las provincias</option>' : '';
+  return allOption + SPAIN_PROVINCES_BY_POPULATION.map(province => (
+    `<option value="${province}"${province === normalizedSelected ? ' selected' : ''}>${province}</option>`
+  )).join('');
+}
+
+function populateProvinceControls() {
+  ['regCity', 'postCity', 'editCity', 'accCity'].forEach(id => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    const selected = select.value || 'Barcelona';
+    select.innerHTML = provinceOptionsHtml(selected);
+    select.value = normalizeProvinceName(selected) || 'Barcelona';
+  });
+  const provinceFilter = document.getElementById('provinceFilter');
+  if (provinceFilter) {
+    provinceFilter.innerHTML = provinceOptionsHtml(currentCity, true);
+    provinceFilter.value = currentCity === '全部' ? '全部' : normalizeProvinceName(currentCity);
+  }
+}
+
 function normalizeDedupeValue(value) {
   return String(value ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
 }
@@ -2034,7 +2109,7 @@ async function loadListings() {
         if(cat) query = query.eq('category', cat);
       }
     }
-    if (currentCity !== '全部') query = query.eq('city', currentCity);
+    if (currentCity !== '全部') query = query.in('city', provinceQueryValues(currentCity));
 
     const { data, error } = await query;
     if (error) throw error;
@@ -2044,14 +2119,14 @@ async function loadListings() {
       allListings = uniqueRows.map(r => ({
         id: r.id,
         cat: uiCatMap[r.category] || 'goods',
-        city: r.city,
+        city: normalizeProvinceName(r.city),
         icon: catIcons[r.category] || '📋',
         badge: catBadge[r.category] || '信息',
         badgeType: r.is_pinned ? 'gold' : '',
         title: r.title,
         price: r.price || '面议',
         unit: '',
-        tags: [r.category, r.city],
+        tags: [r.category, normalizeProvinceName(r.city)],
         time: timeAgo(r.created_at)
       }));
     }
@@ -2126,7 +2201,7 @@ function getListingShareUrl(id) {
 }
 
 function updateDocumentShareMeta(listing) {
-  const desc = [listing.category, listing.city, listing.price || '面议'].filter(Boolean).join(' · ');
+  const desc = [listing.category, normalizeProvinceName(listing.city), listing.price || '面议'].filter(Boolean).join(' · ');
   document.title = `${listing.title} - 西班牙生活通`;
   [
     ['meta[name="description"]', desc],
@@ -2169,7 +2244,7 @@ async function getListingForShare(id) {
     id: local.id,
     title: local.title,
     category: local.tags?.[0] || local.badge,
-    city: local.city,
+    city: normalizeProvinceName(local.city),
     price: local.price,
     description: '',
     contact: ''
@@ -2179,7 +2254,7 @@ async function getListingForShare(id) {
 function buildListingShareText(listing, url) {
   const parts = [
     `【${listing.category || '信息'}】${listing.title}`,
-    listing.city ? `城市：${listing.city}` : '',
+    listing.city ? `省份：${normalizeProvinceName(listing.city)}` : '',
     listing.price ? `价格：${listing.price}${String(listing.price).includes('€') ? '' : ' €'}` : '价格：面议',
     listing.description ? `简介：${String(listing.description).slice(0, 70)}` : '',
     `查看详情：${url}`
@@ -2225,7 +2300,7 @@ function renderListings() {
       filtered = filtered.filter(l => l.cat === currentCat);
     }
   }
-  if(currentCity !== '全部') filtered = filtered.filter(l => l.city === currentCity);
+  if(currentCity !== '全部') filtered = filtered.filter(l => normalizeProvinceName(l.city) === currentCity);
 
   if(filtered.length === 0) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:16px">暂无相关信息</div><div style="font-size:13px;margin-top:8px">试试其他条件或发布新信息</div></div>';
@@ -2242,11 +2317,11 @@ function renderListings() {
       <div class="listing-body">
         <div class="listing-title">${escapeHTML(l.title)}</div>
         <div class="listing-tags">
-          ${l.tags.map(t=>`<span class="tag">${escapeHTML(t)}</span>`).join('')}
+          ${l.tags.map(t=>`<span class="tag">${escapeHTML(normalizeProvinceName(t))}</span>`).join('')}
         </div>
         <div class="listing-meta">
           <div class="listing-price">${escapeHTML(l.price)}<span> ${escapeHTML(l.unit)}</span></div>
-          <div class="listing-loc">📍 ${escapeHTML(l.city)}</div>
+          <div class="listing-loc">📍 ${escapeHTML(normalizeProvinceName(l.city))}</div>
         </div>
         <div class="listing-open-hint">
           <span>🕐 ${escapeHTML(l.time)}</span>
@@ -2272,9 +2347,14 @@ function filterCat(cat, el) {
 }
 
 function filterCity(city, el) {
-  currentCity = city;
+  currentCity = city === '全部' ? '全部' : normalizeProvinceName(city);
   document.querySelectorAll('.city-tab').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
+  const provinceFilter = document.getElementById('provinceFilter');
+  if (provinceFilter) {
+    provinceFilter.value = currentCity;
+    if (currentCity !== '全部') provinceFilter.classList.add('active');
+  }
   loadListings();
 }
 async function viewListing(id) {
@@ -2307,7 +2387,7 @@ async function viewListing(id) {
     const safeTitle = escapeHTML(data.title);
     const safeDescription = escapeHTML(data.description);
     const safePrice = escapeHTML(data.price || '面议');
-    const safeCity = escapeHTML(data.city);
+    const safeCity = escapeHTML(normalizeProvinceName(data.city));
     const safeContact = escapeHTML(data.contact || '未填写');
     updateDocumentShareMeta(data);
 
@@ -2330,7 +2410,7 @@ async function viewListing(id) {
             <div style="font-size:16px;font-weight:700;color:#c0392b">${safePrice} €</div>
           </div>
           <div style="background:#f0fdf4;border-radius:8px;padding:12px 14px">
-            <div style="font-size:11px;color:#999;margin-bottom:4px">📍 城市</div>
+            <div style="font-size:11px;color:#999;margin-bottom:4px">📍 省份/地区</div>
             <div style="font-size:15px;font-weight:600;color:#166534">${safeCity}</div>
           </div>
         </div>
@@ -2372,14 +2452,14 @@ async function doSearch() {
     if(data && data.length > 0) {
       const uniqueRows = dedupeListingRows(data);
       allListings = uniqueRows.map(r => ({
-        id: r.id, cat: 'all', city: r.city,
+        id: r.id, cat: 'all', city: normalizeProvinceName(r.city),
         icon: catIcons[r.category] || '📋',
         badge: catBadge[r.category] || '信息',
         badgeType: r.is_pinned ? 'gold' : '',
         title: r.title, price: r.price || '面议', unit: '',
-        tags: [r.category, r.city], time: timeAgo(r.created_at)
+        tags: [r.category, normalizeProvinceName(r.city)], time: timeAgo(r.created_at)
       }));
-      currentCat = 'all'; currentCity = '全部';
+      currentCat = 'all'; currentCity = '全部'; populateProvinceControls();
       showLoading(false); renderListings();
       showToast(`搜索"${q}" 找到 ${uniqueRows.length} 条结果`);
     } else {
@@ -2434,6 +2514,7 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   });
 });
 document.addEventListener('DOMContentLoaded', function() {
+  populateProvinceControls();
   syncModalScrollLock();
   applyWeChatBrowserHints();
 });
@@ -2444,7 +2525,7 @@ async function submitRegister() {
   const password = document.getElementById('regPassword')?.value.trim();
   const confirmPassword = document.getElementById('regPasswordConfirm')?.value.trim();
   const nickname = document.getElementById('regNickname')?.value.trim();
-  const city     = document.getElementById('regCity')?.value;
+  const city     = normalizeProvinceName(document.getElementById('regCity')?.value) || 'Barcelona';
   const phone    = normalizePhone(document.getElementById('regPhone')?.value);
   const digits   = phoneDigits(phone);
   if(!nickname || !phone || !password || !confirmPassword) { showToast('⚠️ 请填写昵称、手机号和密码', true); return; }
@@ -2526,7 +2607,7 @@ async function submitPost() {
   const cat   = document.getElementById('postCat').value;
   const title = document.getElementById('postTitle').value.trim();
   const desc  = document.getElementById('postDesc')?.value.trim();
-  const city  = document.getElementById('postCity')?.value;
+  const city  = normalizeProvinceName(document.getElementById('postCity')?.value) || 'Barcelona';
   const price = document.getElementById('postPrice')?.value.trim();
   const contact = document.getElementById('postContact')?.value.trim();
   if(!cat)   { showToast('⚠️ 请选择信息类别', true); return; }
@@ -2538,7 +2619,7 @@ async function submitPost() {
   const { error } = await sb.from('listings').insert([{
     user_id: currentUser.id,
     title, description: desc || title,
-    category: catZh, city: city || '巴塞罗那',
+    category: catZh, city,
     price: price || '面议', contact,
     status: 'pending'
   }]);
@@ -2681,7 +2762,7 @@ async function submitGuestPost() {
   const cat     = document.getElementById('postCat').value;
   const title   = document.getElementById('postTitle').value.trim();
   const desc    = document.getElementById('postDesc')?.value.trim();
-  const city    = document.getElementById('postCity')?.value;
+  const city    = normalizeProvinceName(document.getElementById('postCity')?.value) || 'Barcelona';
   const price   = document.getElementById('postPrice')?.value.trim();
   const contact = document.getElementById('postContact')?.value.trim();
   const nickname = document.getElementById('guestNickname')?.value.trim();
@@ -2693,7 +2774,7 @@ async function submitGuestPost() {
   if (btn) { btn.textContent = '发布中…'; btn.disabled = true; }
   const { error } = await sb.from('listings').insert([{
     title, description: desc || title,
-    category: catZh, city: city || '巴塞罗那',
+    category: catZh, city,
     price: price || '面议', contact,
     status: 'pending',
     user_id: null
@@ -2739,6 +2820,7 @@ async function handleInitialDeepLink() {
   }
 }
 
+populateProvinceControls();
 loadListings().then(handleInitialDeepLink);
 </script>
 
@@ -2782,16 +2864,16 @@ loadListings().then(handleInitialDeepLink);
   window.selectVipPlan=function(p){window._selectedVipPlan=p;var m=document.getElementById('vipPlanMonth'),y=document.getElementById('vipPlanYear');if(p==='monthly'){if(m){m.style.border='2px solid #e09518';m.style.background='#fffbf2';}if(y){y.style.border='2px solid #e0e0e0';y.style.background='#fff';}}else{if(y){y.style.border='2px solid #e09518';y.style.background='#fffbf2';}if(m){m.style.border='2px solid #e0e0e0';m.style.background='#fff';}}};
   window.confirmVipUpgrade=function(){var p=window._selectedVipPlan,pr=p==='yearly'?'€68.8/年':'€9.9/月';navigator.clipboard&&navigator.clipboard.writeText('espana_life').catch(function(){});var v=document.getElementById('vipUpgradeModal');if(v)v.style.display='none';var t=document.getElementById('toast');if(t){t.textContent='客服微信espana_life已复制，请添加后完成'+pr+'付款';t.style.display='block';setTimeout(function(){t.style.display='none';},4000);}};
   window.switchProfileTab=function(tab,btn){document.querySelectorAll('#profileTabBar button').forEach(function(b){b.style.color='#888';b.style.borderBottom='none';});if(btn){btn.style.color='#e09518';btn.style.borderBottom='2px solid #e09518';}var lp=document.getElementById('myListingsPanel'),ep=document.getElementById('editListingPanel'),ap=document.getElementById('accountPanel');if(lp)lp.style.display=tab==='listings'?'block':'none';if(ep)ep.style.display='none';if(ap)ap.style.display=tab==='account'?'block':'none';if(tab==='listings')window.loadMyListings&&window.loadMyListings();};
-  window.loadMyListings=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var panel=document.getElementById('myListingsPanel');if(!panel)return;panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">⏳ 加载中…</div>';var r=await sb.from('listings').select('*').eq('user_id',sess.user.id).order('created_at',{ascending:false});if(r.error){panel.innerHTML='<div style="color:#c62828;padding:20px;">❌ '+r.error.message+'</div>';return;}if(!r.data||!r.data.length){panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">📭 暂无发布记录</div>';return;}var tv=r.data.reduce(function(s,d){return s+(d.view_count||0);},0);['statPostCount','statViewCount'].forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=i===0?r.data.length:tv;});var cn={worker:'招工',house:'租房',business:'生意转让',wholesale:'批发',dating:'交友',goods:'二手',service:'生活',edu:'教育'};var sm={approved:{l:'已上线',c:'approved'},pending:{l:'审核中',c:'pending'},rejected:{l:'已拒绝',c:'rejected'}};panel.innerHTML=r.data.map(function(item){var s=sm[item.status]||{l:item.status,c:'pending'};var dt=new Date(item.created_at).toLocaleDateString('zh-CN');return '<div class="my-listing-card"><div class="mlc-title">'+item.title+(item.is_pinned?' 📌':'')+'</div><div class="mlc-meta"><span>'+(cn[item.category]||item.category)+'</span><span>📍'+(item.city||'')+'</span><span>👁'+(item.view_count||0)+'</span><span>'+dt+'</span><span class="mlc-status '+s.c+'">'+s.l+'</span>'+(item.reject_reason?'<span style="color:#c62828;">拒绝:'+item.reject_reason+'</span>':'')+'</div><div class="mlc-actions"><button class="mlc-btn view" onclick="viewMyListing('+item.id+')">查看详情</button><button class="mlc-btn edit" onclick="startEdit('+item.id+')">✏️ 编辑</button>'+(!item.is_pinned?'<button class="mlc-btn pin" onclick="pinListing('+item.id+',this)">📌 置顶</button>':'<button class="mlc-btn pin" disabled>已置顶</button>')+'<button class="mlc-btn del" onclick="deleteListing('+item.id+',this)">🗑 删除</button></div></div>';}).join('');};
-  window.viewMyListing=async function(id){var sb=window.getSb();var content=document.getElementById('detailContent');if(!content)return;content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px;margin-bottom:10px">⏳</div><div>加载中…</div></div>';openModal('detail');var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999">信息加载失败</div>';return;}var d=r.data;var safe=function(v){return escapeHTML(v||'')};var sm={approved:'已上线',pending:'审核中',rejected:'已拒绝',offline:'已下线'};content.innerHTML='<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="font-size:34px">📋</span><div><span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">'+safe(d.category)+'</span><h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">'+safe(d.title)+'</h3></div></div><div style="background:#fff8e1;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:#8a5a00;font-size:13px;font-weight:700">状态：'+(sm[d.status]||safe(d.status))+(d.reject_reason?' · 原因：'+safe(d.reject_reason):'')+'</div><div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">详细描述</div><div style="font-size:14px;line-height:1.7;color:#333;white-space:pre-wrap">'+safe(d.description||'暂无描述')+'</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:#fef3f2;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">价格</div><div style="font-size:16px;font-weight:700;color:#c0392b">'+safe(d.price||'面议')+' €</div></div><div style="background:#f0fdf4;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">城市</div><div style="font-size:15px;font-weight:600;color:#166534">'+safe(d.city)+'</div></div></div><div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px"><div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">联系方式</div><div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">'+safe(d.contact||'未填写')+'</div></div><div class="detail-actions"><button class="detail-action" onclick="startEdit('+d.id+');closeModal(&quot;detail&quot;)">编辑这条信息</button></div></div>';};
-  window.startEdit=async function(id){var sb=window.getSb();var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){alert('加载失败');return;}document.getElementById('myListingsPanel').style.display='none';document.getElementById('editListingPanel').style.display='block';['editListingId','editCat','editTitle','editDesc','editCity','editPrice','editContact'].forEach(function(eid){var el=document.getElementById(eid);if(!el)return;var key={editListingId:'id',editCat:'category',editTitle:'title',editDesc:'description',editCity:'city',editPrice:'price',editContact:'contact'}[eid];if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=r.data[key]||'';else if(el.tagName==='SELECT')el.value=r.data[key]||'';});};
+  window.loadMyListings=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var panel=document.getElementById('myListingsPanel');if(!panel)return;panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">⏳ 加载中…</div>';var r=await sb.from('listings').select('*').eq('user_id',sess.user.id).order('created_at',{ascending:false});if(r.error){panel.innerHTML='<div style="color:#c62828;padding:20px;">❌ '+r.error.message+'</div>';return;}if(!r.data||!r.data.length){panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">📭 暂无发布记录</div>';return;}var tv=r.data.reduce(function(s,d){return s+(d.view_count||0);},0);['statPostCount','statViewCount'].forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=i===0?r.data.length:tv;});var cn={worker:'招工',house:'租房',business:'生意转让',wholesale:'批发',dating:'交友',goods:'二手',service:'生活',edu:'教育'};var sm={approved:{l:'已上线',c:'approved'},pending:{l:'审核中',c:'pending'},rejected:{l:'已拒绝',c:'rejected'}};panel.innerHTML=r.data.map(function(item){var s=sm[item.status]||{l:item.status,c:'pending'};var dt=new Date(item.created_at).toLocaleDateString('zh-CN');return '<div class="my-listing-card"><div class="mlc-title">'+item.title+(item.is_pinned?' 📌':'')+'</div><div class="mlc-meta"><span>'+(cn[item.category]||item.category)+'</span><span>📍'+(normalizeProvinceName(item.city)||'')+'</span><span>👁'+(item.view_count||0)+'</span><span>'+dt+'</span><span class="mlc-status '+s.c+'">'+s.l+'</span>'+(item.reject_reason?'<span style="color:#c62828;">拒绝:'+item.reject_reason+'</span>':'')+'</div><div class="mlc-actions"><button class="mlc-btn view" onclick="viewMyListing('+item.id+')">查看详情</button><button class="mlc-btn edit" onclick="startEdit('+item.id+')">✏️ 编辑</button>'+(!item.is_pinned?'<button class="mlc-btn pin" onclick="pinListing('+item.id+',this)">📌 置顶</button>':'<button class="mlc-btn pin" disabled>已置顶</button>')+'<button class="mlc-btn del" onclick="deleteListing('+item.id+',this)">🗑 删除</button></div></div>';}).join('');};
+  window.viewMyListing=async function(id){var sb=window.getSb();var content=document.getElementById('detailContent');if(!content)return;content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px;margin-bottom:10px">⏳</div><div>加载中…</div></div>';openModal('detail');var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999">信息加载失败</div>';return;}var d=r.data;var safe=function(v){return escapeHTML(v||'')};var sm={approved:'已上线',pending:'审核中',rejected:'已拒绝',offline:'已下线'};content.innerHTML='<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="font-size:34px">📋</span><div><span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">'+safe(d.category)+'</span><h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">'+safe(d.title)+'</h3></div></div><div style="background:#fff8e1;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:#8a5a00;font-size:13px;font-weight:700">状态：'+(sm[d.status]||safe(d.status))+(d.reject_reason?' · 原因：'+safe(d.reject_reason):'')+'</div><div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">详细描述</div><div style="font-size:14px;line-height:1.7;color:#333;white-space:pre-wrap">'+safe(d.description||'暂无描述')+'</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:#fef3f2;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">价格</div><div style="font-size:16px;font-weight:700;color:#c0392b">'+safe(d.price||'面议')+' €</div></div><div style="background:#f0fdf4;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">省份/地区</div><div style="font-size:15px;font-weight:600;color:#166534">'+safe(normalizeProvinceName(d.city))+'</div></div></div><div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px"><div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">联系方式</div><div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">'+safe(d.contact||'未填写')+'</div></div><div class="detail-actions"><button class="detail-action" onclick="startEdit('+d.id+');closeModal(&quot;detail&quot;)">编辑这条信息</button></div></div>';};
+  window.startEdit=async function(id){var sb=window.getSb();var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){alert('加载失败');return;}populateProvinceControls();document.getElementById('myListingsPanel').style.display='none';document.getElementById('editListingPanel').style.display='block';['editListingId','editCat','editTitle','editDesc','editCity','editPrice','editContact'].forEach(function(eid){var el=document.getElementById(eid);if(!el)return;var key={editListingId:'id',editCat:'category',editTitle:'title',editDesc:'description',editCity:'city',editPrice:'price',editContact:'contact'}[eid];if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=r.data[key]||'';else if(el.tagName==='SELECT'){if(eid==='editCity')el.value=normalizeProvinceName(r.data[key])||'Barcelona';else el.value=r.data[key]||'';}});};
   window.cancelEdit=function(){document.getElementById('editListingPanel').style.display='none';document.getElementById('myListingsPanel').style.display='block';};
-  window.saveEdit=async function(){var sb=window.getSb();var id=document.getElementById('editListingId').value;var btn=document.getElementById('editSaveBtn');btn.disabled=true;btn.textContent='保存中…';var u={category:document.getElementById('editCat').value,title:document.getElementById('editTitle').value,description:document.getElementById('editDesc').value,city:document.getElementById('editCity').value,price:document.getElementById('editPrice').value,contact:document.getElementById('editContact').value,status:'pending',updated_at:new Date().toISOString()};if(!u.title||!u.contact){alert('标题和联系方式不能为空');btn.disabled=false;btn.textContent='💾 保存';return;}var r=await sb.from('listings').update(u).eq('id',id);btn.disabled=false;btn.textContent='💾 保存';if(r.error){alert('保存失败');return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 已保存，等待审核';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}window.cancelEdit();window.loadMyListings();};
+  window.saveEdit=async function(){var sb=window.getSb();var id=document.getElementById('editListingId').value;var btn=document.getElementById('editSaveBtn');btn.disabled=true;btn.textContent='保存中…';var u={category:document.getElementById('editCat').value,title:document.getElementById('editTitle').value,description:document.getElementById('editDesc').value,city:normalizeProvinceName(document.getElementById('editCity').value)||'Barcelona',price:document.getElementById('editPrice').value,contact:document.getElementById('editContact').value,status:'pending',updated_at:new Date().toISOString()};if(!u.title||!u.contact){alert('标题和联系方式不能为空');btn.disabled=false;btn.textContent='💾 保存';return;}var r=await sb.from('listings').update(u).eq('id',id);btn.disabled=false;btn.textContent='💾 保存';if(r.error){alert('保存失败');return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 已保存，等待审核';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}window.cancelEdit();window.loadMyListings();};
   window.pinListing=async function(id,btn){var sb=window.getSb();btn.disabled=true;btn.textContent='…';var r=await sb.from('listings').update({is_pinned:true,pin_until:new Date(Date.now()+604800000).toISOString(),updated_at:new Date().toISOString()}).eq('id',id);if(r.error){alert('失败');btn.disabled=false;btn.textContent='📌 置顶';return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 已置顶7天';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}window.loadMyListings();};
   window.deleteListing=async function(id,btn){if(!confirm('确定删除？'))return;var sb=window.getSb();btn.disabled=true;var r=await sb.from('listings').delete().eq('id',id);if(r.error){alert('失败');btn.disabled=false;return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 已删除';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}window.loadMyListings();};
-  window.saveAccount=async function(){var sb=window.getSb();var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var btn=document.getElementById('saveAccountBtn');btn.disabled=true;btn.textContent='保存中…';var u={nickname:document.getElementById('accNickname').value,phone:document.getElementById('accPhone').value,city:document.getElementById('accCity').value,updated_at:new Date().toISOString()};var r=await sb.from('profiles').update(u).eq('id',sess.user.id);btn.disabled=false;btn.textContent='✅ 保存设置';if(r.error){alert('失败');return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 设置已保存';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}var pn=document.getElementById('profileName');if(pn)pn.textContent=u.nickname||'用户';};
+  window.saveAccount=async function(){var sb=window.getSb();var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var btn=document.getElementById('saveAccountBtn');btn.disabled=true;btn.textContent='保存中…';var u={nickname:document.getElementById('accNickname').value,phone:document.getElementById('accPhone').value,city:normalizeProvinceName(document.getElementById('accCity').value)||'Barcelona',updated_at:new Date().toISOString()};var r=await sb.from('profiles').update(u).eq('id',sess.user.id);btn.disabled=false;btn.textContent='✅ 保存设置';if(r.error){alert('失败');return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 设置已保存';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}var pn=document.getElementById('profileName');if(pn)pn.textContent=u.nickname||'用户';};
   window.doLogout=async function(){if(!confirm('确定退出？'))return;await window.getSb().auth.signOut();document.getElementById('profileModal').style.display='none';var t=document.getElementById('toast');if(t){t.textContent='✅ 已退出';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}setTimeout(function(){location.reload();},800);};
-  window.refreshProfile=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;var pc=document.getElementById('profileContent'),lo=document.getElementById('profileLoggedOut');if(!sess){if(pc)pc.style.display='none';if(lo)lo.style.display='block';return;}if(pc)pc.style.display='block';if(lo)lo.style.display='none';var r=await sb.from('profiles').select('*').eq('id',sess.user.id).single();if(r.data){var d=r.data;var av=document.getElementById('profileAvatar');if(av)av.textContent=(d.nickname||'U').charAt(0).toUpperCase();var pn=document.getElementById('profileName');if(pn)pn.textContent=d.nickname||'用户';var pc2=document.getElementById('profileCity');if(pc2)pc2.textContent='📍 '+(d.city||'--');var spc=document.getElementById('statPostCount');if(spc)spc.textContent=d.post_count||0;var an=document.getElementById('accNickname');if(an)an.value=d.nickname||'';var ap=document.getElementById('accPhone');if(ap)ap.value=d.phone||'';var ac=document.getElementById('accCity');if(ac)ac.value=d.city||'巴塞罗那';var ae=document.getElementById('accEmail');if(ae)ae.value=publicAccountLabel(sess.user.email,d.phone);var vu=d.vip_until?new Date(d.vip_until):null,isVip=vu&&vu>new Date();var vt=document.getElementById('vipStatusTitle'),vs=document.getElementById('vipStatusSub'),vb=document.getElementById('vipBadge'),vub=document.getElementById('vipUpgradeBtn');if(isVip){if(vt)vt.textContent='💎 VIP会员';if(vs)vs.textContent='到期：'+vu.toLocaleDateString('zh-CN');if(vb){vb.textContent='VIP';vb.style.background='linear-gradient(135deg,#c0830a,#f5c842)';vb.style.color='#fff';}if(vub)vub.textContent='续费VIP';}else{if(vt)vt.textContent='普通用户';if(vs)vs.textContent='升级VIP，享置顶展示和更多特权';if(vb){vb.textContent='FREE';vb.style.background='#eee';vb.style.color='#888';}if(vub)vub.textContent='升级VIP';}}window.loadMyListings();};
+  window.refreshProfile=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;var pc=document.getElementById('profileContent'),lo=document.getElementById('profileLoggedOut');if(!sess){if(pc)pc.style.display='none';if(lo)lo.style.display='block';return;}populateProvinceControls();if(pc)pc.style.display='block';if(lo)lo.style.display='none';var r=await sb.from('profiles').select('*').eq('id',sess.user.id).single();if(r.data){var d=r.data;var province=normalizeProvinceName(d.city)||'Barcelona';var av=document.getElementById('profileAvatar');if(av)av.textContent=(d.nickname||'U').charAt(0).toUpperCase();var pn=document.getElementById('profileName');if(pn)pn.textContent=d.nickname||'用户';var pc2=document.getElementById('profileCity');if(pc2)pc2.textContent='📍 '+province;var spc=document.getElementById('statPostCount');if(spc)spc.textContent=d.post_count||0;var an=document.getElementById('accNickname');if(an)an.value=d.nickname||'';var ap=document.getElementById('accPhone');if(ap)ap.value=d.phone||'';var ac=document.getElementById('accCity');if(ac)ac.value=province;var ae=document.getElementById('accEmail');if(ae)ae.value=publicAccountLabel(sess.user.email,d.phone);var vu=d.vip_until?new Date(d.vip_until):null,isVip=vu&&vu>new Date();var vt=document.getElementById('vipStatusTitle'),vs=document.getElementById('vipStatusSub'),vb=document.getElementById('vipBadge'),vub=document.getElementById('vipUpgradeBtn');if(isVip){if(vt)vt.textContent='💎 VIP会员';if(vs)vs.textContent='到期：'+vu.toLocaleDateString('zh-CN');if(vb){vb.textContent='VIP';vb.style.background='linear-gradient(135deg,#c0830a,#f5c842)';vb.style.color='#fff';}if(vub)vub.textContent='续费VIP';}else{if(vt)vt.textContent='普通用户';if(vs)vs.textContent='升级VIP，享置顶展示和更多特权';if(vb){vb.textContent='FREE';vb.style.background='#eee';vb.style.color='#888';}if(vub)vub.textContent='升级VIP';}}window.loadMyListings();};
   document.addEventListener('DOMContentLoaded',function(){window.applyVipFreePromo&&window.applyVipFreePromo();var pb=document.getElementById('postBtn');if(pb)pb.innerHTML='🚀 立即发布（限时免费）';var origOpen=window.openModal;window.openModal=function(type){origOpen&&origOpen(type);if(type==='profile')setTimeout(function(){window.refreshProfile&&window.refreshProfile();},50);};});
   </script>
   <div class="modal-overlay" id="detailModal">
@@ -2813,7 +2895,7 @@ loadListings().then(handleInitialDeepLink);
         <ol style="padding-left:18px;margin:0">
           <li style="margin-bottom:6px">点击页面顶部的"<strong>＋ 免费发布</strong>"按钮</li>
           <li style="margin-bottom:6px">选择"游客快速发布"标签</li>
-          <li style="margin-bottom:6px">填写您的昵称、信息类别、标题、描述、城市、价格和联系方式</li>
+          <li style="margin-bottom:6px">填写您的昵称、信息类别、标题、描述、省份/地区、价格和联系方式</li>
           <li style="margin-bottom:6px">点击"立即发布"，信息将在审核后上线</li>
         </ol>
       </div>
@@ -2953,7 +3035,7 @@ loadListings().then(handleInitialDeepLink);
     <div style="line-height:1.8;color:#333;font-size:13px">
       <p style="color:#999;margin-bottom:16px">最后更新：2025年1月1日</p>
       <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">一、信息收集</h4>
-      <p style="margin-bottom:12px">我们收集的信息包括：注册时填写的昵称、手机号码和城市；发布信息时填写的内容；您在使用本平台过程中产生的浏览记录和操作日志。</p>
+      <p style="margin-bottom:12px">我们收集的信息包括：注册时填写的昵称、手机号码和省份/地区；发布信息时填写的内容；您在使用本平台过程中产生的浏览记录和操作日志。</p>
       <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">二、信息使用</h4>
       <p style="margin-bottom:8px">我们收集的信息用于：</p>
       <ul style="padding-left:18px;margin-bottom:12px;color:#555">
@@ -3016,7 +3098,7 @@ loadListings().then(handleInitialDeepLink);
       </div>
       <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
         <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F50D; 如何搜索我需要的信息？</div>
-        <div style="font-size:14px;color:#555;line-height:1.6;">可以使用顶部搜索框输入关键词（如“招厨师”、“巴塞罗那租房”），也可通过分类导航或城市筛选快速找到目标信息。</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">可以使用顶部搜索框输入关键词（如“招厨师”、“Barcelona租房”），也可通过分类导航或省份筛选快速找到目标信息。</div>
       </div>
       <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
         <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x270F;&#xFE0F; 发布后可以修改信息吗？</div>
@@ -3031,8 +3113,8 @@ loadListings().then(handleInitialDeepLink);
         <div style="font-size:14px;color:#555;line-height:1.6;">手机号账号请联系客服重置4位密码；老邮箱账号可在登录页面使用邮箱找回密码。</div>
       </div>
       <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
-        <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F30D; 平台覆盖哪些城市？</div>
-        <div style="font-size:14px;color:#555;line-height:1.6;">目前覆盖西班牙 15+ 城市，包括巴塞罗那、马德里、瓦伦西亚、毕尔巴鄂、塞维利亚、萨拉戈萨等主要城市，并持续扩展中。</div>
+        <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F30D; 平台覆盖哪些地区？</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">目前省份选择已覆盖西班牙所有省份，并加入 Ceuta、Melilla，按人口较多的地区优先显示。</div>
       </div>
     </div>
     <div style="background:linear-gradient(135deg,#8b1a1a 0%,#c0392b 100%);border-radius:12px;padding:16px;color:white;text-align:center;">
