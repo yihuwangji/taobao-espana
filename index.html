@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -2200,6 +2200,110 @@ function getListingShareUrl(id) {
   return new URL(`/s/${encodeURIComponent(id)}`, window.location.origin).toString();
 }
 
+function getReferralVisitorId() {
+  const key = 'xby_referral_visitor_id';
+  let visitorId = localStorage.getItem(key);
+  if (!visitorId) {
+    visitorId = (crypto?.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2)).replace(/[^a-zA-Z0-9_-]/g, '');
+    localStorage.setItem(key, visitorId);
+  }
+  return visitorId;
+}
+
+async function getAuthHeader() {
+  const client = window.getSb ? window.getSb() : sb;
+  const session = (await client.auth.getSession()).data.session;
+  return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+}
+
+async function trackReferralVisit() {
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  if (!ref) return;
+  try {
+    const headers = await getAuthHeader();
+    await fetch('/api/referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body: JSON.stringify({ ref, visitorId: getReferralVisitorId() })
+    });
+  } catch(e) {
+    console.warn('邀请访问记录失败', e.message);
+  }
+}
+
+function renderReferralPanel(status) {
+  const vipBar = document.getElementById('vipStatusBar');
+  if (!vipBar || !status) return;
+  let panel = document.getElementById('referralPromoPanel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'referralPromoPanel';
+    vipBar.insertAdjacentElement('afterend', panel);
+  }
+  const count = Math.max(0, Number(status.count || 0));
+  const target = Math.max(1, Number(status.target || 10));
+  const remaining = Math.max(0, Number(status.remaining ?? (target - count)));
+  const percent = Math.min(100, Math.round(count / target * 100));
+  const inviteUrl = status.inviteUrl || '';
+  panel.style.cssText = 'background:#fff;border:1.5px solid #bbf7d0;border-left:5px solid #16a34a;border-radius:12px;padding:12px 14px;margin:-4px 0 16px;box-shadow:0 8px 18px rgba(22,163,74,.08);';
+  panel.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+      <div style="font-size:26px;line-height:1">🎁</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:900;color:#064e3b;margin-bottom:3px">邀请10位好友，免费领1年VIP</div>
+        <div style="font-size:12px;color:#047857;line-height:1.5">${remaining === 0 ? '已达到活动条件，系统会自动开通或刷新会员状态。' : `已累计 ${count}/${target} 位，还差 ${remaining} 位好友打开你的链接。`}</div>
+      </div>
+      <div style="font-size:18px;font-weight:900;color:#16a34a">${count}/${target}</div>
+    </div>
+    <div style="height:8px;background:#dcfce7;border-radius:99px;overflow:hidden;margin-bottom:10px">
+      <div style="height:100%;width:${percent}%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:99px"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input id="referralInviteUrl" readonly value="${escapeHTML(inviteUrl)}" style="flex:1;min-width:160px;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;font-size:12px;color:#14532d;background:#f0fdf4;box-sizing:border-box">
+      <button onclick="copyReferralInvite()" style="border:none;border-radius:8px;background:#16a34a;color:white;font-weight:800;padding:8px 12px;cursor:pointer">复制链接</button>
+      <button onclick="shareReferralInvite()" style="border:1.5px solid #16a34a;border-radius:8px;background:white;color:#047857;font-weight:800;padding:7px 12px;cursor:pointer">微信分享</button>
+    </div>
+  `;
+}
+
+async function loadReferralStatus() {
+  try {
+    const headers = await getAuthHeader();
+    if (!headers.Authorization) return;
+    const response = await fetch('/api/referral', { headers });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) {
+      renderReferralPanel(data);
+      if (data.vipGranted) showToast('🎉 邀请达标，已自动开通1年VIP');
+    }
+  } catch(e) {
+    console.warn('邀请状态加载失败', e.message);
+  }
+}
+
+async function copyReferralInvite() {
+  const input = document.getElementById('referralInviteUrl');
+  if (!input?.value) return;
+  await copyText(input.value);
+  showToast('✅ 专属邀请链接已复制，发给微信好友即可');
+}
+
+async function shareReferralInvite() {
+  const input = document.getElementById('referralInviteUrl');
+  if (!input?.value) return;
+  const text = `我在用西班牙生活通，招工、租房、生意转让、二手和生活服务都能看。打开这个链接支持我领取VIP：${input.value}`;
+  if (navigator.share && !isWeChatBrowser()) {
+    try {
+      await navigator.share({ title: '西班牙生活通', text, url: input.value });
+      return;
+    } catch(e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+  await copyText(text);
+  showToast(isWeChatBrowser() ? '已复制分享文案，去微信聊天粘贴发送' : '已复制邀请文案和链接');
+}
+
 function updateDocumentShareMeta(listing) {
   const desc = [listing.category, normalizeProvinceName(listing.city), listing.price || '面议'].filter(Boolean).join(' · ');
   document.title = `${listing.title} - 西班牙生活通`;
@@ -2289,6 +2393,8 @@ async function shareListing(id, event) {
 window.shareListing = shareListing;
 window.copyText = copyText;
 window.getListingShareUrl = getListingShareUrl;
+window.copyReferralInvite = copyReferralInvite;
+window.shareReferralInvite = shareReferralInvite;
 
 function renderListings() {
   const grid = document.getElementById('listingsGrid');
@@ -2517,6 +2623,7 @@ document.addEventListener('DOMContentLoaded', function() {
   populateProvinceControls();
   syncModalScrollLock();
   applyWeChatBrowserHints();
+  trackReferralVisit();
 });
 window.addEventListener('pageshow', syncModalScrollLock);
 
@@ -2572,7 +2679,8 @@ async function submitRegister() {
   btn.textContent = '注册';
   btn.disabled = false;
   closeModal('register');
-  showToast('🎉 注册成功，已自动登录，可以发布信息并转发微信好友');
+  showToast('🎉 注册成功，已自动登录。去“我的”复制专属链接，邀请10位好友可免费领1年VIP');
+  loadReferralStatus();
 }
 
 // ===== 用户登录 =====
@@ -2595,6 +2703,7 @@ async function submitLogin() {
   if(loginBtn2) loginBtn2.textContent = '＋ 免费发布';
   closeModal('login');
   showToast('👋 欢迎回来！');
+  loadReferralStatus();
 }
 
 // ===== 发布信息 =====
@@ -2873,7 +2982,7 @@ loadListings().then(handleInitialDeepLink);
   window.deleteListing=async function(id,btn){if(!confirm('确定删除？'))return;var sb=window.getSb();btn.disabled=true;var r=await sb.from('listings').delete().eq('id',id);if(r.error){alert('失败');btn.disabled=false;return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 已删除';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}window.loadMyListings();};
   window.saveAccount=async function(){var sb=window.getSb();var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var btn=document.getElementById('saveAccountBtn');btn.disabled=true;btn.textContent='保存中…';var u={nickname:document.getElementById('accNickname').value,phone:document.getElementById('accPhone').value,city:normalizeProvinceName(document.getElementById('accCity').value)||'Barcelona',updated_at:new Date().toISOString()};var r=await sb.from('profiles').update(u).eq('id',sess.user.id);btn.disabled=false;btn.textContent='✅ 保存设置';if(r.error){alert('失败');return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 设置已保存';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}var pn=document.getElementById('profileName');if(pn)pn.textContent=u.nickname||'用户';};
   window.doLogout=async function(){if(!confirm('确定退出？'))return;await window.getSb().auth.signOut();document.getElementById('profileModal').style.display='none';var t=document.getElementById('toast');if(t){t.textContent='✅ 已退出';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}setTimeout(function(){location.reload();},800);};
-  window.refreshProfile=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;var pc=document.getElementById('profileContent'),lo=document.getElementById('profileLoggedOut');if(!sess){if(pc)pc.style.display='none';if(lo)lo.style.display='block';return;}populateProvinceControls();if(pc)pc.style.display='block';if(lo)lo.style.display='none';var r=await sb.from('profiles').select('*').eq('id',sess.user.id).single();if(r.data){var d=r.data;var province=normalizeProvinceName(d.city)||'Barcelona';var av=document.getElementById('profileAvatar');if(av)av.textContent=(d.nickname||'U').charAt(0).toUpperCase();var pn=document.getElementById('profileName');if(pn)pn.textContent=d.nickname||'用户';var pc2=document.getElementById('profileCity');if(pc2)pc2.textContent='📍 '+province;var spc=document.getElementById('statPostCount');if(spc)spc.textContent=d.post_count||0;var an=document.getElementById('accNickname');if(an)an.value=d.nickname||'';var ap=document.getElementById('accPhone');if(ap)ap.value=d.phone||'';var ac=document.getElementById('accCity');if(ac)ac.value=province;var ae=document.getElementById('accEmail');if(ae)ae.value=publicAccountLabel(sess.user.email,d.phone);var vu=d.vip_until?new Date(d.vip_until):null,isVip=vu&&vu>new Date();var vt=document.getElementById('vipStatusTitle'),vs=document.getElementById('vipStatusSub'),vb=document.getElementById('vipBadge'),vub=document.getElementById('vipUpgradeBtn');if(isVip){if(vt)vt.textContent='💎 VIP会员';if(vs)vs.textContent='到期：'+vu.toLocaleDateString('zh-CN');if(vb){vb.textContent='VIP';vb.style.background='linear-gradient(135deg,#c0830a,#f5c842)';vb.style.color='#fff';}if(vub)vub.textContent='续费VIP';}else{if(vt)vt.textContent='普通用户';if(vs)vs.textContent='升级VIP，享置顶展示和更多特权';if(vb){vb.textContent='FREE';vb.style.background='#eee';vb.style.color='#888';}if(vub)vub.textContent='升级VIP';}}window.loadMyListings();};
+  window.refreshProfile=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;var pc=document.getElementById('profileContent'),lo=document.getElementById('profileLoggedOut');if(!sess){if(pc)pc.style.display='none';if(lo)lo.style.display='block';return;}populateProvinceControls();if(pc)pc.style.display='block';if(lo)lo.style.display='none';var r=await sb.from('profiles').select('*').eq('id',sess.user.id).single();if(r.data){var d=r.data;var province=normalizeProvinceName(d.city)||'Barcelona';var av=document.getElementById('profileAvatar');if(av)av.textContent=(d.nickname||'U').charAt(0).toUpperCase();var pn=document.getElementById('profileName');if(pn)pn.textContent=d.nickname||'用户';var pc2=document.getElementById('profileCity');if(pc2)pc2.textContent='📍 '+province;var spc=document.getElementById('statPostCount');if(spc)spc.textContent=d.post_count||0;var an=document.getElementById('accNickname');if(an)an.value=d.nickname||'';var ap=document.getElementById('accPhone');if(ap)ap.value=d.phone||'';var ac=document.getElementById('accCity');if(ac)ac.value=province;var ae=document.getElementById('accEmail');if(ae)ae.value=publicAccountLabel(sess.user.email,d.phone);var vu=d.vip_until?new Date(d.vip_until):null,isVip=vu&&vu>new Date();var vt=document.getElementById('vipStatusTitle'),vs=document.getElementById('vipStatusSub'),vb=document.getElementById('vipBadge'),vub=document.getElementById('vipUpgradeBtn');if(isVip){if(vt)vt.textContent='💎 VIP会员';if(vs)vs.textContent='到期：'+vu.toLocaleDateString('zh-CN');if(vb){vb.textContent='VIP';vb.style.background='linear-gradient(135deg,#c0830a,#f5c842)';vb.style.color='#fff';}if(vub)vub.textContent='续费VIP';}else{if(vt)vt.textContent='普通用户';if(vs)vs.textContent='升级VIP，享置顶展示和更多特权';if(vb){vb.textContent='FREE';vb.style.background='#eee';vb.style.color='#888';}if(vub)vub.textContent='升级VIP';}}window.loadReferralStatus&&window.loadReferralStatus();window.loadMyListings();};
   document.addEventListener('DOMContentLoaded',function(){window.applyVipFreePromo&&window.applyVipFreePromo();var pb=document.getElementById('postBtn');if(pb)pb.innerHTML='🚀 立即发布（限时免费）';var origOpen=window.openModal;window.openModal=function(type){origOpen&&origOpen(type);if(type==='profile')setTimeout(function(){window.refreshProfile&&window.refreshProfile();},50);};});
   </script>
   <div class="modal-overlay" id="detailModal">

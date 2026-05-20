@@ -5,6 +5,7 @@
     { "src": "/download", "dest": "/download.html" },
     { "src": "/privacy", "dest": "/privacy.html" },
     { "src": "/api/register", "dest": "/api/register.js" },
+    { "src": "/api/referral", "dest": "/api/referral.js" },
     { "src": "/api/admin-delete", "dest": "/api/admin-delete.js" },
     { "src": "/s/([^/]+)", "dest": "/api/share?id=$1" },
     { "src": "/share/([^/]+)", "dest": "/api/share?id=$1" },
