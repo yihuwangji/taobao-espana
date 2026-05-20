@@ -1671,6 +1671,7 @@ function renderListings(data) {
         <div class="action-btns">
           ${l.status==='已上线' ? `<button class="btn btn-red" onclick="takeDown('${l.id}')">下架</button>` : `<button class="btn btn-green" onclick="bringUp('${l.id}')">上线</button>`}
           <button class="btn btn-blue" onclick="openListingModal('${l.id}')">详情</button>
+          <button class="btn btn-red" onclick="deleteAdminItem('listing','${l._id || l.id}')">删除</button>
         </div>
       </td>
     </tr>
@@ -1726,6 +1727,7 @@ function renderReports() {
         <div class="action-btns">
           <button class="btn btn-green" onclick="resolveReport(${r._id})">标记处理</button>
           <button class="btn btn-red" onclick="dismissReport(${r._id})">驳回举报</button>
+          <button class="btn btn-red" onclick="deleteAdminItem('report','${r._id || r.id}')">删除</button>
         </div>
       </td>
     </tr>
@@ -1775,6 +1777,7 @@ function renderUsers(data) {
             ? `<button class="btn btn-red" onclick="setBanTarget('${u._id || ''}')">封禁</button>`
             : `<button class="btn btn-green" onclick="unban('${esc(u.name)}')">解封</button>`}
           <button class="btn" onclick="showToast('查看用户详情','info')">详情</button>
+          ${u._id ? `<button class="btn btn-red" onclick="deleteAdminItem('user','${u._id}')">删除</button>` : ''}
         </div>
       </td>
     </tr>
@@ -1983,6 +1986,61 @@ async function bringUp(id) {
   showToast(`已上线信息 ${id}`, 'success');
   loadRealListings();
 }
+
+function findDeleteLabel(type, id) {
+  if (type === 'listing') {
+    const item = allListings.find(x => String(x._id) === String(id) || x.id === id);
+    return item?.title || `信息 ${id}`;
+  }
+  if (type === 'report') {
+    const item = reportItems.find(x => String(x._id) === String(id) || x.id === id);
+    return item?.listing || `举报 ${id}`;
+  }
+  if (type === 'user') {
+    const item = allUsers.find(x => String(x._id) === String(id));
+    return item?.name || `用户 ${id}`;
+  }
+  return String(id);
+}
+
+async function deleteAdminItem(type, id) {
+  const labels = { listing: '发布信息', report: '举报信息', user: '客人账号' };
+  const label = findDeleteLabel(type, id);
+  const extra = type === 'user'
+    ? '\n\n删除客人账号后，该账号将不能再登录；该客人已发布的信息会保留为游客发布。'
+    : '';
+  if (!confirm(`确定删除这条${labels[type] || '记录'}吗？\n\n${label}${extra}`)) return;
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    showToast('请先登录后台', 'error');
+    return;
+  }
+  const response = await fetch('/api/admin-delete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`
+    },
+    body: JSON.stringify({ type, id })
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    showToast('删除失败：' + (result.message || '请稍后再试'), 'error');
+    return;
+  }
+  showToast('已删除：' + label, 'success');
+  if (type === 'listing') {
+    loadRealListings();
+    loadRealReview();
+  } else if (type === 'report') {
+    loadRealReports();
+  } else if (type === 'user') {
+    loadRealUsers();
+    loadRealListings();
+  }
+}
+
 let banTargetId = null;
 function setBanTarget(id) { banTargetId = id; openModal('ban'); }
 async function unban(name) {
