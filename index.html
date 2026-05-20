@@ -2106,7 +2106,7 @@ function isPhoneAccount(value) {
 }
 
 function authEmailFromPhone(phone) {
-  return 'u' + phoneDigits(phone) + '@phone.taobao-espana.es';
+  return 'taobaoespana.' + phoneDigits(phone) + '@gmail.com';
 }
 
 function authPasswordFromPin(pin) {
@@ -2114,7 +2114,7 @@ function authPasswordFromPin(pin) {
 }
 
 function isSyntheticAuthEmail(email) {
-  return /@phone\.taobao-espana\.es$/i.test(email || '');
+  return /^taobaoespana\.\d+@gmail\.com$/i.test(email || '');
 }
 
 function publicAccountLabel(email, phone) {
@@ -2451,31 +2451,30 @@ async function submitRegister() {
   if(digits.length < 6) { showToast('⚠️ 请填写正确的手机号', true); return; }
   if(!/^\d{4}$/.test(password)) { showToast('⚠️ 密码请设置为4位数字', true); return; }
   if(password !== confirmPassword) { showToast('⚠️ 两次密码不一致', true); return; }
-  const email = authEmailFromPhone(phone);
   const authPassword = authPasswordFromPin(password);
   const btn = document.getElementById('regBtn');
   btn.textContent = '注册中…'; btn.disabled = true;
-  const { data, error } = await sb.auth.signUp({
-    email, password: authPassword,
-    options: { data: { nickname, city, phone, account_type: 'phone' } }
+  const registerResponse = await fetch('/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nickname, city, phone, password })
   });
-  if(error) {
+  const registerData = await registerResponse.json().catch(() => ({}));
+  if(!registerResponse.ok) {
     btn.textContent = '注册';
     btn.disabled = false;
-    showToast('注册失败：' + error.message, true);
+    showToast('注册失败：' + (registerData.message || '请稍后再试'), true);
     return;
   }
-  let user = data?.user || null;
-  if (!data?.session) {
-    const login = await sb.auth.signInWithPassword({ email, password: authPassword });
-    if (login.error) {
-      btn.textContent = '注册';
-      btn.disabled = false;
-      showToast('注册已提交，但当前项目仍要求邮箱认证；请关闭 Supabase 邮箱确认后再试。', true);
-      return;
-    }
-    user = login.data.user;
+  const email = registerData.email || authEmailFromPhone(phone);
+  const login = await sb.auth.signInWithPassword({ email, password: authPassword });
+  if (login.error) {
+    btn.textContent = '注册';
+    btn.disabled = false;
+    showToast('账号已创建，但自动登录失败，请用手机号和4位密码登录。', true);
+    return;
   }
+  const user = login.data.user;
   if (user) {
     currentUser = user;
     await sb.from('profiles').upsert({
