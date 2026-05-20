@@ -1316,8 +1316,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     <div id="reviewDetail"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('review')">关闭</button>
-      <button class="btn btn-red" onclick="rejectOne(); closeModal('review')">❌ 拒绝</button>
-      <button class="btn btn-green" onclick="approveOne(); closeModal('review')">✅ 通过</button>
+      <button class="btn btn-red" id="reviewRejectBtn" onclick="rejectOne(); closeModal('review')">❌ 拒绝</button>
+      <button class="btn btn-green" id="reviewApproveBtn" onclick="approveOne(); closeModal('review')">✅ 通过</button>
     </div>
   </div>
 </div>
@@ -1461,7 +1461,7 @@ function esc(value) {
 // ═══════════ LOAD REAL DATA ═══════════
 async function loadRealListings() {
   const { data } = await sb.from('listings')
-    .select('id, title, category, city, status, created_at, user_id, profiles(nickname)')
+    .select('id, title, category, city, price, description, contact, status, created_at, user_id, profiles(nickname, phone)')
     .order('created_at', { ascending: false })
     .limit(50);
   if(data && data.length > 0) {
@@ -1470,6 +1470,9 @@ async function loadRealListings() {
       id: 'L'+r.id, _id: r.id,
       title: r.title, cat: r.category,
       city: r.city, user: r.profiles?.nickname || (r.user_id ? '未知用户' : '游客发布'),
+      price: r.price || '',
+      contact: r.contact || r.profiles?.phone || '—',
+      desc: r.description || '',
       status: { pending:'待审核', approved:'已上线', rejected:'已下架', offline:'已下架' }[r.status] || r.status,
       time: new Date(r.created_at).toLocaleString('zh-CN')
     }));
@@ -1667,7 +1670,7 @@ function renderListings(data) {
       <td>
         <div class="action-btns">
           ${l.status==='已上线' ? `<button class="btn btn-red" onclick="takeDown('${l.id}')">下架</button>` : `<button class="btn btn-green" onclick="bringUp('${l.id}')">上线</button>`}
-          <button class="btn" onclick="showToast('查看详情','info')">详情</button>
+          <button class="btn btn-blue" onclick="openListingModal('${l.id}')">详情</button>
         </div>
       </td>
     </tr>
@@ -1844,36 +1847,68 @@ function updateChart(period) {
 // ═══════════ ACTIONS ═══════════
 let currentReviewIdx = -1;
 
+function setReviewActionsVisible(visible) {
+  const approveBtn = document.getElementById('reviewApproveBtn');
+  const rejectBtn = document.getElementById('reviewRejectBtn');
+  if (approveBtn) approveBtn.style.display = visible ? '' : 'none';
+  if (rejectBtn) rejectBtn.style.display = visible ? '' : 'none';
+}
+
+function detailBlock(label, value, extraStyle = '') {
+  return `
+    <div style="background:var(--surface2);border-radius:8px;padding:14px;${extraStyle}">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">${esc(label)}</div>
+      <div style="line-height:1.6">${value || '—'}</div>
+    </div>
+  `;
+}
+
+function renderListingDetail(r) {
+  return `
+    <div style="display:grid;gap:10px">
+      ${detailBlock('标题', `<strong>${esc(r.title)}</strong>`)}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${detailBlock('分类', esc(r.cat))}
+        ${detailBlock('城市', `📍 ${esc(r.city)}`)}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${detailBlock('发布者', esc(r.user))}
+        ${detailBlock('价格', r.price ? esc(r.price) : '面议')}
+      </div>
+      ${detailBlock('详细描述', esc(r.desc || '暂无描述').replace(/\n/g, '<br>'))}
+      ${detailBlock('联系方式', `<span style="font-family:JetBrains Mono">${esc(r.contact || '—')}</span>`)}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${detailBlock('状态', esc(r.status))}
+        ${detailBlock('发布时间', esc(r.time))}
+      </div>
+    </div>
+  `;
+}
+
+function openListingModal(listingId) {
+  currentReviewIdx = -1;
+  const item = allListings.find(l => l.id === listingId || String(l._id) === String(listingId));
+  if (!item) {
+    showToast('没有找到这条信息', 'error');
+    return;
+  }
+  document.querySelector('#reviewModal h3').textContent = '📋 信息详情';
+  setReviewActionsVisible(false);
+  document.getElementById('reviewDetail').innerHTML = renderListingDetail(item);
+  openModal('review');
+}
+
 function openReviewModal(idx) {
   currentReviewIdx = idx;
   const r = reviewItems[idx];
-  document.getElementById('reviewDetail').innerHTML = `
-    <div style="display:grid;gap:10px">
-      <div style="background:var(--surface2);border-radius:8px;padding:14px">
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">标题</div>
-        <div style="font-weight:700">${r.title}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="background:var(--surface2);border-radius:8px;padding:14px">
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">分类</div>
-          <div>${r.cat}</div>
-        </div>
-        <div style="background:var(--surface2);border-radius:8px;padding:14px">
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">城市</div>
-          <div>📍 ${r.city}</div>
-        </div>
-      </div>
-      <div style="background:var(--surface2);border-radius:8px;padding:14px">
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">详细描述</div>
-        <div style="line-height:1.6">${r.desc}</div>
-      </div>
-      <div style="background:var(--surface2);border-radius:8px;padding:14px">
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">联系方式</div>
-        <div style="font-family:JetBrains Mono">${r.contact}</div>
-      </div>
-      ${r.id==='R003'?`<div style="background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);border-radius:8px;padding:12px;color:var(--red)">⚠️ 风险提示：此信息包含"保证收益""无风险"等疑似诈骗关键词，建议拒绝</div>`:''}
-    </div>
-  `;
+  if (!r) return;
+  document.querySelector('#reviewModal h3').textContent = '📋 信息详情审核';
+  setReviewActionsVisible(true);
+  document.getElementById('reviewDetail').innerHTML = renderListingDetail({
+    ...r,
+    status: '待审核',
+    price: r.price || ''
+  }) + (r.id==='R003'?`<div style="margin-top:10px;background:rgba(229,57,53,0.1);border:1px solid rgba(229,57,53,0.3);border-radius:8px;padding:12px;color:var(--red)">⚠️ 风险提示：此信息包含"保证收益""无风险"等疑似诈骗关键词，建议拒绝</div>`:'');
   openModal('review');
 }
 
