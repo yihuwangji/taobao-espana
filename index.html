@@ -272,6 +272,26 @@
     line-height: 1.7;
   }
 
+  .hero-promo-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: -12px 0 22px;
+    position: relative;
+  }
+
+  .hero-promo-steps span {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff7df;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
   .hero-inner {
     max-width: 1180px;
     margin: 0 auto;
@@ -1112,6 +1132,14 @@
       font-size: 14px;
       line-height: 1.55;
     }
+    .hero-promo-steps {
+      gap: 6px;
+      margin: -6px 0 18px;
+    }
+    .hero-promo-steps span {
+      padding: 6px 8px;
+      font-size: 11.5px;
+    }
     .hero-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1474,11 +1502,17 @@
 <!-- ===== HERO ===== -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-kicker">🇪🇸 华人本地生活 · España</div>
-    <h2>在西班牙找工作、找房源、转让生意，一页搞定</h2>
-    <p>面向巴塞罗那、马德里、瓦伦西亚等城市的华人社区，发布招工、租房、二手、服务与生意转让信息，后台审核后展示。</p>
+    <div class="hero-kicker">🎁 限时活动 · 截至2026年9月30日</div>
+    <h2>注册账号，邀请10位好友访问，免费领1年VIP</h2>
+    <p>活动期内注册西班牙生活通，分享你的专属链接。累计10位不同好友打开访问后，即可获得1年VIP，享置顶优先、VIP标识和更多曝光。</p>
+    <div class="hero-promo-steps" aria-label="活动步骤">
+      <span>1. 注册账号</span>
+      <span>2. 分享专属链接</span>
+      <span>3. 邀请10位好友</span>
+      <span>4. 免费领1年VIP</span>
+    </div>
     <div class="hero-actions">
-      <button class="hero-action primary" onclick="openModal('post')">马上发布</button>
+      <button class="hero-action primary" onclick="openModal('register')">立即注册</button>
       <a class="hero-action" href="#listingsGrid">最新信息</a>
     </div>
   </div>
@@ -2645,14 +2679,14 @@ loadListings().then(handleInitialDeepLink);
   <style>#profileModal .modal{max-width:680px;width:95vw}.my-listing-card{border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:10px;transition:box-shadow .2s}.my-listing-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}.my-listing-card .mlc-title{font-weight:700;font-size:14px;color:#333;margin-bottom:4px}.my-listing-card .mlc-meta{font-size:11px;color:#999;display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}.mlc-status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}.mlc-status.approved{background:#e8f5e9;color:#2e7d32}.mlc-status.pending{background:#fff8e1;color:#f57f17}.mlc-status.rejected{background:#fce4ec;color:#c62828}.mlc-actions{display:flex;gap:8px;flex-wrap:wrap}.mlc-btn{padding:4px 12px;font-size:11px;border-radius:6px;border:1px solid;cursor:pointer;font-weight:500}.mlc-btn.view{border-color:#2e7d32;color:#2e7d32;background:#e8f5e9}.mlc-btn.edit{border-color:#e09518;color:#e09518;background:#fffbf2}.mlc-btn.pin{border-color:#1565c0;color:#1565c0;background:#e3f2fd}.mlc-btn.del{border-color:#c62828;color:#c62828;background:#fce4ec}.mlc-btn:disabled{opacity:.5;cursor:not-allowed}</style>
   <script>
   window.getSb=function(){if(window._sbClient)return window._sbClient;window._sbClient=window.supabase.createClient('https://jfhpsxfnbpsvvtqsdvco.supabase.co','sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta');return window._sbClient;};
-  window.VIP_FREE_PROMO_TEXT='即日起至2026年9月30日，注册/申请VIP首年费用全免';
+  window.VIP_FREE_PROMO_TEXT='即日起至2026年9月30日，注册账号并邀请10位好友访问你的专属链接，即可免费获得1年VIP';
   window.applyVipFreePromo=function(){
     var vipCard=document.getElementById('planVip');
     if(vipCard&&!document.getElementById('vipFreePromoCard')){
       var card=document.createElement('div');
       card.id='vipFreePromoCard';
       card.style.cssText='margin:7px 0 2px;padding:6px 7px;border-radius:8px;background:#ecfdf5;border:1px solid #86efac;color:#047857;font-size:11px;font-weight:800;line-height:1.35;';
-      card.textContent='限时活动：首年VIP免费';
+      card.textContent='限时活动：邀10友免费1年VIP';
       var desc=document.getElementById('vipDesc');
       if(desc&&desc.parentNode)desc.parentNode.insertBefore(card,desc.nextSibling);else vipCard.appendChild(card);
     }
@@ -2661,7 +2695,7 @@ loadListings().then(handleInitialDeepLink);
       var banner=document.createElement('div');
       banner.id='vipFreePromoModal';
       banner.style.cssText='background:linear-gradient(135deg,#ecfdf5,#fff7ed);border:1.5px solid #22c55e;border-left:5px solid #16a34a;border-radius:12px;padding:12px 14px;margin:0 0 14px;color:#064e3b;box-shadow:0 8px 20px rgba(22,163,74,.12);';
-      banner.innerHTML='<div style="font-size:15px;font-weight:900;margin-bottom:4px;">🎁 9月底前注册VIP，首年费用全免</div><div style="font-size:12px;line-height:1.55;">'+window.VIP_FREE_PROMO_TEXT+'。活动期内提交申请后，由客服审核开通1年VIP。</div>';
+      banner.innerHTML='<div style="font-size:15px;font-weight:900;margin-bottom:4px;">🎁 注册 + 分享，免费领1年VIP</div><div style="font-size:12px;line-height:1.55;">'+window.VIP_FREE_PROMO_TEXT+'。达到条件后由客服审核开通。</div>';
       var subtitle=modal.querySelector('p');
       if(subtitle)subtitle.insertAdjacentElement('afterend',banner);else modal.insertBefore(banner,modal.firstChild);
     }
@@ -2670,7 +2704,7 @@ loadListings().then(handleInitialDeepLink);
       var note=document.createElement('div');
       note.id='vipFreePromoPayNote';
       note.style.cssText='margin:-2px 0 10px;text-align:center;font-size:12px;font-weight:800;color:#047857;';
-      note.textContent='活动期内首年免费，可联系管理员直接开通';
+      note.textContent='活动期内邀10位好友访问，可免费开通1年VIP';
       payTitle.insertAdjacentElement('afterend',note);
     }
   };
@@ -2907,7 +2941,7 @@ loadListings().then(handleInitialDeepLink);
       <h4 style="font-size:16px;color:#2d1f0e;margin-bottom:16px;font-weight:700;">&#x2753; 常见问题</h4>
       <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
         <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x1F193; 发布信息需要收费吗？</div>
-        <div style="font-size:14px;color:#555;line-height:1.6;">提供<strong>限时免费</strong>套餐（新用户专享，展示7天）以及<strong>VIP会员</strong>套餐。即日起至<strong>2026年9月30日</strong>，注册/申请VIP首年费用全免，审核通过后开通1年VIP。</div>
+        <div style="font-size:14px;color:#555;line-height:1.6;">提供<strong>限时免费</strong>套餐（新用户专享，展示7天）以及<strong>VIP会员</strong>套餐。即日起至<strong>2026年9月30日</strong>，注册账号并邀请10位好友访问你的专属链接，即可免费获得1年VIP。</div>
       </div>
       <div style="background:#fdf8f3;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #c0392b;">
         <div style="font-weight:600;color:#2d1f0e;margin-bottom:6px;">&#x23F1; 发布后多久能上线？</div>
