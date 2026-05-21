@@ -251,7 +251,8 @@
     pointer-events: none;
   }
 
-  .hero h2 {
+  .hero h2,
+  .hero-index-title {
     font-family: 'Noto Serif SC', serif;
     font-size: clamp(22px, 5vw, 38px);
     color: white;
@@ -261,6 +262,75 @@
     position: relative;
     max-width: 860px;
     line-height: 1.2;
+  }
+
+  .hero-activity {
+    position: relative;
+    max-width: 920px;
+    color: white;
+  }
+
+  .hero-activity summary {
+    list-style: none;
+    cursor: pointer;
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .hero-activity summary::-webkit-details-marker { display: none; }
+
+  .hero-index {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--red-dark);
+    border: 2px solid var(--gold);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+  }
+
+  .hero-index-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 18px;
+    flex: 0 0 34px;
+  }
+
+  .hero-index-text {
+    font-size: clamp(20px, 4.5vw, 34px);
+    font-weight: 950;
+    line-height: 1.12;
+    letter-spacing: 0;
+  }
+
+  .hero-index-hint {
+    margin-left: 4px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: #f0fdf4;
+    color: #087f42;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .hero-activity-body {
+    margin-top: 14px;
+    padding: 14px 16px 16px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.24);
+    max-width: 780px;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.12);
   }
 
   .hero p {
@@ -1383,10 +1453,37 @@
       margin-bottom: 10px;
       font-size: 11px;
     }
-    .hero h2 {
+    .hero h2,
+    .hero-index-title {
       max-width: 320px;
       font-size: 25px;
       line-height: 1.18;
+    }
+    .hero-activity summary {
+      width: 100%;
+    }
+    .hero-index {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 11px;
+      gap: 8px;
+    }
+    .hero-index-icon {
+      width: 32px;
+      height: 32px;
+      flex-basis: 32px;
+      font-size: 17px;
+    }
+    .hero-index-text {
+      font-size: 22px;
+    }
+    .hero-index-hint {
+      font-size: 11px;
+      padding: 4px 7px;
+    }
+    .hero-activity-body {
+      margin-top: 12px;
+      padding: 12px 12px 14px;
     }
     .hero p {
       max-width: 96%;
@@ -1799,19 +1896,30 @@
 <!-- ===== HERO ===== -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-kicker">🎁 限时活动 · 截至2026年9月30日</div>
-    <h2>注册账号，邀请10位好友访问，免费领1年VIP</h2>
-    <p>活动期内注册西班牙生活通，分享你的专属链接。累计10位不同好友打开访问后，即可获得1年VIP，享置顶优先、VIP标识和更多曝光。</p>
-    <div class="hero-promo-steps" aria-label="活动步骤">
-      <span>1. 注册账号</span>
-      <span>2. 分享专属链接</span>
-      <span>3. 邀请10位好友</span>
-      <span>4. 免费领1年VIP</span>
-    </div>
-    <div class="hero-actions">
-      <button class="hero-action primary" onclick="openModal('register')">立即注册</button>
-      <a class="hero-action" href="#listingsGrid">最新信息</a>
-    </div>
+    <details class="hero-activity">
+      <summary>
+        <div class="hero-index">
+          <span class="hero-index-icon">🎁</span>
+          <span class="hero-index-text">限时活动-免费领1年VIP</span>
+          <span class="hero-index-hint">查看规则</span>
+        </div>
+      </summary>
+      <div class="hero-activity-body">
+        <div class="hero-kicker">限时活动 · 截至2026年9月30日</div>
+        <h2>注册账号，邀请10位好友访问，免费领1年VIP</h2>
+        <p>活动期内注册西班牙生活通，分享你的专属链接。累计10位不同好友打开访问后，即可获得1年VIP，享置顶优先、VIP标识和更多曝光。</p>
+        <div class="hero-promo-steps" aria-label="活动步骤">
+          <span>1. 注册账号</span>
+          <span>2. 分享专属链接</span>
+          <span>3. 邀请10位好友</span>
+          <span>4. 免费领1年VIP</span>
+        </div>
+        <div class="hero-actions">
+          <button class="hero-action primary" onclick="openModal('register')">立即注册</button>
+          <a class="hero-action" href="#listingsGrid">最新信息</a>
+        </div>
+      </div>
+    </details>
   </div>
 </div>
 
