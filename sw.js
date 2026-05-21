@@ -1,11 +1,12 @@
-const CACHE_NAME = 'espana-life-v7';
+const CACHE_NAME = 'espana-life-v8';
 const APP_SHELL = [
   '/',
   '/index.html',
   '/offline.html',
   '/manifest.webmanifest',
   '/assets/icons/icon-192.png',
-  '/assets/icons/icon-512.png'
+  '/assets/icons/icon-512.png',
+  '/assets/icons/share-logo-20260521.png'
 ];
 
 self.addEventListener('install', (event) => {

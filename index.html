@@ -9,7 +9,7 @@
 <meta property="og:site_name" content="西班牙生活通">
 <meta property="og:title" content="西班牙生活通 - 西班牙华人生活服务平台">
 <meta property="og:description" content="面向西班牙华人社区的招工、租房、生意转让、二手和生活服务信息平台。">
-<meta property="og:image" content="https://taobao-espana.vercel.app/assets/icons/icon-512.png">
+<meta property="og:image" content="https://taobao-espana.vercel.app/assets/icons/share-logo-20260521.png">
 <meta property="og:url" content="https://taobao-espana.vercel.app/">
 <meta name="theme-color" content="#D42B2B">
 <meta name="mobile-web-app-capable" content="yes">
@@ -17,8 +17,8 @@
 <meta name="apple-mobile-web-app-title" content="西班牙生活通">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" href="/assets/icons/icon-192.png" sizes="192x192">
-<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="icon" href="/assets/icons/icon-192.png?v=20260521" sizes="192x192">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=20260521">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 
@@ -108,6 +108,13 @@
     width: 30px; height: 30px;
     background: rgba(255,255,255,0.2);
     border-radius: 50%;
+  }
+
+  .logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   .logo-text { color: white; }
@@ -1236,6 +1243,16 @@
     color: var(--gold);
     font-weight: 900;
     margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-logo img {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    object-fit: cover;
   }
 
   /* ===== MODAL ===== */
@@ -1868,7 +1885,7 @@
   </div>
   <div class="header-main">
     <a href="#" class="logo">
-      <div class="logo-icon">🏮</div>
+      <div class="logo-icon"><img src="/assets/icons/icon-192.png?v=20260521" alt="西班牙生活通"></div>
       <div class="logo-text">
         <h1>西班牙生活通</h1>
         <span>全西班牙华人分类信息平台</span>
@@ -2030,7 +2047,7 @@
 <footer>
   <div class="footer-grid">
     <div class="footer-col">
-      <div class="footer-logo">🏮 西班牙生活通</div>
+      <div class="footer-logo"><img src="/assets/icons/icon-192.png?v=20260521" alt=""> 西班牙生活通</div>
       <p style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.5);">面向西班牙华人社区的本地分类信息平台，帮助用户更快找到工作、房源、服务与生意机会。</p>
     </div>
     <div class="footer-col">

@@ -58,7 +58,7 @@ module.exports = async function handler(req, res) {
     : '面向西班牙华人社区的招工、租房、生意转让、二手和生活服务信息平台。';
   const targetUrl = numericId ? `${SITE_URL}/?listing=${encodeURIComponent(numericId)}` : SITE_URL;
   const shareUrl = numericId ? `${SITE_URL}/s/${encodeURIComponent(numericId)}` : SITE_URL;
-  const imageUrl = `${SITE_URL}/assets/icons/icon-512.png`;
+  const imageUrl = `${SITE_URL}/assets/icons/share-logo-20260521.png`;
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=300');

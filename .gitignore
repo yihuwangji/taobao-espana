@@ -13,6 +13,7 @@ build/
 android-twa/.gradle/
 android-twa/build/
 android-twa/app/build/
+android-twa/local.properties
 
 # Local tooling caches and downloads
 android-commandlinetools.zip
