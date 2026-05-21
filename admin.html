@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>淘宝西班牙 · 管理后台</title>
+<title>西班牙生活通 · 管理后台</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
@@ -911,7 +911,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 <div class="auth-gate" id="authGate">
   <div class="auth-card">
-    <h1>淘宝西班牙后台</h1>
+    <h1>西班牙生活通后台</h1>
     <p>请使用管理员账号登录。后台仅对授权账号开放。</p>
     <label>邮箱</label>
     <input type="email" id="adminEmail" autocomplete="username" placeholder="admin@example.com">
@@ -925,7 +925,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-title">🏮 淘宝西班牙</div>
+    <div class="logo-title">🏮 西班牙生活通</div>
     <div class="logo-sub">管理控制台 v1.0</div>
   </div>
 
@@ -982,7 +982,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
       <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
       <div>
         <div class="page-title" id="topbarTitle">数据仪表盘</div>
-        <div class="page-breadcrumb" id="topbarSub">淘宝西班牙 / 概览</div>
+        <div class="page-breadcrumb" id="topbarSub">西班牙生活通 / 概览</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1320,7 +1320,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
             <h4>⚙️ 站点设置</h4>
             <div class="config-row">
               <label>站点名称</label>
-              <input type="text" value="淘宝西班牙">
+              <input type="text" value="西班牙生活通">
             </div>
             <div class="config-row">
               <label>管理员邮箱</label>
@@ -2733,7 +2733,7 @@ function showPage(name, el) {
   if(el) el.classList.add('active');
   const meta = pageMeta[name] || {};
   document.getElementById('topbarTitle').textContent = meta.title || name;
-  document.getElementById('topbarSub').textContent = '淘宝西班牙 / ' + (meta.sub || name);
+  document.getElementById('topbarSub').textContent = '西班牙生活通 / ' + (meta.sub || name);
   // Close mobile sidebar
   document.getElementById('sidebar').classList.remove('open');
 }
