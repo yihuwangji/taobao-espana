@@ -1902,7 +1902,7 @@
           <div class="photo-upload-tip">最多6张，每张不超过5MB</div>
         </div>
         <input type="file" id="postImages" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="previewPostImages()">
-        <div class="photo-upload-tip" style="margin-top:8px">适用于出租、买卖物品、批发市场、生意转让类信息。</div>
+        <div class="photo-upload-tip" style="margin-top:8px">除招工外，其他分类都可以发布照片，方便以后做广告展示。</div>
         <div id="postImagePreview" class="photo-preview-grid"></div>
       </div>
     </div>
@@ -2266,7 +2266,7 @@ function normalizeListingImages(images) {
 }
 
 function isPhotoCategory(category) {
-  return ['租房', '生意', '二手物品', '二手车'].includes(String(category || ''));
+  return String(category || '') !== '招工';
 }
 
 function selectedPostCategory() {
