@@ -1832,6 +1832,32 @@
 <!-- ===== MAIN CONTENT ===== -->
 <main class="content-shell">
 
+<div class="section merchant-filter-section">
+  <div class="section-title">
+    <h3>商家服务筛选</h3>
+    <a href="#" class="see-all" onclick="filterMerchant('all');return false;">商家黄页 →</a>
+  </div>
+  <div class="merchant-filter-grid" id="merchantFilterGrid"></div>
+</div>
+
+<!-- Latest listings -->
+<div class="section">
+  <div class="section-title">
+    <h3 id="listingTitle">最新信息</h3>
+    <a href="#" class="see-all">查看更多 →</a>
+  </div>
+
+  <!-- Province filter -->
+  <div class="city-tabs">
+    <button class="city-tab active" onclick="filterCity('全部',this)">🌐 Todas las provincias</button>
+    <select id="provinceFilter" class="city-tab province-select" onchange="filterCity(this.value,this)" aria-label="Provincia">
+      <option value="全部">Seleccionar provincia</option>
+    </select>
+  </div>
+
+  <div class="listings-grid" id="listingsGrid"></div>
+</div>
+
 <!-- Trust strip -->
 <div class="section trust-strip">
   <div class="trust-strip-grid">
@@ -1900,34 +1926,6 @@
       <span class="cat-count">421 条信息</span>
     </a>
   </div>
-</div>
-
-<div class="section merchant-filter-section">
-  <div class="section-title">
-    <h3>商家服务筛选</h3>
-    <a href="#" class="see-all" onclick="filterMerchant('all');return false;">商家黄页 →</a>
-  </div>
-  <div class="merchant-filter-grid" id="merchantFilterGrid"></div>
-</div>
-
-<hr class="section-divider">
-
-<!-- Latest listings -->
-<div class="section">
-  <div class="section-title">
-    <h3 id="listingTitle">最新信息</h3>
-    <a href="#" class="see-all">查看更多 →</a>
-  </div>
-
-  <!-- Province filter -->
-  <div class="city-tabs">
-    <button class="city-tab active" onclick="filterCity('全部',this)">🌐 Todas las provincias</button>
-    <select id="provinceFilter" class="city-tab province-select" onchange="filterCity(this.value,this)" aria-label="Provincia">
-      <option value="全部">Seleccionar provincia</option>
-    </select>
-  </div>
-
-  <div class="listings-grid" id="listingsGrid"></div>
 </div>
 
 </main>
