@@ -56,7 +56,7 @@ async function requireAdmin(req) {
 function normalizeUpdate(row) {
   const id = Number(row?.id);
   const title = cleanText(row?.title);
-  const images = Array.isArray(row?.images) ? row.images.map(cleanText).filter(Boolean).slice(0, 3) : [];
+  const images = Array.isArray(row?.images) ? row.images.map(cleanText).filter(Boolean).slice(0, 6) : [];
   if (!Number.isFinite(id) || id <= 0 || !images.length) return null;
   if (!images.every(url => /^https:\/\/images\.unsplash\.com\//.test(url))) return null;
   return { id, title, images };
