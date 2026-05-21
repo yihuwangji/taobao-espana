@@ -1,6 +1,7 @@
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
 const SITE_URL = 'https://taobao-espana.vercel.app';
+const IMPORTED_MERCHANT_MARK = '平台代登记商家信息';
 
 function escapeHTML(value) {
   return String(value ?? '').replace(/[&<>"']/g, ch => ({
@@ -16,6 +17,14 @@ function compact(value, fallback = '') {
   return String(value || fallback).replace(/\s+/g, ' ').trim();
 }
 
+function displayCategory(listing) {
+  return listing
+    && listing.user_id === null
+    && String(listing.description || '').includes(IMPORTED_MERCHANT_MARK)
+    ? '商家黄页'
+    : listing?.category;
+}
+
 module.exports = async function handler(req, res) {
   const id = compact(req.query.id);
   const numericId = id.match(/^\d+$/) ? id : '';
@@ -23,7 +32,7 @@ module.exports = async function handler(req, res) {
 
   if (numericId) {
     const params = new URLSearchParams({
-      select: 'id,title,description,category,city,price,address,created_at',
+      select: 'id,title,description,category,city,price,address,created_at,user_id',
       id: `eq.${numericId}`,
       status: 'eq.approved',
       limit: '1'
@@ -45,7 +54,7 @@ module.exports = async function handler(req, res) {
 
   const title = listing ? `${compact(listing.title)} - 西班牙生活通` : '西班牙生活通 - 华人本地信息';
   const description = listing
-    ? [listing.category, listing.city, listing.price ? `${listing.price} €` : '面议', compact(listing.description).slice(0, 70)].filter(Boolean).join(' · ')
+    ? [displayCategory(listing), listing.city, listing.price ? `${listing.price} €` : '面议', compact(listing.description).slice(0, 70)].filter(Boolean).join(' · ')
     : '面向西班牙华人社区的招工、租房、生意转让、二手和生活服务信息平台。';
   const targetUrl = numericId ? `${SITE_URL}/?listing=${encodeURIComponent(numericId)}` : SITE_URL;
   const shareUrl = numericId ? `${SITE_URL}/s/${encodeURIComponent(numericId)}` : SITE_URL;

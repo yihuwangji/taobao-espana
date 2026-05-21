@@ -1575,9 +1575,11 @@ async function loadRealListings() {
     .limit(1000);
   if(data && data.length > 0) {
     allListings.length = 0;
-    data.forEach(r => allListings.push({
+    data.forEach(r => {
+      const isMerchant = r.user_id === null && String(r.description || '').includes('平台代登记商家信息');
+      allListings.push({
       id: 'L'+r.id, _id: r.id,
-      title: r.title, cat: r.category,
+      title: r.title, cat: isMerchant ? '商家' : r.category, rawCat: r.category, isMerchant,
       city: r.city, user: r.profiles?.nickname || (r.user_id ? '未知用户' : '游客发布'),
       price: r.price || '',
       address: r.address || '',
@@ -1586,7 +1588,8 @@ async function loadRealListings() {
       desc: r.description || '',
       status: { pending:'待审核', approved:'已上线', rejected:'已下架', offline:'已下架' }[r.status] || r.status,
       time: new Date(r.created_at).toLocaleString('zh-CN')
-    }));
+    });
+    });
   }
   filterListings();
 }
@@ -1815,6 +1818,8 @@ function compactDigits(value) {
 
 function listingMatchesCategory(listing, cat) {
   if (!cat) return true;
+  if (cat === '生意' && listing.isMerchant) return false;
+  if (cat === 'merchant' && listing.isMerchant) return true;
   if (cat === 'goods') return listing.cat === '二手物品' || listing.cat === '二手车';
   if (cat === 'merchant') {
     const haystack = normalizeSearchText([
