@@ -3,6 +3,7 @@
   "routes": [
     { "src": "/admin", "dest": "/admin.html" },
     { "src": "/download", "dest": "/download.html" },
+    { "src": "/publish", "dest": "/index.html" },
     { "src": "/privacy", "dest": "/privacy.html" },
     { "src": "/api/register", "dest": "/api/register.js" },
     { "src": "/api/referral", "dest": "/api/referral.js" },

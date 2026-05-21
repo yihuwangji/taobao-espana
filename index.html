@@ -619,6 +619,93 @@
   .trust-title { font-weight: 700; font-size: 13px; color: var(--ink); }
   .trust-text { font-size: 11px; color: var(--ink-light); margin-top: 2px; }
 
+  .publish-entry-card {
+    width: 100%;
+    border: 0;
+    border-radius: 18px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+    color: #fff;
+    background: linear-gradient(135deg, #D42B2B 0%, #E05A21 48%, #F5A623 100%);
+    box-shadow: 0 10px 24px rgba(158, 28, 28, 0.22);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .publish-entry-card:hover {
+    box-shadow: 0 16px 34px rgba(158, 28, 28, 0.32);
+    transform: translateY(-1px);
+    filter: saturate(1.05);
+  }
+
+  .publish-entry-card:active {
+    transform: scale(0.985);
+    box-shadow: 0 8px 18px rgba(158, 28, 28, 0.24);
+  }
+
+  .publish-entry-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.18);
+    font-size: 24px;
+  }
+
+  .publish-entry-copy {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .publish-entry-title {
+    display: block;
+    font-size: 16px;
+    line-height: 1.25;
+    font-weight: 900;
+    color: #fff;
+  }
+
+  .publish-entry-text {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .publish-entry-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .publish-entry-arrow {
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 900;
+  }
+
+  .empty-publish-entry {
+    width: min(100%, 520px);
+    margin: 18px auto 0;
+  }
+
   .section-title {
     display: flex;
     align-items: center;
@@ -1603,6 +1690,18 @@
       padding: 10px;
       scroll-snap-align: start;
     }
+    .publish-entry-card {
+      min-width: 280px;
+      padding: 13px 14px;
+    }
+    .publish-entry-icon {
+      width: 38px;
+      height: 38px;
+      font-size: 22px;
+    }
+    .publish-entry-title { font-size: 15px; }
+    .publish-entry-text { font-size: 11.5px; }
+    .publish-entry-btn { padding: 6px 9px; }
     .section-title {
       gap: 8px;
       margin-bottom: 14px;
@@ -1984,10 +2083,14 @@
 <!-- Trust strip -->
 <div class="section trust-strip">
   <div class="trust-strip-grid">
-    <div class="trust-item">
-      <span class="trust-icon">🆓</span>
-      <div><div class="trust-title">基础发布免费</div><div class="trust-text">适合招工、房源、二手信息</div></div>
-    </div>
+    <button class="trust-item publish-entry-card" type="button" onclick="openPublishPage(event)" aria-label="免费发布信息">
+      <span class="publish-entry-icon">📢</span>
+      <span class="publish-entry-copy">
+        <span class="publish-entry-title">免费发布信息</span>
+        <span class="publish-entry-text">招工、房源、二手、生意转让都可以发布</span>
+      </span>
+      <span class="publish-entry-btn">立即发布 <span class="publish-entry-arrow">&gt;</span></span>
+    </button>
     <div class="trust-item">
       <span class="trust-icon">🛡</span>
       <div><div class="trust-title">先审核后展示</div><div class="trust-text">减少诈骗与重复广告</div></div>
@@ -2105,7 +2208,7 @@
     <a href="#" class="mobile-nav-item" onclick="filterCat('worker',null);return false;">
       <span>👷</span><span>招工</span>
     </a>
-    <a href="#" class="mobile-nav-item" onclick="openModal('post');return false;" style="color:var(--red)">
+    <a href="/publish" class="mobile-nav-item" onclick="openPublishPage(event)" style="color:var(--red)">
       <span>➕</span><span>发布</span>
     </a>
     <a href="#listingsGrid" class="mobile-nav-item">
@@ -2956,6 +3059,33 @@ async function shareReferralInvite() {
   showToast(isWeChatBrowser() ? '已复制分享文案，去微信聊天粘贴发送' : '已复制邀请文案和链接');
 }
 
+function publishEntryCardHtml(extraClass = '') {
+  return `
+    <button class="publish-entry-card ${extraClass}" type="button" onclick="openPublishPage(event)" aria-label="免费发布信息">
+      <span class="publish-entry-icon">📢</span>
+      <span class="publish-entry-copy">
+        <span class="publish-entry-title">免费发布信息</span>
+        <span class="publish-entry-text">招工、房源、二手、生意转让都可以发布</span>
+      </span>
+      <span class="publish-entry-btn">立即发布 <span class="publish-entry-arrow">&gt;</span></span>
+    </button>
+  `;
+}
+
+function openPublishPage(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  if (location.pathname !== '/publish' && window.history && history.pushState) {
+    history.pushState({ publish: true }, '', '/publish');
+  }
+  openModal('post');
+  return false;
+}
+
+window.openPublishPage = openPublishPage;
+
 function updateDocumentShareMeta(listing) {
   const desc = [getListingDisplayCategory(listing), normalizeProvinceName(listing.city), listing.address, listing.price || '面议'].filter(Boolean).join(' · ');
   document.title = `${listing.title} - 西班牙生活通`;
@@ -3064,7 +3194,7 @@ function renderListings() {
   if(currentMerchant) filtered = filtered.filter(matchesMerchantFilter);
 
   if(filtered.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:16px">暂无相关信息</div><div style="font-size:13px;margin-top:8px">试试其他条件或发布新信息</div></div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--ink-light)"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:16px">暂无相关信息</div><div style="font-size:13px;margin-top:8px">试试其他条件，或发布第一条信息</div>' + publishEntryCardHtml('empty-publish-entry') + '</div>';
     return;
   }
 
@@ -3254,7 +3384,7 @@ async function doSearch() {
       showToast(`搜索"${q}" 找到 ${uniqueRows.length} 条结果`);
     } else {
       showLoading(false);
-      document.getElementById('listingsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:48px">🔍</div><div style="margin-top:10px">未找到“'+escapeHTML(q)+'”相关信息</div><button class="btn-post" style="margin-top:16px" onclick="openModal(&quot;post&quot;)">发布这条需求</button></div>';
+      document.getElementById('listingsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--ink-light)"><div style="font-size:48px">🔍</div><div style="margin-top:10px">未找到“'+escapeHTML(q)+'”相关信息</div>' + publishEntryCardHtml('empty-publish-entry') + '</div>';
     }
   } catch(e) {
     showLoading(false);
@@ -3292,6 +3422,11 @@ function openModal(name) {
     updatePostForm();
   }
 }
+
+if (location.pathname === '/publish') {
+  window.addEventListener('DOMContentLoaded', () => setTimeout(() => openModal('post'), 80));
+}
+
 function closeModal(name) {
   const modal = document.getElementById(name+'Modal');
   if (!modal) return;
