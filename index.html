@@ -809,6 +809,77 @@
     background: #f4eee6;
   }
 
+  .listing-map-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #ecfdf3;
+    color: #047857;
+    font-size: 10px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .detail-map-card {
+    margin-bottom: 14px;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f0fdf4;
+  }
+
+  .detail-map-preview {
+    display: block;
+    min-height: 112px;
+    padding: 18px 16px;
+    color: #064e3b;
+    text-decoration: none;
+    background:
+      linear-gradient(135deg, rgba(22,163,74,.15), rgba(14,165,233,.12)),
+      repeating-linear-gradient(45deg, rgba(255,255,255,.9) 0 12px, rgba(236,253,245,.9) 12px 24px);
+  }
+
+  .detail-map-frame {
+    width: 100%;
+    height: 150px;
+    border: 0;
+    display: block;
+    background: #e8f7ee;
+  }
+
+  .detail-map-pin {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #16a34a;
+    color: white;
+    font-size: 22px;
+    box-shadow: 0 8px 18px rgba(22,163,74,.28);
+  }
+
+  .detail-map-body {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .detail-map-title {
+    font-size: 13px;
+    font-weight: 900;
+    color: #065f46;
+    margin-bottom: 4px;
+  }
+
+  .detail-map-address {
+    font-size: 13px;
+    line-height: 1.45;
+    color: #14532d;
+  }
+
   .listing-body { padding: 11px 12px 12px; }
 
   .listing-title {
@@ -1407,6 +1478,22 @@
       padding: 3px 6px;
       font-size: 10px;
     }
+    .listing-map-chip {
+      font-size: 9.5px;
+      padding: 2px 6px;
+    }
+    .detail-map-preview {
+      min-height: 100px;
+      padding: 14px 12px;
+    }
+    .detail-map-frame {
+      height: 124px;
+    }
+    .detail-map-pin {
+      width: 38px;
+      height: 38px;
+      font-size: 19px;
+    }
     .listing-open-hint {
       margin-top: 6px;
       padding-top: 6px;
@@ -1895,6 +1982,11 @@
         <input type="text" id="postPrice" placeholder="例：1200€/月 或 面议">
       </div>
     </div>
+    <div class="form-group" id="postAddressGroup" style="display:none">
+      <label>店铺地址 / 地图位置（可选）</label>
+      <input type="text" id="postAddress" placeholder="例：Carrer de Mallorca 123, Barcelona">
+      <div class="photo-upload-tip" style="margin-top:6px">填写后详情页会显示地图入口，适合店铺、生意、服务和培训机构。</div>
+    </div>
     <div class="form-group" id="postImagesGroup" style="display:none">
       <div class="photo-upload-box">
         <div class="photo-upload-head">
@@ -2182,7 +2274,7 @@ async function loadListings() {
   showLoading(true);
   try {
     let query = sb.from('listings')
-      .select('id, title, category, city, price, images, created_at, is_pinned')
+      .select('id, title, category, city, price, address, images, created_at, is_pinned')
       .eq('status', 'approved')
       .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false })
@@ -2216,6 +2308,7 @@ async function loadListings() {
         badgeType: r.is_pinned ? 'gold' : '',
         title: r.title,
         price: r.price || '面议',
+        address: r.address || '',
         images: normalizeListingImages(r.images),
         unit: '',
         tags: [r.category, normalizeProvinceName(r.city)],
@@ -2269,17 +2362,25 @@ function isPhotoCategory(category) {
   return String(category || '') !== '招工';
 }
 
+function isMapCategory(category) {
+  return ['生意', '服务', '教育'].includes(String(category || ''));
+}
+
 function selectedPostCategory() {
   const raw = document.getElementById('postCat')?.value || '';
   return catMap[raw] || raw;
 }
 
 function updatePostForm() {
-  const group = document.getElementById('postImagesGroup');
-  if (!group) return;
-  const show = isPhotoCategory(selectedPostCategory());
-  group.style.display = show ? 'block' : 'none';
-  if (!show) clearPostImages();
+  const imageGroup = document.getElementById('postImagesGroup');
+  const addressGroup = document.getElementById('postAddressGroup');
+  const category = selectedPostCategory();
+  const showImages = isPhotoCategory(category);
+  const showAddress = isMapCategory(category);
+  if (imageGroup) imageGroup.style.display = showImages ? 'block' : 'none';
+  if (addressGroup) addressGroup.style.display = showAddress ? 'block' : 'none';
+  if (!showImages) clearPostImages();
+  if (!showAddress) clearPostAddress();
 }
 
 function clearPostImages() {
@@ -2287,6 +2388,11 @@ function clearPostImages() {
   const preview = document.getElementById('postImagePreview');
   if (input) input.value = '';
   if (preview) preview.innerHTML = '';
+}
+
+function clearPostAddress() {
+  const input = document.getElementById('postAddress');
+  if (input) input.value = '';
 }
 
 function previewPostImages() {
@@ -2342,6 +2448,38 @@ function renderDetailPhotos(images) {
   const photos = normalizeListingImages(images);
   if (!photos.length) return '';
   return `<div class="detail-photo-grid">${photos.map(url => `<img src="${escapeHTML(url)}" alt="信息照片" loading="lazy">`).join('')}</div>`;
+}
+
+function buildMapQuery(address, city) {
+  return [address, normalizeProvinceName(city), 'España'].filter(Boolean).join(', ');
+}
+
+function getMapUrl(address, city) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(buildMapQuery(address, city))}`;
+}
+
+function getMapEmbedUrl(address, city) {
+  return `https://www.google.com/maps?q=${encodeURIComponent(buildMapQuery(address, city))}&output=embed`;
+}
+
+function renderBusinessMap(address, city) {
+  const safeAddress = String(address || '').trim();
+  if (!safeAddress) return '';
+  const mapUrl = getMapUrl(safeAddress, city);
+  const embedUrl = getMapEmbedUrl(safeAddress, city);
+  return `
+    <div class="detail-map-card">
+      <iframe class="detail-map-frame" src="${escapeHTML(embedUrl)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="地图位置"></iframe>
+      <a class="detail-map-preview" href="${escapeHTML(mapUrl)}" target="_blank" rel="noopener">
+        <div class="detail-map-body">
+          <div class="detail-map-pin">📍</div>
+          <div>
+            <div class="detail-map-title">地图位置 / 导航</div>
+            <div class="detail-map-address">${escapeHTML(safeAddress)}</div>
+          </div>
+        </div>
+      </a>
+    </div>`;
 }
 
 function isWeChatBrowser() {
@@ -2490,7 +2628,7 @@ async function shareReferralInvite() {
 }
 
 function updateDocumentShareMeta(listing) {
-  const desc = [listing.category, normalizeProvinceName(listing.city), listing.price || '面议'].filter(Boolean).join(' · ');
+  const desc = [listing.category, normalizeProvinceName(listing.city), listing.address, listing.price || '面议'].filter(Boolean).join(' · ');
   document.title = `${listing.title} - 西班牙生活通`;
   [
     ['meta[name="description"]', desc],
@@ -2523,7 +2661,7 @@ async function getListingForShare(id) {
   const local = allListings.find(item => String(item.id) === String(id));
   try {
     const { data } = await sb.from('listings')
-      .select('id, title, description, category, city, price, contact')
+      .select('id, title, description, category, city, price, address, contact')
       .eq('id', id)
       .eq('status', 'approved')
       .single();
@@ -2535,6 +2673,7 @@ async function getListingForShare(id) {
     category: local.tags?.[0] || local.badge,
     city: normalizeProvinceName(local.city),
     price: local.price,
+    address: local.address || '',
     description: '',
     contact: ''
   } : null;
@@ -2544,6 +2683,7 @@ function buildListingShareText(listing, url) {
   const parts = [
     `【${listing.category || '信息'}】${listing.title}`,
     listing.city ? `省份：${normalizeProvinceName(listing.city)}` : '',
+    listing.address ? `地址：${listing.address}` : '',
     listing.price ? `价格：${listing.price}${String(listing.price).includes('€') ? '' : ' €'}` : '价格：面议',
     listing.description ? `简介：${String(listing.description).slice(0, 70)}` : '',
     `查看详情：${url}`
@@ -2612,6 +2752,7 @@ function renderListings() {
         <div class="listing-title">${escapeHTML(l.title)}</div>
         <div class="listing-tags">
           ${l.tags.map(t=>`<span class="tag">${escapeHTML(normalizeProvinceName(t))}</span>`).join('')}
+          ${l.address ? '<span class="listing-map-chip">📍 地图</span>' : ''}
         </div>
         <div class="listing-meta">
           <div class="listing-price">${escapeHTML(l.price)}<span> ${escapeHTML(l.unit)}</span></div>
@@ -2663,7 +2804,7 @@ async function viewListing(id) {
 
   try {
     const { data, error } = await sb.from('listings')
-      .select('id, title, description, category, city, price, contact, images, created_at, is_pinned, view_count')
+      .select('id, title, description, category, city, price, address, contact, images, created_at, is_pinned, view_count')
       .eq('id', id)
       .eq('status', 'approved')
       .single();
@@ -2695,6 +2836,7 @@ async function viewListing(id) {
           </div>
         </div>
         ${renderDetailPhotos(data.images)}
+        ${renderBusinessMap(data.address, data.city)}
         ${data.description ? `<div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px">
           <div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">📝 详细描述</div>
           <div style="font-size:14px;line-height:1.7;color:#333">${safeDescription}</div>
@@ -2716,6 +2858,7 @@ async function viewListing(id) {
         </div>
         <div class="detail-actions">
           <button class="detail-action primary" onclick="shareListing(${data.id}, event)">微信分享这条信息</button>
+          ${data.address ? `<a class="detail-action" href="${escapeHTML(getMapUrl(data.address, data.city))}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">打开地图导航</a>` : ''}
           <button class="detail-action" onclick="copyText('${escapeHTML(data.contact || '')}').then(()=>showToast('联系方式已复制'))">复制联系方式</button>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px;color:#999;padding-top:10px;border-top:1px solid #f0f0f0">
@@ -2739,7 +2882,7 @@ async function doSearch() {
   showLoading(true);
   try {
     const { data, error } = await sb.from('listings')
-      .select('id, title, category, city, price, images, created_at, is_pinned')
+      .select('id, title, category, city, price, address, images, created_at, is_pinned')
       .eq('status', 'approved')
       .ilike('title', `%${q}%`)
       .limit(40);
@@ -2751,7 +2894,7 @@ async function doSearch() {
         icon: catIcons[r.category] || '📋',
         badge: catBadge[r.category] || '信息',
         badgeType: r.is_pinned ? 'gold' : '',
-        title: r.title, price: r.price || '面议', images: normalizeListingImages(r.images), unit: '',
+        title: r.title, price: r.price || '面议', address: r.address || '', images: normalizeListingImages(r.images), unit: '',
         tags: [r.category, normalizeProvinceName(r.city)], time: timeAgo(r.created_at)
       }));
       currentCat = 'all'; currentCity = '全部'; populateProvinceControls();
@@ -2913,6 +3056,7 @@ async function submitPost() {
   if(!title) { showToast('⚠️ 请填写标题', true); return; }
   if(!contact) { showToast('⚠️ 请填写联系方式', true); return; }
   const catZh = catMap[cat] || cat;
+  const address = isMapCategory(catZh) ? (document.getElementById('postAddress')?.value.trim() || '') : '';
   const btn = document.getElementById('postBtn');
   if(btn) { btn.textContent = '上传中…'; btn.disabled = true; }
   let images = [];
@@ -2929,6 +3073,7 @@ async function submitPost() {
     title, description: desc || title,
     category: catZh, city,
     price: price || '面议', contact,
+    address: address || null,
     images,
     status: 'pending'
   }]);
@@ -2936,6 +3081,7 @@ async function submitPost() {
   if(error) { showToast('发布失败：' + error.message, true); return; }
   closeModal('post');
   clearPostImages();
+  clearPostAddress();
   showToast('🎉 发布成功！您的信息将在管理员审核后上线');
 }
 
@@ -3080,6 +3226,7 @@ async function submitGuestPost() {
   if (!title)    { showToast('⚠️ 请填写标题', true); return; }
   if (!contact)  { showToast('⚠️ 请填写联系方式', true); return; }
   const catZh = catMap[cat] || cat;
+  const address = isMapCategory(catZh) ? (document.getElementById('postAddress')?.value.trim() || '') : '';
   const btn = document.getElementById('postBtn');
   if (btn) { btn.textContent = '上传中…'; btn.disabled = true; }
   let images = [];
@@ -3095,6 +3242,7 @@ async function submitGuestPost() {
     title, description: desc || title,
     category: catZh, city,
     price: price || '面议', contact,
+    address: address || null,
     images,
     status: 'pending',
     user_id: null
@@ -3103,6 +3251,7 @@ async function submitGuestPost() {
   if (error) { showToast('发布失败：' + error.message, true); return; }
   closeModal('post');
   clearPostImages();
+  clearPostAddress();
   showToast('🎉 发布成功！信息将在审核后上线');
 }
 
@@ -3196,6 +3345,69 @@ loadListings().then(handleInitialDeepLink);
   window.doLogout=async function(){if(!confirm('确定退出？'))return;await window.getSb().auth.signOut();document.getElementById('profileModal').style.display='none';var t=document.getElementById('toast');if(t){t.textContent='✅ 已退出';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}setTimeout(function(){location.reload();},800);};
   window.refreshProfile=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;var pc=document.getElementById('profileContent'),lo=document.getElementById('profileLoggedOut');if(!sess){if(pc)pc.style.display='none';if(lo)lo.style.display='block';return;}populateProvinceControls();if(pc)pc.style.display='block';if(lo)lo.style.display='none';var r=await sb.from('profiles').select('*').eq('id',sess.user.id).single();if(r.data){var d=r.data;var province=normalizeProvinceName(d.city)||'Barcelona';var av=document.getElementById('profileAvatar');if(av)av.textContent=(d.nickname||'U').charAt(0).toUpperCase();var pn=document.getElementById('profileName');if(pn)pn.textContent=d.nickname||'用户';var pc2=document.getElementById('profileCity');if(pc2)pc2.textContent='📍 '+province;var spc=document.getElementById('statPostCount');if(spc)spc.textContent=d.post_count||0;var an=document.getElementById('accNickname');if(an)an.value=d.nickname||'';var ap=document.getElementById('accPhone');if(ap)ap.value=d.phone||'';var ac=document.getElementById('accCity');if(ac)ac.value=province;var ae=document.getElementById('accEmail');if(ae)ae.value=publicAccountLabel(sess.user.email,d.phone);var vu=d.vip_until?new Date(d.vip_until):null,isVip=vu&&vu>new Date();var vt=document.getElementById('vipStatusTitle'),vs=document.getElementById('vipStatusSub'),vb=document.getElementById('vipBadge'),vub=document.getElementById('vipUpgradeBtn');if(isVip){if(vt)vt.textContent='💎 VIP会员';if(vs)vs.textContent='到期：'+vu.toLocaleDateString('zh-CN');if(vb){vb.textContent='VIP';vb.style.background='linear-gradient(135deg,#c0830a,#f5c842)';vb.style.color='#fff';}if(vub)vub.textContent='续费VIP';}else{if(vt)vt.textContent='普通用户';if(vs)vs.textContent='升级VIP，享置顶展示和更多特权';if(vb){vb.textContent='FREE';vb.style.background='#eee';vb.style.color='#888';}if(vub)vub.textContent='升级VIP';}}window.loadReferralStatus&&window.loadReferralStatus();window.loadMyListings();};
   document.addEventListener('DOMContentLoaded',function(){window.applyVipFreePromo&&window.applyVipFreePromo();var pb=document.getElementById('postBtn');if(pb)pb.innerHTML='🚀 立即发布（限时免费）';var origOpen=window.openModal;window.openModal=function(type){origOpen&&origOpen(type);if(type==='profile')setTimeout(function(){window.refreshProfile&&window.refreshProfile();},50);};});
+  </script>
+  <script>
+  (function(){
+    function ensureEditAddressField(){
+      var contact=document.getElementById('editContact');
+      if(!contact||document.getElementById('editAddress'))return;
+      var input=document.createElement('input');
+      input.id='editAddress';
+      input.type='text';
+      input.placeholder='店铺地址 / 地图位置';
+      input.style.cssText='width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;margin-bottom:10px;';
+      contact.parentNode.insertBefore(input,contact);
+      var cat=document.getElementById('editCat');
+      var sync=function(){input.style.display=isMapCategory(cat&&cat.value)?'block':'none';if(input.style.display==='none')input.value='';};
+      if(cat)cat.addEventListener('change',sync);
+      sync();
+    }
+    var oldStart=window.startEdit;
+    if(oldStart&&!oldStart._mapPatched){
+      window.startEdit=async function(id){
+        await oldStart(id);
+        ensureEditAddressField();
+        var input=document.getElementById('editAddress');
+        var cat=document.getElementById('editCat');
+        if(cat&&input){input.style.display=isMapCategory(cat.value)?'block':'none';}
+        try{
+          var r=await window.getSb().from('listings').select('address').eq('id',id).single();
+          if(input)input.value=r.data&&r.data.address?r.data.address:'';
+        }catch(e){}
+      };
+      window.startEdit._mapPatched=true;
+    }
+    var oldSave=window.saveEdit;
+    if(oldSave&&!oldSave._mapPatched){
+      window.saveEdit=async function(){
+        ensureEditAddressField();
+        var id=document.getElementById('editListingId')&&document.getElementById('editListingId').value;
+        var cat=document.getElementById('editCat')&&document.getElementById('editCat').value;
+        var title=document.getElementById('editTitle')&&document.getElementById('editTitle').value;
+        var contact=document.getElementById('editContact')&&document.getElementById('editContact').value;
+        var address=document.getElementById('editAddress')&&document.getElementById('editAddress').value.trim();
+        if(id&&title&&contact){
+          await window.getSb().from('listings').update({address:isMapCategory(cat)?(address||null):null}).eq('id',id);
+        }
+        return oldSave();
+      };
+      window.saveEdit._mapPatched=true;
+    }
+    var oldViewMyListing=window.viewMyListing;
+    if(oldViewMyListing&&!oldViewMyListing._mapPatched){
+      window.viewMyListing=async function(id){
+        await oldViewMyListing(id);
+        try{
+          var r=await window.getSb().from('listings').select('address,city').eq('id',id).single();
+          var content=document.getElementById('detailContent');
+          if(content&&r.data&&r.data.address&&!content.querySelector('.detail-map-card')){
+            content.firstElementChild&&content.firstElementChild.insertAdjacentHTML('afterbegin',renderBusinessMap(r.data.address,r.data.city));
+          }
+        }catch(e){}
+      };
+      window.viewMyListing._mapPatched=true;
+    }
+  })();
   </script>
   <div class="modal-overlay" id="detailModal">
   <div class="modal relative" style="max-width:560px">

@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
 
   if (numericId) {
     const params = new URLSearchParams({
-      select: 'id,title,description,category,city,price,created_at',
+      select: 'id,title,description,category,city,price,address,created_at',
       id: `eq.${numericId}`,
       status: 'eq.approved',
       limit: '1'
@@ -37,6 +37,9 @@ module.exports = async function handler(req, res) {
     if (response.ok) {
       const rows = await response.json();
       listing = rows[0] || null;
+      if (listing?.address) {
+        listing.description = `${listing.address} ${listing.description || ''}`.trim();
+      }
     }
   }
 

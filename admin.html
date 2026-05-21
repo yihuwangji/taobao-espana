@@ -1461,7 +1461,7 @@ function esc(value) {
 // ═══════════ LOAD REAL DATA ═══════════
 async function loadRealListings() {
   const { data } = await sb.from('listings')
-    .select('id, title, category, city, price, description, contact, images, status, created_at, user_id, profiles(nickname, phone)')
+    .select('id, title, category, city, price, address, description, contact, images, status, created_at, user_id, profiles(nickname, phone)')
     .order('created_at', { ascending: false })
     .limit(50);
   if(data && data.length > 0) {
@@ -1471,6 +1471,7 @@ async function loadRealListings() {
       title: r.title, cat: r.category,
       city: r.city, user: r.profiles?.nickname || (r.user_id ? '未知用户' : '游客发布'),
       price: r.price || '',
+      address: r.address || '',
       images: Array.isArray(r.images) ? r.images : [],
       contact: r.contact || r.profiles?.phone || '—',
       desc: r.description || '',
@@ -1483,7 +1484,7 @@ async function loadRealListings() {
 
 async function loadRealReview() {
   const { data } = await sb.from('listings')
-    .select('id, title, category, city, description, contact, images, created_at, user_id, profiles(nickname, phone)')
+    .select('id, title, category, city, address, description, contact, images, created_at, user_id, profiles(nickname, phone)')
     .eq('status', 'pending')
     .order('created_at', { ascending: true });
   if(data) {
@@ -1491,6 +1492,7 @@ async function loadRealReview() {
     data.forEach(r => reviewItems.push({
       id: 'R'+r.id, _id: r.id,
       title: r.title, cat: r.category,
+      address: r.address || '',
       city: r.city, user: r.profiles?.nickname || (r.user_id ? '未知用户' : '游客发布'),
       images: Array.isArray(r.images) ? r.images : [],
       contact: r.contact || r.profiles?.phone || '—',
@@ -1892,11 +1894,22 @@ function renderListingImages(images) {
   `;
 }
 
+function listingMapUrl(address, city) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([address, city, 'España'].filter(Boolean).join(', '))}`;
+}
+
+function renderListingMap(address, city) {
+  if (!address) return '';
+  const url = listingMapUrl(address, city);
+  return detailBlock('地图地址', `<a href="${esc(url)}" target="_blank" rel="noopener" style="color:#047857;font-weight:800;text-decoration:none">📍 ${esc(address)} · 打开地图</a>`);
+}
+
 function renderListingDetail(r) {
   return `
     <div style="display:grid;gap:10px">
       ${detailBlock('标题', `<strong>${esc(r.title)}</strong>`)}
       ${renderListingImages(r.images)}
+      ${renderListingMap(r.address, r.city)}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         ${detailBlock('分类', esc(r.cat))}
         ${detailBlock('城市', `📍 ${esc(r.city)}`)}
