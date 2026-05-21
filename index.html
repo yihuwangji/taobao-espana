@@ -3658,6 +3658,63 @@ loadListings().then(handleInitialDeepLink);
   </div>
 </div>
 <script>
+function categoryFromLinkText(text) {
+  const normalized = String(text || '').replace(/\s+/g, '');
+  const entries = [
+    ['招工', 'worker'],
+    ['租房', 'house'],
+    ['生意', 'business'],
+    ['批发', 'wholesale'],
+    ['百元', 'wholesale'],
+    ['酒吧', 'wholesale'],
+    ['交友', 'dating'],
+    ['二手', 'goods'],
+    ['车', 'goods'],
+    ['生活服务', 'service'],
+    ['回国服务', 'service'],
+    ['教育', 'edu'],
+    ['餐饮', 'business']
+  ];
+  const match = entries.find(([label]) => normalized.includes(label));
+  return match ? match[1] : '';
+}
+
+function handlePlaceholderLinkClick(event) {
+  const link = event.target.closest && event.target.closest('a[href="#"]');
+  if (!link) return;
+  event.preventDefault();
+
+  const text = (link.textContent || '').trim();
+  const listings = document.getElementById('listingsGrid');
+
+  if (link.classList.contains('logo') || text === '🏠首页' || text === '首页') {
+    filterCat('all', null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  if (link.classList.contains('see-all')) {
+    filterCat('all', null);
+    if (listings) listings.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
+  if (text.includes('用户协议')) { openModal('userAgreement'); return; }
+  if (text.includes('隐私政策')) { openModal('privacyPolicy'); return; }
+  if (text.includes('公众号') || text.includes('微信群') || text.includes('WhatsApp') || text.includes('Facebook')) {
+    openModal('contactUs');
+    return;
+  }
+
+  const category = categoryFromLinkText(text);
+  if (category) {
+    filterCat(category, link.classList.contains('nav-cat') ? link : null);
+    return;
+  }
+}
+
+document.addEventListener('click', handlePlaceholderLinkClick, true);
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/sw.js').catch(function() {});
