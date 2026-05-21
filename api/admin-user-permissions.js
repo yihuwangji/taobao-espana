@@ -2,7 +2,7 @@ const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
 
 const ALL_SECTIONS = ['dashboard', 'listings', 'review', 'reports', 'pinned', 'users', 'payment'];
-const MANAGEABLE_SECTIONS = ['listings', 'review', 'reports', 'pinned', 'users'];
+const MANAGEABLE_SECTIONS = ['listings', 'review', 'reports', 'pinned', 'users', 'payment'];
 
 function json(res, status, body) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');

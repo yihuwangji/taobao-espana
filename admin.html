@@ -641,6 +641,35 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 }
 .config-row input:focus { border-color: rgba(245,166,35,0.4); }
 
+.admin-tools-panel {
+  margin: 0 20px 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(245,166,35,0.1), rgba(59,130,246,0.06));
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+.admin-tools-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.admin-tools-text {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.admin-tools-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 /* ── AUTH GATE ── */
 .auth-gate {
   position: fixed;
@@ -856,6 +885,15 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .config-row input,
   .config-row select {
     width: 100%;
+  }
+  .admin-tools-panel {
+    margin: 0 12px 12px;
+    grid-template-columns: 1fr;
+  }
+  .admin-tools-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-content: stretch;
   }
   .modal-overlay {
     align-items: flex-end;
@@ -1269,6 +1307,17 @@ tr:hover td { background: rgba(255,255,255,0.02); }
             </select>
           </div>
         </div>
+        <div class="admin-tools-panel">
+          <div>
+            <div class="admin-tools-title">管理员权限与密码</div>
+            <div class="admin-tools-text">超级管理员可以给不同账号分配后台版面，也可以重置用户或其他管理员密码。当前管理员自己的密码也可以在这里直接修改。</div>
+          </div>
+          <div class="admin-tools-actions">
+            <button class="btn btn-blue" onclick="showAdminUsersOnly()">只看管理员</button>
+            <button class="btn" onclick="showAllUsers()">查看全部用户</button>
+            <button class="btn btn-gold" onclick="openMyPasswordReset()">修改我的后台密码</button>
+          </div>
+        </div>
         <div style="overflow-x:auto">
           <table>
             <thead>
@@ -1449,6 +1498,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         <label><input type="checkbox" class="perm-section" value="reports"> 举报处理</label>
         <label><input type="checkbox" class="perm-section" value="pinned"> 置顶管理</label>
         <label><input type="checkbox" class="perm-section" value="users"> 用户管理</label>
+        <label><input type="checkbox" class="perm-section" value="payment"> 系统设置</label>
       </div>
     </div>
     <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:8px">
@@ -2202,11 +2252,11 @@ function renderUsers(data) {
       <td data-label="状态"><span class="badge ${u.status==='正常'?'badge-approved':'badge-banned'}">${u.status}</span></td>
       <td data-label="操作">
         <div class="action-btns">
+          ${isSuperAdmin() && u._id ? `<button class="btn btn-blue" onclick="openPermissionModal('${u._id}')">设置权限</button>` : ''}
+          ${isSuperAdmin() && u._id ? `<button class="btn btn-gold" onclick="openResetPasswordModal('${u._id}')">${String(u._id) === String(currentAdmin?.id) ? '改自己密码' : '重置密码'}</button>` : ''}
           ${u.status==='正常'
             ? `<button class="btn btn-red" onclick="setBanTarget('${u._id || ''}')">封禁</button>`
             : `<button class="btn btn-green" onclick="unban('${esc(u.name)}')">解封</button>`}
-          ${isSuperAdmin() && u._id ? `<button class="btn btn-blue" onclick="openPermissionModal('${u._id}')">权限</button>` : ''}
-          ${isSuperAdmin() && u._id ? `<button class="btn btn-gold" onclick="openResetPasswordModal('${u._id}')">重置密码</button>` : ''}
           ${isSuperAdmin() && u._id ? `<button class="btn btn-red" onclick="deleteAdminItem('user','${u._id}')">删除</button>` : ''}
         </div>
       </td>
@@ -2223,6 +2273,28 @@ function filterUsers() {
     (!status || u.status === status)
   );
   renderUsers(data);
+}
+
+function showAdminUsersOnly() {
+  const input = document.getElementById('userSearch');
+  if (input) input.value = '管理员';
+  filterUsers();
+}
+
+function showAllUsers() {
+  const input = document.getElementById('userSearch');
+  const status = document.getElementById('userStatusFilter');
+  if (input) input.value = '';
+  if (status) status.value = '';
+  filterUsers();
+}
+
+function openMyPasswordReset() {
+  if (!currentAdmin?.id) {
+    showToast('请先登录后台', 'error');
+    return;
+  }
+  openResetPasswordModal(currentAdmin.id);
 }
 
 let permissionTargetId = null;
@@ -2279,13 +2351,13 @@ function openResetPasswordModal(userId) {
     showToast('只有超级管理员可以重置密码', 'error');
     return;
   }
-  const user = getUserById(userId);
-  if (!user) {
-    showToast('没有找到这个用户', 'error');
-    return;
-  }
+  const user = getUserById(userId) || (String(userId) === String(currentAdmin?.id)
+    ? { _id: currentAdmin.id, name: currentAdminProfile?.nickname || '当前管理员', email: currentAdmin.email || '' }
+    : null);
+  if (!user) { showToast('没有找到这个用户', 'error'); return; }
   resetPasswordTargetId = userId;
-  document.getElementById('resetPasswordUserName').textContent = `${user.name} ${user.email ? ' · ' + user.email : ''}`;
+  const selfMark = String(userId) === String(currentAdmin?.id) ? '（当前登录管理员）' : '';
+  document.getElementById('resetPasswordUserName').textContent = `${user.name}${selfMark} ${user.email ? ' · ' + user.email : ''}`;
   document.getElementById('resetPasswordValue').value = '';
   openModal('resetPassword');
 }
@@ -2305,11 +2377,16 @@ async function submitPasswordReset() {
   }
   if (!confirm('确定重置这个用户的密码吗？重置后旧密码会失效。')) return;
   try {
-    await adminApi('/api/admin-user-permissions', {
-      action: 'reset_password',
-      userId: resetPasswordTargetId,
-      password
-    });
+    if (String(resetPasswordTargetId) === String(currentAdmin?.id)) {
+      const { error } = await sb.auth.updateUser({ password: authPasswordFromAdminInput(password) });
+      if (error) throw error;
+    } else {
+      await adminApi('/api/admin-user-permissions', {
+        action: 'reset_password',
+        userId: resetPasswordTargetId,
+        password
+      });
+    }
     closeModal('resetPassword');
     showToast('密码已重置，请把新密码通知用户', 'success');
   } catch (error) {
