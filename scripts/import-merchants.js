@@ -70,6 +70,21 @@ async function main() {
     return;
   }
 
+  const existingResponse = await fetch(`${SUPABASE_URL}/rest/v1/listings?select=title&category=in.(%E7%94%9F%E6%84%8F,%E6%9C%8D%E5%8A%A1,%E6%95%99%E8%82%B2)&limit=1000`, {
+    headers: {
+      apikey: SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SERVICE_ROLE_KEY}`
+    }
+  });
+  const existingRows = existingResponse.ok ? await existingResponse.json() : [];
+  const existingTitles = new Set(existingRows.map(row => String(row.title || '').trim().toLowerCase()));
+  const newRecords = records.filter(record => !existingTitles.has(record.title.trim().toLowerCase()));
+
+  if (!newRecords.length) {
+    console.log('No new merchant listings to import.');
+    return;
+  }
+
   const response = await fetch(`${SUPABASE_URL}/rest/v1/listings`, {
     method: 'POST',
     headers: {
@@ -78,7 +93,7 @@ async function main() {
       'Content-Type': 'application/json',
       Prefer: 'return=representation'
     },
-    body: JSON.stringify(records)
+    body: JSON.stringify(newRecords)
   });
 
   const body = await response.text();
@@ -86,7 +101,7 @@ async function main() {
     console.error(body);
     process.exit(1);
   }
-  console.log(`Imported ${records.length} merchant listings.`);
+  console.log(`Imported ${newRecords.length} merchant listings. Skipped ${records.length - newRecords.length} duplicates.`);
 }
 
 main().catch(error => {
