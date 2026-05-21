@@ -671,6 +671,30 @@
     position: relative;
   }
 
+  .listing-img.has-photo {
+    background: #f4eee6;
+  }
+
+  .listing-img.has-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .listing-photo-count {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    z-index: 2;
+    background: rgba(0,0,0,.62);
+    color: #fff;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
   .listing-badge {
     position: absolute;
     top: 10px;
@@ -727,6 +751,62 @@
     border-color: #07c160;
     background: #ecfff4;
     color: #04783d;
+  }
+
+  .photo-upload-box {
+    border: 1.5px dashed #d8b477;
+    border-radius: 10px;
+    background: #fffaf1;
+    padding: 12px;
+  }
+
+  .photo-upload-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .photo-upload-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .photo-upload-tip {
+    font-size: 11px;
+    color: var(--ink-light);
+  }
+
+  .photo-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .photo-preview-grid img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #eadfce;
+  }
+
+  .detail-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .detail-photo-grid img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f4eee6;
   }
 
   .listing-body { padding: 11px 12px 12px; }
@@ -1815,6 +1895,17 @@
         <input type="text" id="postPrice" placeholder="例：1200€/月 或 面议">
       </div>
     </div>
+    <div class="form-group" id="postImagesGroup" style="display:none">
+      <div class="photo-upload-box">
+        <div class="photo-upload-head">
+          <div class="photo-upload-title">照片</div>
+          <div class="photo-upload-tip">最多6张，每张不超过5MB</div>
+        </div>
+        <input type="file" id="postImages" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="previewPostImages()">
+        <div class="photo-upload-tip" style="margin-top:8px">适用于出租、买卖物品、批发市场、生意转让类信息。</div>
+        <div id="postImagePreview" class="photo-preview-grid"></div>
+      </div>
+    </div>
     <div class="form-group">
       <label>联系方式（微信/手机/WhatsApp）*</label>
       <input type="text" id="postContact" placeholder="+34 6XX XXX XXX 或 微信号">
@@ -2091,7 +2182,7 @@ async function loadListings() {
   showLoading(true);
   try {
     let query = sb.from('listings')
-      .select('id, title, category, city, price, created_at, is_pinned')
+      .select('id, title, category, city, price, images, created_at, is_pinned')
       .eq('status', 'approved')
       .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false })
@@ -2125,6 +2216,7 @@ async function loadListings() {
         badgeType: r.is_pinned ? 'gold' : '',
         title: r.title,
         price: r.price || '面议',
+        images: normalizeListingImages(r.images),
         unit: '',
         tags: [r.category, normalizeProvinceName(r.city)],
         time: timeAgo(r.created_at)
@@ -2157,6 +2249,99 @@ function escapeHTML(value) {
     '"': '&quot;',
     "'": '&#39;'
   }[ch]));
+}
+
+function normalizeListingImages(images) {
+  if (!images) return [];
+  if (Array.isArray(images)) return images.filter(Boolean).slice(0, 6);
+  if (typeof images === 'string') {
+    try {
+      const parsed = JSON.parse(images);
+      return Array.isArray(parsed) ? parsed.filter(Boolean).slice(0, 6) : [];
+    } catch {
+      return images ? [images] : [];
+    }
+  }
+  return [];
+}
+
+function isPhotoCategory(category) {
+  return ['租房', '生意', '二手物品', '二手车'].includes(String(category || ''));
+}
+
+function selectedPostCategory() {
+  const raw = document.getElementById('postCat')?.value || '';
+  return catMap[raw] || raw;
+}
+
+function updatePostForm() {
+  const group = document.getElementById('postImagesGroup');
+  if (!group) return;
+  const show = isPhotoCategory(selectedPostCategory());
+  group.style.display = show ? 'block' : 'none';
+  if (!show) clearPostImages();
+}
+
+function clearPostImages() {
+  const input = document.getElementById('postImages');
+  const preview = document.getElementById('postImagePreview');
+  if (input) input.value = '';
+  if (preview) preview.innerHTML = '';
+}
+
+function previewPostImages() {
+  const input = document.getElementById('postImages');
+  const preview = document.getElementById('postImagePreview');
+  if (!input || !preview) return;
+  const files = [...input.files].slice(0, 6);
+  preview.innerHTML = '';
+  files.forEach(file => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.alt = '';
+    img.onload = () => URL.revokeObjectURL(img.src);
+    preview.appendChild(img);
+  });
+  if (input.files.length > 6) showToast('最多上传6张照片，已保留前6张', true);
+}
+
+async function uploadPostImages(category) {
+  if (!isPhotoCategory(category)) return [];
+  const input = document.getElementById('postImages');
+  const files = input ? [...input.files].slice(0, 6) : [];
+  if (!files.length) return [];
+  const maxSize = 5 * 1024 * 1024;
+  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  const uploaded = [];
+  const session = (await sb.auth.getSession()).data.session;
+  const owner = session?.user?.id || 'guest';
+
+  for (let i = 0; i < files.length; i += 1) {
+    const file = files[i];
+    if (!allowed.includes(file.type)) {
+      throw new Error('照片格式只支持 JPG、PNG、WEBP、GIF');
+    }
+    if (file.size > maxSize) {
+      throw new Error('单张照片不能超过5MB');
+    }
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    const path = `${owner}/${Date.now()}-${i}-${Math.random().toString(16).slice(2)}.${ext}`;
+    const { error } = await sb.storage.from('listing-images').upload(path, file, {
+      cacheControl: '31536000',
+      upsert: false,
+      contentType: file.type
+    });
+    if (error) throw error;
+    const { data } = sb.storage.from('listing-images').getPublicUrl(path);
+    if (data?.publicUrl) uploaded.push(data.publicUrl);
+  }
+  return uploaded;
+}
+
+function renderDetailPhotos(images) {
+  const photos = normalizeListingImages(images);
+  if (!photos.length) return '';
+  return `<div class="detail-photo-grid">${photos.map(url => `<img src="${escapeHTML(url)}" alt="信息照片" loading="lazy">`).join('')}</div>`;
 }
 
 function isWeChatBrowser() {
@@ -2413,11 +2598,14 @@ function renderListings() {
     return;
   }
 
-  grid.innerHTML = filtered.map((l,i) => `
+  grid.innerHTML = filtered.map((l,i) => {
+    const photos = normalizeListingImages(l.images);
+    return `
     <div class="listing-card" style="animation-delay:${i*0.07}s" onclick="viewListing(${l.id})">
-      <div class="listing-img">
-        ${escapeHTML(l.icon)}
+      <div class="listing-img ${photos.length ? 'has-photo' : ''}">
+        ${photos.length ? `<img src="${escapeHTML(photos[0])}" alt="" loading="lazy">` : escapeHTML(l.icon)}
         <div class="listing-badge ${escapeHTML(l.badgeType)}">${escapeHTML(l.badge)}</div>
+        ${photos.length > 1 ? `<div class="listing-photo-count">📷 ${photos.length}</div>` : ''}
         <button class="listing-share" onclick="shareListing(${l.id}, event)">微信分享</button>
       </div>
       <div class="listing-body">
@@ -2435,7 +2623,7 @@ function renderListings() {
         </div>
       </div>
     </div>
-  `).join('');
+  `;}).join('');
 }
 
 function filterCat(cat, el) {
@@ -2475,7 +2663,7 @@ async function viewListing(id) {
 
   try {
     const { data, error } = await sb.from('listings')
-      .select('id, title, description, category, city, price, contact, created_at, is_pinned, view_count')
+      .select('id, title, description, category, city, price, contact, images, created_at, is_pinned, view_count')
       .eq('id', id)
       .eq('status', 'approved')
       .single();
@@ -2506,6 +2694,7 @@ async function viewListing(id) {
             <h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">${safeTitle}</h3>
           </div>
         </div>
+        ${renderDetailPhotos(data.images)}
         ${data.description ? `<div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px">
           <div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">📝 详细描述</div>
           <div style="font-size:14px;line-height:1.7;color:#333">${safeDescription}</div>
@@ -2550,7 +2739,7 @@ async function doSearch() {
   showLoading(true);
   try {
     const { data, error } = await sb.from('listings')
-      .select('id, title, category, city, price, created_at, is_pinned')
+      .select('id, title, category, city, price, images, created_at, is_pinned')
       .eq('status', 'approved')
       .ilike('title', `%${q}%`)
       .limit(40);
@@ -2562,7 +2751,7 @@ async function doSearch() {
         icon: catIcons[r.category] || '📋',
         badge: catBadge[r.category] || '信息',
         badgeType: r.is_pinned ? 'gold' : '',
-        title: r.title, price: r.price || '面议', unit: '',
+        title: r.title, price: r.price || '面议', images: normalizeListingImages(r.images), unit: '',
         tags: [r.category, normalizeProvinceName(r.city)], time: timeAgo(r.created_at)
       }));
       currentCat = 'all'; currentCity = '全部'; populateProvinceControls();
@@ -2605,6 +2794,7 @@ function openModal(name) {
   if (name === 'post') {
     if (currentUser) setPostMode('member');
     else setPostMode('guest');
+    updatePostForm();
   }
 }
 function closeModal(name) {
@@ -2724,17 +2914,28 @@ async function submitPost() {
   if(!contact) { showToast('⚠️ 请填写联系方式', true); return; }
   const catZh = catMap[cat] || cat;
   const btn = document.getElementById('postBtn');
-  if(btn) { btn.textContent = '发布中…'; btn.disabled = true; }
+  if(btn) { btn.textContent = '上传中…'; btn.disabled = true; }
+  let images = [];
+  try {
+    images = await uploadPostImages(catZh);
+  } catch(e) {
+    if(btn) { btn.textContent = '立即发布（免费）'; btn.disabled = false; }
+    showToast('照片上传失败：' + e.message, true);
+    return;
+  }
+  if(btn) btn.textContent = '发布中…';
   const { error } = await sb.from('listings').insert([{
     user_id: currentUser.id,
     title, description: desc || title,
     category: catZh, city,
     price: price || '面议', contact,
+    images,
     status: 'pending'
   }]);
   if(btn) { btn.textContent = '立即发布（免费）'; btn.disabled = false; }
   if(error) { showToast('发布失败：' + error.message, true); return; }
   closeModal('post');
+  clearPostImages();
   showToast('🎉 发布成功！您的信息将在管理员审核后上线');
 }
 
@@ -2880,17 +3081,28 @@ async function submitGuestPost() {
   if (!contact)  { showToast('⚠️ 请填写联系方式', true); return; }
   const catZh = catMap[cat] || cat;
   const btn = document.getElementById('postBtn');
-  if (btn) { btn.textContent = '发布中…'; btn.disabled = true; }
+  if (btn) { btn.textContent = '上传中…'; btn.disabled = true; }
+  let images = [];
+  try {
+    images = await uploadPostImages(catZh);
+  } catch(e) {
+    if (btn) { btn.textContent = '🚀 立即发布（免费）'; btn.disabled = false; }
+    showToast('照片上传失败：' + e.message, true);
+    return;
+  }
+  if (btn) btn.textContent = '发布中…';
   const { error } = await sb.from('listings').insert([{
     title, description: desc || title,
     category: catZh, city,
     price: price || '面议', contact,
+    images,
     status: 'pending',
     user_id: null
   }]);
   if (btn) { btn.textContent = '🚀 立即发布（免费）'; btn.disabled = false; }
   if (error) { showToast('发布失败：' + error.message, true); return; }
   closeModal('post');
+  clearPostImages();
   showToast('🎉 发布成功！信息将在审核后上线');
 }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v2';
+const CACHE_NAME = 'espana-life-v3';
 const APP_SHELL = [
   '/',
   '/index.html',
