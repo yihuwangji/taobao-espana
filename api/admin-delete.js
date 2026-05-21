@@ -33,7 +33,7 @@ async function serviceFetch(path, options = {}) {
   });
 }
 
-async function requireAdmin(req) {
+async function requireAdmin(req, requiredSection = '') {
   const authHeader = req.headers.authorization || req.headers.Authorization || '';
   const token = authHeader.replace(/^Bearer\s+/i, '').trim();
   if (!token) return { error: 'missing_token', status: 401 };
@@ -50,7 +50,9 @@ async function requireAdmin(req) {
   const profileResponse = await serviceFetch(`/rest/v1/profiles?select=is_admin&id=eq.${encodeURIComponent(user.id)}&limit=1`);
   if (!profileResponse.ok) return { error: 'admin_check_failed', status: 403 };
   const profiles = await profileResponse.json();
-  if (!profiles[0]?.is_admin) return { error: 'not_admin', status: 403 };
+  const isSuper = Boolean(profiles[0]?.is_admin || user.app_metadata?.admin_role === 'super_admin');
+  const sections = Array.isArray(user.app_metadata?.admin_sections) ? user.app_metadata.admin_sections : [];
+  if (!isSuper && (!requiredSection || !sections.includes(requiredSection))) return { error: 'not_admin', status: 403 };
   return { user };
 }
 
@@ -117,10 +119,11 @@ module.exports = async function handler(req, res) {
     return json(res, 500, { error: 'missing_service_role', message: '后台服务未配置安全密钥' });
   }
 
-  const admin = await requireAdmin(req);
+  const { type, id } = parseBody(req);
+  const requiredSection = type === 'user' ? 'users' : type === 'report' ? 'reports' : 'listings';
+  const admin = await requireAdmin(req, requiredSection);
   if (admin.error) return json(res, admin.status, { error: admin.error, message: '没有管理员权限' });
 
-  const { type, id } = parseBody(req);
   try {
     let deletedId;
     if (type === 'listing') deletedId = await deleteListing(id);

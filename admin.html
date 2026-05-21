@@ -892,34 +892,34 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
   <nav class="sidebar-nav">
     <div class="nav-section-label">概览</div>
-    <div class="nav-item active" onclick="showPage('dashboard',this)">
+    <div class="nav-item active" data-section="dashboard" onclick="showPage('dashboard',this)">
       <span>📊</span> 数据仪表盘
     </div>
 
     <div class="nav-section-label">内容管理</div>
-    <div class="nav-item" onclick="showPage('listings',this)">
+    <div class="nav-item" data-section="listings" onclick="showPage('listings',this)">
       <span>📋</span> 信息管理
       <span class="nav-badge">23</span>
     </div>
-    <div class="nav-item" onclick="showPage('review',this)">
+    <div class="nav-item" data-section="review" onclick="showPage('review',this)">
       <span>⏳</span> 待审核
       <span class="nav-badge">8</span>
     </div>
-    <div class="nav-item" onclick="showPage('reports',this)">
+    <div class="nav-item" data-section="reports" onclick="showPage('reports',this)">
       <span>🚨</span> 举报处理
       <span class="nav-badge">5</span>
     </div>
-    <div class="nav-item" onclick="showPage('pinned',this)">
+    <div class="nav-item" data-section="pinned" onclick="showPage('pinned',this)">
       <span>📌</span> 置顶管理
     </div>
 
     <div class="nav-section-label">用户管理</div>
-    <div class="nav-item" onclick="showPage('users',this)">
+    <div class="nav-item" data-section="users" onclick="showPage('users',this)">
       <span>👥</span> 用户列表
     </div>
 
     <div class="nav-section-label">系统</div>
-    <div class="nav-item" onclick="showPage('payment',this)">      <span>💳</span> 
+    <div class="nav-item" data-section="payment" onclick="showPage('payment',this)">      <span>💳</span> 
       <span>⚙️</span> 系统设置
     </div>
   </nav>
@@ -1212,8 +1212,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         <div class="card-header">
           <div class="card-title">👥 用户管理</div>
           <div class="card-actions">
-            <input class="search-input" placeholder="🔍 搜索用户名/手机…" oninput="filterUsers(this.value)">
-            <select class="select-input" id="userStatusFilter" onchange="filterUsers('')">
+            <input class="search-input" id="userSearch" placeholder="🔍 搜索用户名/手机/邮箱/权限…" oninput="filterUsers()">
+            <select class="select-input" id="userStatusFilter" onchange="filterUsers()">
               <option value="">全部状态</option>
               <option value="正常">正常</option>
               <option value="封禁">已封禁</option>
@@ -1227,6 +1227,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
                 <th>用户</th>
                 <th>城市</th>
                 <th>手机号</th>
+                <th>后台权限</th>
                 <th>注册时间</th>
                 <th>发布数</th>
                 <th>状态</th>
@@ -1358,6 +1359,61 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   </div>
 </div>
 
+<!-- ── MODAL: ADMIN PERMISSIONS ── -->
+<div class="modal-overlay" id="permissionModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('permission')">✕</button>
+    <h3>👑 管理权限设置</h3>
+    <div id="permissionUserName" style="font-weight:700;margin-bottom:14px;color:var(--text)">选择用户</div>
+    <div class="form-group">
+      <label>管理身份</label>
+      <select id="permissionRole">
+        <option value="none">普通用户</option>
+        <option value="section_admin">版面管理员</option>
+        <option value="super_admin">超级管理员</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>可管理版面</label>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;font-size:13px;color:var(--text-dim)">
+        <label><input type="checkbox" class="perm-section" value="listings"> 信息管理</label>
+        <label><input type="checkbox" class="perm-section" value="review"> 待审核</label>
+        <label><input type="checkbox" class="perm-section" value="reports"> 举报处理</label>
+        <label><input type="checkbox" class="perm-section" value="pinned"> 置顶管理</label>
+        <label><input type="checkbox" class="perm-section" value="users"> 用户管理</label>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:8px">
+      版面管理员只能进入勾选的后台版面；超级管理员拥有全部权限，并可以继续分配权限和重置密码。
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('permission')">取消</button>
+      <button class="btn btn-gold" onclick="saveUserPermissions()">保存权限</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: RESET PASSWORD ── -->
+<div class="modal-overlay" id="resetPasswordModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('resetPassword')">✕</button>
+    <h3>🔐 重置用户密码</h3>
+    <div id="resetPasswordUserName" style="font-weight:700;margin-bottom:14px;color:var(--text)">选择用户</div>
+    <div class="form-group">
+      <label>新密码</label>
+      <input type="text" id="resetPasswordValue" placeholder="手机号账号填4位数字；管理员邮箱账号填至少8位">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn" onclick="generateResetPassword()">生成8位密码</button>
+      <span style="font-size:12px;color:var(--text-muted)">重置后请把新密码发给对应管理员或用户。</span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('resetPassword')">取消</button>
+      <button class="btn btn-red" onclick="submitPasswordReset()">确认重置</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MODAL: PIN ── -->
 <div class="modal-overlay" id="pinModal">
   <div class="modal">
@@ -1401,6 +1457,31 @@ const SUPABASE_ANON_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentAdmin = null;
+let currentAdminProfile = null;
+let currentAdminPermissions = { role: 'none', sections: [] };
+
+const ADMIN_ALL_SECTIONS = ['dashboard', 'listings', 'review', 'reports', 'pinned', 'users', 'payment'];
+const ADMIN_SECTION_LABELS = {
+  dashboard: '数据仪表盘',
+  listings: '信息管理',
+  review: '待审核',
+  reports: '举报处理',
+  pinned: '置顶管理',
+  users: '用户管理',
+  payment: '系统设置'
+};
+
+function normalizeAdminSections(value) {
+  return Array.isArray(value) ? value.filter(section => ADMIN_ALL_SECTIONS.includes(section)) : [];
+}
+
+function isSuperAdmin() {
+  return currentAdminPermissions.role === 'super_admin';
+}
+
+function canManageSection(section) {
+  return isSuperAdmin() || currentAdminPermissions.sections.includes(section);
+}
 
 function setAuthError(message) {
   const box = document.getElementById('adminAuthError');
@@ -1417,17 +1498,27 @@ async function requireAdmin() {
     .select('nickname, is_admin')
     .eq('id', session.user.id)
     .single();
-  if (error || !profile?.is_admin) {
+  const app = session.user.app_metadata || {};
+  const role = profile?.is_admin ? 'super_admin' : (app.admin_role || 'none');
+  const sections = role === 'super_admin' ? ADMIN_ALL_SECTIONS : normalizeAdminSections(app.admin_sections);
+  if (error || (role !== 'super_admin' && !sections.length)) {
     await sb.auth.signOut();
     currentAdmin = null;
+    currentAdminProfile = null;
+    currentAdminPermissions = { role: 'none', sections: [] };
     document.getElementById('authGate').style.display = 'flex';
     setAuthError('此账号没有后台管理员权限');
     return false;
   }
   currentAdmin = session.user;
+  currentAdminProfile = profile;
+  currentAdminPermissions = { role, sections };
   document.getElementById('authGate').style.display = 'none';
   const nameEl = document.querySelector('.admin-name');
   if (nameEl) nameEl.textContent = profile.nickname || session.user.email || '管理员';
+  const roleEl = document.querySelector('.admin-role');
+  if (roleEl) roleEl.textContent = role === 'super_admin' ? 'Super Admin' : sections.map(s => ADMIN_SECTION_LABELS[s]).join(' / ');
+  applyAdminPermissions();
   return true;
 }
 
@@ -1448,6 +1539,22 @@ async function submitAdminLogin() {
 
 async function sbLog(action, type, id, note='') {
   await sb.from('admin_logs').insert([{ action, target_type: type, target_id: String(id), note }]);
+}
+
+async function adminApi(path, body) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) throw new Error('请先登录后台');
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`
+    },
+    body: JSON.stringify(body)
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.message || result.error || '后台操作失败');
+  return result;
 }
 
 function esc(value) {
@@ -1526,23 +1633,30 @@ async function loadRealReports() {
 }
 
 async function loadRealUsers() {
-  const { data } = await sb.from('profiles')
-    .select('id, nickname, city, phone, is_banned, post_count, created_at')
-    .order('created_at', { ascending: false })
-    .limit(50);
-  if(data) {
+  if (!canManageSection('users')) {
+    renderUsers([]);
+    return;
+  }
+  try {
+    const result = await adminApi('/api/admin-user-permissions', { action: 'list' });
     allUsers.length = 0;
-    data.forEach(u => allUsers.push({
+    (result.users || []).forEach(u => allUsers.push({
       _id: u.id,
-      name: u.nickname || '未知',
+      name: u.nickname || u.email || '未知',
+      email: u.email || '',
       city: u.city || '—',
       phone: u.phone || '—',
-      reg: new Date(u.created_at).toLocaleDateString('zh-CN'),
+      reg: u.created_at ? new Date(u.created_at).toLocaleDateString('zh-CN') : '—',
       posts: u.post_count || 0,
-      status: u.is_banned ? '封禁' : '正常'
+      status: u.is_banned ? '封禁' : '正常',
+      role: u.role || 'none',
+      sections: normalizeAdminSections(u.sections)
     }));
+    filterUsers();
+  } catch (error) {
+    showToast('加载用户权限失败：' + error.message, 'error');
+    renderUsers(allUsers);
   }
-  renderUsers(allUsers);
 }
 
 async function loadRealStats() {
@@ -1829,6 +1943,18 @@ function renderPinned() {
   `).join('');
 }
 
+function adminRoleLabel(user) {
+  if (user.role === 'super_admin') return '超级管理员';
+  if (user.role === 'section_admin') return '版面管理员';
+  return '普通用户';
+}
+
+function adminSectionsLabel(user) {
+  if (user.role === 'super_admin') return '全部版面';
+  const labels = normalizeAdminSections(user.sections).map(section => ADMIN_SECTION_LABELS[section]).filter(Boolean);
+  return labels.length ? labels.join('、') : '无后台权限';
+}
+
 function renderUsers(data) {
   const colors = ['#E53935','#3B82F6','#00C896','#F5A623','#8B5CF6'];
   document.getElementById('usersTbody').innerHTML = data.map((u,i) => `
@@ -1838,11 +1964,16 @@ function renderUsers(data) {
           <div class="user-avatar" style="background:${colors[i%5]}22;color:${colors[i%5]}">${esc(u.name[0] || '?')}</div>
           <div>
             <div style="font-weight:600">${esc(u.name)}</div>
+            ${u.email ? `<div style="font-size:11px;color:var(--text-muted)">${esc(u.email)}</div>` : ''}
           </div>
         </div>
       </td>
       <td>📍 ${esc(u.city)}</td>
       <td style="font-family:JetBrains Mono;font-size:12px">${esc(u.phone)}</td>
+      <td>
+        <div><span class="badge ${u.role==='none'?'badge-active':(u.role==='super_admin'?'badge-pinned':'badge-approved')}">${esc(adminRoleLabel(u))}</span></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(adminSectionsLabel(u))}</div>
+      </td>
       <td style="font-size:11px;color:var(--text-dim)">${u.reg}</td>
       <td><span style="font-family:JetBrains Mono;color:var(--blue)">${u.posts}</span></td>
       <td><span class="badge ${u.status==='正常'?'badge-approved':'badge-banned'}">${u.status}</span></td>
@@ -1851,8 +1982,9 @@ function renderUsers(data) {
           ${u.status==='正常'
             ? `<button class="btn btn-red" onclick="setBanTarget('${u._id || ''}')">封禁</button>`
             : `<button class="btn btn-green" onclick="unban('${esc(u.name)}')">解封</button>`}
-          <button class="btn" onclick="showToast('查看用户详情','info')">详情</button>
-          ${u._id ? `<button class="btn btn-red" onclick="deleteAdminItem('user','${u._id}')">删除</button>` : ''}
+          ${isSuperAdmin() && u._id ? `<button class="btn btn-blue" onclick="openPermissionModal('${u._id}')">权限</button>` : ''}
+          ${isSuperAdmin() && u._id ? `<button class="btn btn-gold" onclick="openResetPasswordModal('${u._id}')">重置密码</button>` : ''}
+          ${isSuperAdmin() && u._id ? `<button class="btn btn-red" onclick="deleteAdminItem('user','${u._id}')">删除</button>` : ''}
         </div>
       </td>
     </tr>
@@ -1860,13 +1992,106 @@ function renderUsers(data) {
   document.getElementById('usersInfo').textContent = `共 ${data.length} 位用户`;
 }
 
-function filterUsers(q) {
+function filterUsers() {
+  const q = normalizeSearchText(document.getElementById('userSearch')?.value || '');
   const status = document.getElementById('userStatusFilter').value;
   let data = allUsers.filter(u =>
-    (!q || u.name.includes(q) || u.phone.includes(q)) &&
+    (!q || normalizeSearchText([u.name, u.email, u.phone, u.city, adminRoleLabel(u), adminSectionsLabel(u)].join(' ')).includes(q) || compactDigits(u.phone).includes(compactDigits(q))) &&
     (!status || u.status === status)
   );
   renderUsers(data);
+}
+
+let permissionTargetId = null;
+let resetPasswordTargetId = null;
+
+function getUserById(id) {
+  return allUsers.find(user => String(user._id) === String(id));
+}
+
+function openPermissionModal(userId) {
+  if (!isSuperAdmin()) {
+    showToast('只有超级管理员可以分配权限', 'error');
+    return;
+  }
+  const user = getUserById(userId);
+  if (!user) {
+    showToast('没有找到这个用户', 'error');
+    return;
+  }
+  permissionTargetId = userId;
+  document.getElementById('permissionUserName').textContent = `${user.name} ${user.phone && user.phone !== '—' ? ' · ' + user.phone : ''}`;
+  document.getElementById('permissionRole').value = user.role || 'none';
+  document.querySelectorAll('.perm-section').forEach(input => {
+    input.checked = user.role === 'super_admin' || normalizeAdminSections(user.sections).includes(input.value);
+  });
+  openModal('permission');
+}
+
+async function saveUserPermissions() {
+  if (!permissionTargetId) return;
+  const role = document.getElementById('permissionRole').value;
+  const sections = [...document.querySelectorAll('.perm-section:checked')].map(input => input.value);
+  if (role === 'section_admin' && !sections.length) {
+    showToast('请至少选择一个可管理版面', 'error');
+    return;
+  }
+  try {
+    await adminApi('/api/admin-user-permissions', {
+      action: 'set_permissions',
+      userId: permissionTargetId,
+      role,
+      sections
+    });
+    closeModal('permission');
+    showToast('管理权限已保存', 'success');
+    await loadRealUsers();
+  } catch (error) {
+    showToast('保存权限失败：' + error.message, 'error');
+  }
+}
+
+function openResetPasswordModal(userId) {
+  if (!isSuperAdmin()) {
+    showToast('只有超级管理员可以重置密码', 'error');
+    return;
+  }
+  const user = getUserById(userId);
+  if (!user) {
+    showToast('没有找到这个用户', 'error');
+    return;
+  }
+  resetPasswordTargetId = userId;
+  document.getElementById('resetPasswordUserName').textContent = `${user.name} ${user.email ? ' · ' + user.email : ''}`;
+  document.getElementById('resetPasswordValue').value = '';
+  openModal('resetPassword');
+}
+
+function generateResetPassword() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  let password = '';
+  for (let i = 0; i < 8; i++) password += alphabet[Math.floor(Math.random() * alphabet.length)];
+  document.getElementById('resetPasswordValue').value = password;
+}
+
+async function submitPasswordReset() {
+  const password = document.getElementById('resetPasswordValue').value.trim();
+  if (!resetPasswordTargetId || !password) {
+    showToast('请填写新密码', 'error');
+    return;
+  }
+  if (!confirm('确定重置这个用户的密码吗？重置后旧密码会失效。')) return;
+  try {
+    await adminApi('/api/admin-user-permissions', {
+      action: 'reset_password',
+      userId: resetPasswordTargetId,
+      password
+    });
+    closeModal('resetPassword');
+    showToast('密码已重置，请把新密码通知用户', 'success');
+  } catch (error) {
+    showToast('重置密码失败：' + error.message, 'error');
+  }
 }
 
 // ═══════════ CHART ═══════════
@@ -2238,6 +2463,28 @@ function showToast(msg, type='success') {
 }
 
 // ═══════════ NAV ═══════════
+function applyAdminPermissions() {
+  const allowed = new Set(currentAdminPermissions.sections || []);
+  document.querySelectorAll('[data-section]').forEach(el => {
+    const section = el.dataset.section;
+    el.style.display = canManageSection(section) ? '' : 'none';
+  });
+  document.querySelectorAll('.page').forEach(page => {
+    const section = page.id.replace('page-', '');
+    if (section && !canManageSection(section)) page.classList.remove('active');
+  });
+  const userNav = document.querySelector('[data-section="users"]');
+  const paymentNav = document.querySelector('[data-section="payment"]');
+  if (userNav) userNav.style.display = canManageSection('users') ? '' : 'none';
+  if (paymentNav) paymentNav.style.display = canManageSection('payment') ? '' : 'none';
+  const topReviewBtn = document.querySelector('.topbar-btn[onclick*="review"]');
+  if (topReviewBtn) topReviewBtn.style.display = canManageSection('review') ? '' : 'none';
+  if (!document.querySelector('.page.active')) {
+    const first = ADMIN_ALL_SECTIONS.find(section => canManageSection(section));
+    if (first) showPage(first, document.querySelector(`[data-section="${first}"]`));
+  }
+}
+
 const pageMeta = {
   dashboard: { title:'数据仪表盘', sub:'概览' },
   listings:  { title:'信息管理', sub:'内容管理 / 全部信息' },
@@ -2249,6 +2496,10 @@ const pageMeta = {
 };
 
 function showPage(name, el) {
+  if (!canManageSection(name)) {
+    showToast('你没有这个版面的管理权限', 'error');
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
@@ -2267,11 +2518,12 @@ function toggleSidebar() {
 // ═══════════ INIT ═══════════
 let dashboardInitialized = false;
 function initDashboard() {
-  renderListings(allListings);
-  renderReview();
-  renderReports();
-  renderPinned();
-  renderUsers(allUsers);
+  applyAdminPermissions();
+  if (canManageSection('listings')) renderListings(allListings);
+  if (canManageSection('review')) renderReview();
+  if (canManageSection('reports')) renderReports();
+  if (canManageSection('pinned')) renderPinned();
+  if (canManageSection('users')) renderUsers(allUsers);
   if (!dashboardInitialized) {
     renderCatChart();
     renderCityChart();
@@ -2280,10 +2532,10 @@ function initDashboard() {
   document.getElementById('sbUrl').value = SUPABASE_URL;
   document.getElementById('sbKeyStatus').value = '公开客户端密钥 + 管理员账号权限';
   loadRealStats();
-  loadRealListings();
-  loadRealReview();
-  loadRealReports();
-  loadRealUsers();
+  if (canManageSection('listings')) loadRealListings();
+  if (canManageSection('review')) loadRealReview();
+  if (canManageSection('reports')) loadRealReports();
+  if (canManageSection('users')) loadRealUsers();
 }
 
 requireAdmin().then(ok => { if (ok) initDashboard(); });
