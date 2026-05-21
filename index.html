@@ -9,8 +9,17 @@
 <meta property="og:site_name" content="西班牙生活通">
 <meta property="og:title" content="西班牙生活通 - 西班牙华人生活服务平台">
 <meta property="og:description" content="面向西班牙华人社区的招工、租房、生意转让、二手和生活服务信息平台。">
-<meta property="og:image" content="https://taobao-espana.vercel.app/assets/icons/share-logo-20260521.png">
+<meta property="og:image" content="https://taobao-espana.vercel.app/assets/icons/wechat-share-logo-20260521.jpg">
+<meta property="og:image:secure_url" content="https://taobao-espana.vercel.app/assets/icons/wechat-share-logo-20260521.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="300">
+<meta property="og:image:height" content="300">
 <meta property="og:url" content="https://taobao-espana.vercel.app/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="西班牙生活通 - 西班牙华人生活服务平台">
+<meta name="twitter:description" content="面向西班牙华人社区的招工、租房、生意转让、二手和生活服务信息平台。">
+<meta name="twitter:image" content="https://taobao-espana.vercel.app/assets/icons/wechat-share-logo-20260521.jpg">
+<link rel="image_src" href="https://taobao-espana.vercel.app/assets/icons/wechat-share-logo-20260521.jpg">
 <meta name="theme-color" content="#D42B2B">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3088,12 +3097,20 @@ window.openPublishPage = openPublishPage;
 
 function updateDocumentShareMeta(listing) {
   const desc = [getListingDisplayCategory(listing), normalizeProvinceName(listing.city), listing.address, listing.price || '面议'].filter(Boolean).join(' · ');
-  document.title = `${listing.title} - 西班牙生活通`;
+  const title = `西班牙生活通｜${listing.title}`;
+  const logo = 'https://taobao-espana.vercel.app/assets/icons/wechat-share-logo-20260521.jpg';
+  document.title = title;
   [
     ['meta[name="description"]', desc],
-    ['meta[property="og:title"]', `${listing.title} - 西班牙生活通`],
+    ['meta[property="og:site_name"]', '西班牙生活通'],
+    ['meta[property="og:title"]', title],
     ['meta[property="og:description"]', desc],
-    ['meta[property="og:url"]', getListingShareUrl(listing.id)]
+    ['meta[property="og:image"]', logo],
+    ['meta[property="og:image:secure_url"]', logo],
+    ['meta[property="og:url"]', getListingShareUrl(listing.id)],
+    ['meta[name="twitter:title"]', title],
+    ['meta[name="twitter:description"]', desc],
+    ['meta[name="twitter:image"]', logo]
   ].forEach(([selector, content]) => {
     const el = document.querySelector(selector);
     if (el) el.setAttribute('content', content);
