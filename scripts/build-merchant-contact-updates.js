@@ -87,8 +87,13 @@ function extractContact(html, source) {
   const mailtoEmails = unique([...html.matchAll(/mailto:([^"'>\s]+)/gi)]
     .map(match => decodeURIComponent(match[1]))
     .filter(email => !email.includes('xinhua.es')));
+  const websiteLinks = unique([
+    ...[...html.matchAll(/网址：\s*<a\s+href=["']([^"']+)["']/gi)].map(match => match[1]),
+    ...[...html.matchAll(/Website:\s*<a\s+href=["']([^"']+)["']/gi)].map(match => match[1]),
+    ...[...html.matchAll(/<div class="address-row row-web">[\s\S]*?<a\s+href=["']([^"']+)["']/gi)].map(match => match[1])
+  ].filter(link => /^https?:\/\//i.test(link) && !/soufun\.es|xinhua\.es/i.test(link)));
 
-  const parts = unique([...telContacts, ...labeledPhones, ...wechat, ...mailtoEmails, ...cfEmails]);
+  const parts = unique([...telContacts, ...labeledPhones, ...wechat, ...mailtoEmails, ...cfEmails, ...websiteLinks]);
   if (!parts.length) return '';
   return parts.slice(0, source === 'xinhua.es' ? 2 : 4).join(' / ');
 }
