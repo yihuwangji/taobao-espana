@@ -636,6 +636,69 @@
     color: var(--ink-light);
   }
 
+  .merchant-filter-section {
+    background: #fffdf8;
+    border-top: 1px solid #f4eadc;
+    border-bottom: 1px solid #f4eadc;
+  }
+
+  .merchant-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+    gap: 10px;
+  }
+
+  .merchant-filter-card {
+    min-height: 72px;
+    border: 1.5px solid #eadfce;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    padding: 10px 11px;
+    text-align: left;
+    font-family: 'Noto Sans SC', sans-serif;
+    box-shadow: 0 6px 18px rgba(80,34,15,0.06);
+    transition: transform .2s, border-color .2s, background .2s, box-shadow .2s;
+  }
+
+  .merchant-filter-card:hover,
+  .merchant-filter-card.active {
+    transform: translateY(-2px);
+    border-color: #16a34a;
+    background: #f0fdf4;
+    box-shadow: 0 8px 22px rgba(22,163,74,.12);
+  }
+
+  .merchant-filter-icon {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: #ecfdf3;
+    font-size: 18px;
+  }
+
+  .merchant-filter-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  .merchant-filter-sub {
+    display: block;
+    margin-top: 3px;
+    font-size: 10.5px;
+    color: var(--ink-light);
+    line-height: 1.25;
+  }
+
   /* ===== LISTINGS GRID ===== */
   .listings-grid {
     display: grid;
@@ -751,6 +814,41 @@
     border-color: #07c160;
     background: #ecfff4;
     color: #04783d;
+  }
+
+  .merchant-claim-card {
+    border: 1.5px solid #bbf7d0;
+    border-radius: 10px;
+    background: #f0fdf4;
+    padding: 13px 14px;
+    margin-bottom: 14px;
+  }
+
+  .merchant-claim-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: #065f46;
+    margin-bottom: 4px;
+  }
+
+  .merchant-claim-text {
+    font-size: 12px;
+    line-height: 1.55;
+    color: #166534;
+    margin-bottom: 10px;
+  }
+
+  .merchant-claim-btn {
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    background: #16a34a;
+    color: white;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
   }
 
   .photo-upload-box {
@@ -1404,6 +1502,22 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
+    .merchant-filter-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .merchant-filter-card {
+      min-height: 68px;
+      padding: 9px;
+    }
+    .merchant-filter-icon {
+      width: 30px;
+      height: 30px;
+      flex-basis: 30px;
+      font-size: 16px;
+    }
+    .merchant-filter-name { font-size: 12px; }
+    .merchant-filter-sub { font-size: 10px; }
     .cat-card {
       min-height: 96px;
       padding: 13px 8px 10px;
@@ -1788,6 +1902,14 @@
   </div>
 </div>
 
+<div class="section merchant-filter-section">
+  <div class="section-title">
+    <h3>商家服务筛选</h3>
+    <a href="#" class="see-all" onclick="filterMerchant('all');return false;">商家黄页 →</a>
+  </div>
+  <div class="merchant-filter-grid" id="merchantFilterGrid"></div>
+</div>
+
 <hr class="section-divider">
 
 <!-- Latest listings -->
@@ -2170,8 +2292,25 @@ const catBadge = { '招工':'招聘','租房':'出租','生意':'转让','二手
 const catMap   = { worker:'招工', house:'租房', business:'生意', wholesale:'生意', wholesale_100:'生意', wholesale_bar:'生意', dating:'交友', goods:'二手物品', service:'服务', edu:'教育' };
 const uiCatMap = { '招工':'worker', '租房':'house', '生意':'business', '二手车':'goods', '交友':'dating', '二手物品':'goods', '服务':'service', '教育':'edu' };
 
+const merchantFilters = [
+  { id:'all', icon:'🏪', name:'商家黄页', sub:'店铺/机构/服务', categories:['生意','服务','教育'] },
+  { id:'renovation', icon:'🧰', name:'装修维修', sub:'装修/水电/空调', categories:['服务'], keywords:['装修','维修','水电','空调','安装'] },
+  { id:'convenience', icon:'🧾', name:'便民服务', sub:'跑腿/翻译/代办', categories:['服务'], keywords:['便民','跑腿','代办','翻译','证件'] },
+  { id:'logistics', icon:'📦', name:'物流集运', sub:'快递/清关/搬家', categories:['服务'], keywords:['物流','集运','快递','清关','搬家','转运'] },
+  { id:'legal', icon:'⚖️', name:'律师居留', sub:'签证/保险/会计', categories:['服务'], keywords:['律师','居留','签证','保险','会计','税务'] },
+  { id:'restaurant', icon:'🍽', name:'餐饮设备', sub:'厨具/酒吧/货源', categories:['生意','二手物品'], keywords:['餐饮设备','厨具','冰箱','酒吧','货源','设备'] },
+  { id:'health', icon:'🩺', name:'理疗健康', sub:'诊所/牙医/按摩', categories:['服务'], keywords:['理疗','按摩','针灸','牙医','诊所','健康'] },
+  { id:'property', icon:'🏘', name:'房产中介', sub:'买房/租房/管理', categories:['租房','服务'], keywords:['房产','中介','买房','卖房','租房','管理'] },
+  { id:'beauty', icon:'💅', name:'美容美发', sub:'美甲/美睫/理发', categories:['服务'], keywords:['美容','美发','美甲','美睫','理发'] },
+  { id:'travel', icon:'🚐', name:'旅游接送', sub:'包车/机票/导游', categories:['服务'], keywords:['旅游','接送','包车','机票','导游','机场'] },
+  { id:'education', icon:'📚', name:'教育培训', sub:'语言/驾校/补习', categories:['教育'], keywords:['培训','语言','驾校','补习','中文','西语'] },
+  { id:'vehicles', icon:'🚗', name:'车辆买卖', sub:'二手车/修车/保险', categories:['二手车','二手物品','服务'], keywords:['汽车','二手车','修车','车辆','保险','面包车'] }
+];
+
 let currentCat = 'all';
 let currentCity = '全部';
+let currentMerchant = '';
+let currentClaimListing = null;
 let allListings = [...fallbackListings]; // 先用备用数据
 
 const SPAIN_PROVINCES_BY_POPULATION = [
@@ -2235,6 +2374,56 @@ function provinceOptionsHtml(selected = '', includeAll = false) {
   )).join('');
 }
 
+function getMerchantFilter(id = currentMerchant) {
+  return merchantFilters.find(item => item.id === id) || null;
+}
+
+function renderMerchantFilters() {
+  const grid = document.getElementById('merchantFilterGrid');
+  if (!grid) return;
+  grid.innerHTML = merchantFilters.map(item => `
+    <button class="merchant-filter-card${currentMerchant === item.id ? ' active' : ''}" data-merchant="${escapeHTML(item.id)}" onclick="filterMerchant('${escapeHTML(item.id)}')" type="button">
+      <span class="merchant-filter-icon">${escapeHTML(item.icon)}</span>
+      <span>
+        <span class="merchant-filter-name">${escapeHTML(item.name)}</span>
+        <span class="merchant-filter-sub">${escapeHTML(item.sub)}</span>
+      </span>
+    </button>
+  `).join('');
+}
+
+function updateMerchantFilterUI() {
+  document.querySelectorAll('.merchant-filter-card').forEach(card => card.classList.remove('active'));
+  if (!currentMerchant) return;
+  const active = document.querySelector(`.merchant-filter-card[data-merchant="${currentMerchant}"]`);
+  if (active) active.classList.add('active');
+}
+
+function merchantOrFilter(filter) {
+  if (!filter?.keywords?.length) return '';
+  const columns = ['title', 'description', 'address'];
+  return filter.keywords.flatMap(keyword => columns.map(column => `${column}.ilike.%${keyword}%`)).join(',');
+}
+
+function applyMerchantQuery(query) {
+  const filter = getMerchantFilter();
+  if (!filter) return query;
+  if (filter.categories?.length) query = query.in('category', filter.categories);
+  const orFilter = merchantOrFilter(filter);
+  return orFilter ? query.or(orFilter) : query;
+}
+
+function matchesMerchantFilter(listing) {
+  const filter = getMerchantFilter();
+  if (!filter) return true;
+  const category = catMap[listing.cat] || listing.tags?.[0] || listing.badge || '';
+  const categoryOk = !filter.categories?.length || filter.categories.includes(category);
+  if (!categoryOk) return false;
+  if (!filter.keywords?.length) return true;
+  const haystack = [listing.title, listing.address, listing.tags?.join(' ')].join(' ').toLowerCase();
+  return filter.keywords.some(keyword => haystack.includes(String(keyword).toLowerCase()));
+}
+
 function populateProvinceControls() {
   ['regCity', 'postCity', 'editCity', 'accCity'].forEach(id => {
     const select = document.getElementById(id);
@@ -2292,6 +2481,7 @@ async function loadListings() {
         if(cat) query = query.eq('category', cat);
       }
     }
+    query = applyMerchantQuery(query);
     if (currentCity !== '全部') query = query.in('city', provinceQueryValues(currentCity));
 
     const { data, error } = await query;
@@ -2479,6 +2669,22 @@ function renderBusinessMap(address, city) {
           </div>
         </div>
       </a>
+    </div>`;
+}
+
+function isClaimableMerchant(listing) {
+  return listing
+    && listing.user_id === null
+    && ['生意', '服务', '教育'].includes(String(listing.category || ''));
+}
+
+function renderMerchantClaimBox(listing) {
+  if (!isClaimableMerchant(listing)) return '';
+  return `
+    <div class="merchant-claim-card">
+      <div class="merchant-claim-title">这是平台代登记的商家信息</div>
+      <div class="merchant-claim-text">如果你是这家商家的老板或负责人，可以提交认领。审核通过后可自己修改资料、添加照片、做VIP置顶和广告展示。</div>
+      <button class="merchant-claim-btn" onclick="openClaimMerchant()" type="button">我是商家，申请认领</button>
     </div>`;
 }
 
@@ -2732,6 +2938,7 @@ function renderListings() {
     }
   }
   if(currentCity !== '全部') filtered = filtered.filter(l => normalizeProvinceName(l.city) === currentCity);
+  if(currentMerchant) filtered = filtered.filter(matchesMerchantFilter);
 
   if(filtered.length === 0) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-light)"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:16px">暂无相关信息</div><div style="font-size:13px;margin-top:8px">试试其他条件或发布新信息</div></div>';
@@ -2769,6 +2976,8 @@ function renderListings() {
 
 function filterCat(cat, el) {
   currentCat = cat;
+  currentMerchant = '';
+  updateMerchantFilterUI();
   document.querySelectorAll('.nav-cat').forEach(e => e.classList.remove('active'));
   if(el) el.classList.add('active');
   const titles = {
@@ -2777,6 +2986,19 @@ function filterCat(cat, el) {
     dating:'交友相亲', goods:'二手物品/车', service:'生活服务', edu:'教育培训'
   };
   document.getElementById('listingTitle').textContent = titles[cat] || '最新信息';
+  loadListings();
+  document.getElementById('listingsGrid').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function filterMerchant(id) {
+  currentMerchant = id || 'all';
+  currentCat = 'all';
+  document.querySelectorAll('.nav-cat').forEach(e => e.classList.remove('active'));
+  const allNav = document.querySelector('.nav-cat');
+  if (allNav) allNav.classList.add('active');
+  updateMerchantFilterUI();
+  const filter = getMerchantFilter();
+  document.getElementById('listingTitle').textContent = filter ? `商家黄页 · ${filter.name}` : '商家黄页';
   loadListings();
   document.getElementById('listingsGrid').scrollIntoView({behavior:'smooth', block:'start'});
 }
@@ -2804,7 +3026,7 @@ async function viewListing(id) {
 
   try {
     const { data, error } = await sb.from('listings')
-      .select('id, title, description, category, city, price, address, contact, images, created_at, is_pinned, view_count')
+      .select('id, title, description, category, city, price, address, contact, images, created_at, is_pinned, view_count, user_id')
       .eq('id', id)
       .eq('status', 'approved')
       .single();
@@ -2824,6 +3046,7 @@ async function viewListing(id) {
     const safePrice = escapeHTML(data.price || '面议');
     const safeCity = escapeHTML(normalizeProvinceName(data.city));
     const safeContact = escapeHTML(data.contact || '未填写');
+    currentClaimListing = data;
     updateDocumentShareMeta(data);
 
     document.getElementById('detailContent').innerHTML = `
@@ -2837,6 +3060,7 @@ async function viewListing(id) {
         </div>
         ${renderDetailPhotos(data.images)}
         ${renderBusinessMap(data.address, data.city)}
+        ${renderMerchantClaimBox(data)}
         ${data.description ? `<div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px">
           <div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">📝 详细描述</div>
           <div style="font-size:14px;line-height:1.7;color:#333">${safeDescription}</div>
@@ -2897,7 +3121,7 @@ async function doSearch() {
         title: r.title, price: r.price || '面议', address: r.address || '', images: normalizeListingImages(r.images), unit: '',
         tags: [r.category, normalizeProvinceName(r.city)], time: timeAgo(r.created_at)
       }));
-      currentCat = 'all'; currentCity = '全部'; populateProvinceControls();
+      currentCat = 'all'; currentCity = '全部'; currentMerchant = ''; populateProvinceControls(); updateMerchantFilterUI();
       showLoading(false); renderListings();
       showToast(`搜索"${q}" 找到 ${uniqueRows.length} 条结果`);
     } else {
@@ -2954,6 +3178,7 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 });
 document.addEventListener('DOMContentLoaded', function() {
   populateProvinceControls();
+  renderMerchantFilters();
   syncModalScrollLock();
   applyWeChatBrowserHints();
   trackReferralVisit();
@@ -3190,6 +3415,56 @@ async function submitReport() {
   showToast('✅ 举报已提交！我们将在24小时内处理，感谢您的反馈。');
 }
 
+function openClaimMerchant() {
+  if (!currentClaimListing) return;
+  const title = document.getElementById('claimListingTitle');
+  if (title) title.textContent = currentClaimListing.title || '商家信息';
+  ['claimName', 'claimContact', 'claimProof'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  openModal('claimMerchant');
+}
+
+async function submitMerchantClaim() {
+  if (!currentClaimListing?.id) { showToast('商家信息加载失败，请重新打开详情', true); return; }
+  const name = document.getElementById('claimName')?.value.trim();
+  const contact = document.getElementById('claimContact')?.value.trim();
+  const proof = document.getElementById('claimProof')?.value.trim();
+  if (!name) { showToast('请填写商家负责人姓名或称呼', true); return; }
+  if (!contact) { showToast('请填写微信或手机号，方便客服联系', true); return; }
+  if (!proof) { showToast('请简单说明你如何证明这是你的商家', true); return; }
+
+  const btn = document.getElementById('claimBtn');
+  if (btn) { btn.textContent = '提交中…'; btn.disabled = true; }
+  const detail = [
+    `认领商家：${currentClaimListing.title}`,
+    `负责人：${name}`,
+    `联系方式：${contact}`,
+    `证明说明：${proof}`,
+    `省份：${normalizeProvinceName(currentClaimListing.city) || ''}`,
+    `地址：${currentClaimListing.address || ''}`
+  ].join('\n');
+
+  const { error } = await sb.from('reports').insert([{
+    listing_id: currentClaimListing.id,
+    title: `商家认领：${currentClaimListing.title}`,
+    type: '商家认领',
+    reason: '商家认领',
+    description: detail,
+    detail,
+    contact,
+    reporter_id: currentUser?.id || null,
+    status: 'pending',
+    created_at: new Date().toISOString()
+  }]);
+
+  if (btn) { btn.textContent = '提交认领申请'; btn.disabled = false; }
+  if (error) { showToast('认领申请提交失败：' + error.message, true); return; }
+  closeModal('claimMerchant');
+  showToast('✅ 认领申请已提交，客服会核实后联系你');
+}
+
 async function doLogout() {
   await sb.auth.signOut();
   currentUser = null;
@@ -3291,6 +3566,7 @@ async function handleInitialDeepLink() {
 }
 
 populateProvinceControls();
+renderMerchantFilters();
 loadListings().then(handleInitialDeepLink);
 </script>
 
@@ -3486,6 +3762,35 @@ loadListings().then(handleInitialDeepLink);
         </div>
       </div>
       <p style="margin-top:16px;font-size:12px;color:#999;text-align:center">我们通常在24小时内回复您的咨询</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 商家认领 MODAL ===== -->
+<div class="modal-overlay" id="claimMerchantModal">
+  <div class="modal relative" style="max-width:500px">
+    <button class="modal-close" onclick="closeModal('claimMerchant')">✕</button>
+    <h3 style="font-size:20px;font-weight:700;color:var(--red);margin-bottom:4px">🏪 商家认领</h3>
+    <p style="font-size:13px;color:#999;margin-bottom:16px">请留下联系方式和简单证明，客服核实后会把商家信息交给你管理。</p>
+    <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:12px;margin-bottom:14px">
+      <div style="font-size:11px;color:#047857;font-weight:800;margin-bottom:4px">要认领的商家</div>
+      <div id="claimListingTitle" style="font-size:15px;font-weight:900;color:#064e3b;line-height:1.45">商家信息</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:4px">负责人姓名 / 称呼 <span style="color:var(--red)">*</span></label>
+        <input id="claimName" type="text" placeholder="如：王老板 / 店长小陈" style="width:100%;padding:10px 12px;border:1.5px solid #e0c9a6;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit">
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:4px">微信 / 手机 / WhatsApp <span style="color:var(--red)">*</span></label>
+        <input id="claimContact" type="text" placeholder="方便客服核实联系" style="width:100%;padding:10px 12px;border:1.5px solid #e0c9a6;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit">
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:4px">认领证明 <span style="color:var(--red)">*</span></label>
+        <textarea id="claimProof" placeholder="例如：我是店主，可提供营业执照/店面照片/Google商家后台/朋友圈广告截图等。" rows="4" style="width:100%;padding:10px 12px;border:1.5px solid #e0c9a6;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit;resize:vertical"></textarea>
+      </div>
+      <button id="claimBtn" onclick="submitMerchantClaim()" style="width:100%;padding:13px;background:#16a34a;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:4px">提交认领申请</button>
+      <p style="font-size:11px;color:#999;text-align:center;margin-top:-4px">审核通过后可登录账号管理商家资料，后续可开通VIP置顶和广告展示。</p>
     </div>
   </div>
 </div>
