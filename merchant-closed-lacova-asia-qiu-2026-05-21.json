@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-05-21T18:31:24.215Z",
+  "action": "deleted_closed_imported_merchant",
+  "reason": "Owner/user reported Importacion Asia Qiu S.L. is closed",
+  "deleted": {
+    "id": 348,
+    "title": "Importacion Asia Qiu S.L. La Cova bazar mayorista",
+    "city": "Valencia",
+    "address": "Avenida Mas de l'Oli 196 Bajo, Poligono Industrial La Cova, 46940 Manises, Valencia",
+    "status": "approved",
+    "description": "平台代登记商家信息，商家待认领。Public directories list IMPORTACION ASIA QIU S.L. in Poligono Industrial La Cova, Manises, as bazar/services wholesale activity. Chinese surname Qiu appears in the company name and public record clues. Sources: donde-estamos.es and qdq.com public business pages.",
+    "user_id": null
+  },
+  "verification": {
+    "remaining_rows_with_id": 0
+  }
+}
