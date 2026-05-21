@@ -742,7 +742,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     padding: 6px 8px;
     font-size: 11px;
   }
-  .topbar-right .topbar-btn:nth-child(2) { display: none; }
+  .topbar-right .topbar-btn:nth-child(3) { display: none; }
   .content {
     overflow-x: hidden;
     padding: 12px;
@@ -791,10 +791,49 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .card-actions .btn {
     width: 100%;
   }
-  table { min-width: 720px; }
-  th, td { padding: 10px 12px; }
+  table {
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+  }
+  thead { display: none; }
+  tbody, tr, td { display: block; width: 100%; }
+  tr {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 10px;
+  }
+  tr:hover td { background: transparent; }
+  td {
+    display: grid;
+    grid-template-columns: 86px minmax(0,1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    min-width: 0;
+  }
+  td:last-child { border-bottom: none; }
+  td::before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  td[data-label="选择"] {
+    grid-template-columns: 1fr;
+    padding-bottom: 2px;
+  }
+  td[data-label="选择"]::before { display: none; }
+  .action-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .action-btns .btn { width: 100%; }
   .pagination {
-    min-width: 720px;
+    min-width: 0;
     padding: 10px 12px;
   }
   .chart-container { padding: 14px 12px; }
@@ -863,8 +902,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .topbar-right .topbar-btn { font-size: 10.5px; }
   .content { padding: 10px; }
   .card-actions { grid-template-columns: 1fr; }
-  table,
-  .pagination { min-width: 680px; }
+  td { grid-template-columns: 76px minmax(0,1fr); }
+  .action-btns { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -949,9 +988,12 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     <div class="topbar-right">
       <div style="position:relative">
         <button class="topbar-btn" onclick="showPage('review',document.querySelector('[onclick*=review]'))">
-          ⏳ 待审核 <span style="color:var(--red);font-weight:700">8</span>
+          ⏳ 待审核 <span id="topPendingCount" style="color:var(--red);font-weight:700">8</span>
         </button>
       </div>
+      <button class="topbar-btn" id="newUsersBtn" onclick="showPage('users',document.querySelector('[data-section=users]'))">
+        🔔 新注册 <span id="newUsersCount" style="color:var(--gold);font-weight:700">0</span>
+      </button>
       <button class="topbar-btn" onclick="showToast('系统运行正常 ✓','success')">🟢 系统正常</button>
       <button class="topbar-btn danger" onclick="confirmLogout()">退出登录</button>
     </div>
@@ -965,13 +1007,13 @@ tr:hover td { background: rgba(255,255,255,0.02); }
       <div class="stats-grid">
         <div class="stat-card" style="--card-accent:var(--blue)">
           <span class="stat-card-icon">👥</span>
-          <div class="stat-card-val">8,847</div>
+          <div class="stat-card-val" data-stat="users">8,847</div>
           <div class="stat-card-label">注册用户总数</div>
-          <div class="stat-card-change change-up">▲ 今日新增 +34</div>
+          <div class="stat-card-change change-up">▲ 今日新增 <span data-stat="new-users">0</span></div>
         </div>
         <div class="stat-card" style="--card-accent:var(--green)">
           <span class="stat-card-icon">📋</span>
-          <div class="stat-card-val">12,456</div>
+          <div class="stat-card-val" data-stat="listings">12,456</div>
           <div class="stat-card-label">有效信息总数</div>
           <div class="stat-card-change change-up">▲ 今日发布 +87</div>
         </div>
@@ -1040,8 +1082,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
             <div class="activity-item">
               <div class="activity-dot" style="background:var(--blue-glow)">👤</div>
               <div>
-                <div class="activity-text">新用户注册 +34 人（今日）</div>
-                <div class="activity-time">统计截至现在</div>
+                <div class="activity-text">今日新用户注册 <span id="activityNewUsers">0</span> 人</div>
+                <div class="activity-time" id="activityNewUsersTime">统计截至现在</div>
               </div>
             </div>
           </div>
@@ -1065,6 +1107,12 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         <div class="card-header">
           <div class="card-title">📋 全部信息管理</div>
           <div class="card-actions">
+            <input type="file" id="listingCsvInput" accept=".csv,text/csv" style="display:none" onchange="uploadListingsCsv(this)">
+            <button class="btn btn-gold" onclick="document.getElementById('listingCsvInput').click()">批量上传CSV</button>
+            <button class="btn btn-green" onclick="batchListingAction('online')">批量上架</button>
+            <button class="btn btn-red" onclick="batchListingAction('offline')">批量下架</button>
+            <button class="btn btn-blue" onclick="batchListingAction('approve')">批量审批</button>
+            <button class="btn btn-red" onclick="batchListingAction('delete')">批量删除</button>
             <input class="search-input" id="listingSearch" placeholder="🔍 搜索商家名/电话/城市/地址/关键词…" oninput="filterListings()">
             <select class="select-input" id="catFilter" onchange="filterListings()">
               <option value="">全部分类</option>
@@ -1088,6 +1136,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           <table>
             <thead>
               <tr>
+                <th><input type="checkbox" id="listingCheckAll" onchange="toggleListingAll(this)"></th>
                 <th>ID</th>
                 <th>标题</th>
                 <th>分类</th>
@@ -1121,8 +1170,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         <div class="card-header">
           <div class="card-title">⏳ 待审核信息 <span style="color:var(--red);font-family:JetBrains Mono" id="reviewCount">(8)</span></div>
           <div class="card-actions">
-            <button class="btn btn-green" onclick="approveAll()">✅ 全部通过</button>
-            <button class="btn btn-red" onclick="rejectAll()">❌ 全部拒绝</button>
+            <button class="btn btn-green" onclick="approveAll()">✅ 批量通过</button>
+            <button class="btn btn-red" onclick="rejectAll()">❌ 批量拒绝</button>
           </div>
         </div>
         <div style="overflow-x:auto">
@@ -1284,6 +1333,25 @@ tr:hover td { background: rgba(255,255,255,0.02); }
                 <option>发布后审核</option>
                 <option>免审核（不推荐）</option>
               </select>
+            </div>
+          </div>
+          <div class="config-box">
+            <h4>🔐 后台密码</h4>
+            <div class="config-row">
+              <label>当前账号</label>
+              <input type="text" id="currentAdminEmail" readonly value="">
+            </div>
+            <div class="config-row">
+              <label>新密码</label>
+              <input type="password" id="adminNewPassword" autocomplete="new-password" placeholder="管理员密码至少8位；手机号账号可用4位数字">
+            </div>
+            <div class="config-row">
+              <label>确认密码</label>
+              <input type="password" id="adminNewPassword2" autocomplete="new-password" placeholder="再次输入新密码">
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-red" onclick="changeAdminPassword()">修改当前后台密码</button>
+              <span style="font-size:12px;color:var(--text-muted);line-height:28px">修改后请用新密码重新登录后台。</span>
             </div>
           </div>
           <div class="config-box">
@@ -1483,6 +1551,32 @@ function canManageSection(section) {
   return isSuperAdmin() || currentAdminPermissions.sections.includes(section);
 }
 
+function updatePendingBadges(count) {
+  const value = Number(count || 0);
+  const text = String(value);
+  const pendingEl = document.getElementById('pendingCount');
+  const reviewCountEl = document.getElementById('reviewCount');
+  const topPendingEl = document.getElementById('topPendingCount');
+  if (pendingEl) pendingEl.textContent = text;
+  if (reviewCountEl) reviewCountEl.textContent = `(${text})`;
+  if (topPendingEl) topPendingEl.textContent = text;
+  const reviewBadge = document.querySelector('[data-section="review"] .nav-badge');
+  if (reviewBadge) reviewBadge.textContent = text;
+}
+
+function updateNewUserNotice(count) {
+  const value = Number(count || 0);
+  const text = String(value);
+  const newUsersCount = document.getElementById('newUsersCount');
+  const activityNewUsers = document.getElementById('activityNewUsers');
+  const activityTime = document.getElementById('activityNewUsersTime');
+  const statNewUsers = document.querySelector('[data-stat="new-users"]');
+  if (newUsersCount) newUsersCount.textContent = text;
+  if (activityNewUsers) activityNewUsers.textContent = text;
+  if (activityTime) activityTime.textContent = `统计截至 ${new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
+  if (statNewUsers) statNewUsers.textContent = `+${text}`;
+}
+
 function setAuthError(message) {
   const box = document.getElementById('adminAuthError');
   if (box) box.textContent = message || '';
@@ -1518,6 +1612,8 @@ async function requireAdmin() {
   if (nameEl) nameEl.textContent = profile.nickname || session.user.email || '管理员';
   const roleEl = document.querySelector('.admin-role');
   if (roleEl) roleEl.textContent = role === 'super_admin' ? 'Super Admin' : sections.map(s => ADMIN_SECTION_LABELS[s]).join(' / ');
+  const emailEl = document.getElementById('currentAdminEmail');
+  if (emailEl) emailEl.value = session.user.email || '';
   applyAdminPermissions();
   return true;
 }
@@ -1611,7 +1707,7 @@ async function loadRealReview() {
       time: new Date(r.created_at).toLocaleString('zh-CN'),
       desc: r.description || ''
     }));
-    document.getElementById('pendingCount').textContent = reviewItems.length;
+    updatePendingBadges(reviewItems.length);
   }
   renderReview();
 }
@@ -1663,14 +1759,18 @@ async function loadRealUsers() {
 }
 
 async function loadRealStats() {
-  const [{ count: userCount }, { count: listingCount }, { count: pendingCount }] = await Promise.all([
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const [{ count: userCount }, { count: listingCount }, { count: pendingCount }, { count: newUserCount }] = await Promise.all([
     sb.from('profiles').select('*', { count:'exact', head:true }),
     sb.from('listings').select('*', { count:'exact', head:true }).eq('status','approved'),
     sb.from('listings').select('*', { count:'exact', head:true }).eq('status','pending'),
+    sb.from('profiles').select('*', { count:'exact', head:true }).gte('created_at', todayStart.toISOString()),
   ]);
   document.querySelector('[data-stat=users]')  && (document.querySelector('[data-stat=users]').textContent  = (userCount||0).toLocaleString());
   document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = (listingCount||0).toLocaleString());
-  document.getElementById('pendingCount').textContent = pendingCount || 0;
+  updatePendingBadges(pendingCount || 0);
+  updateNewUserNotice(newUserCount || 0);
 }
 
 // ═══════════ REAL APPROVE / REJECT ═══════════
@@ -1783,15 +1883,16 @@ function renderListings(data) {
   const statusMap = { '已上线':'badge-approved', '待审核':'badge-pending', '已下架':'badge-rejected' };
   document.getElementById('listingsTbody').innerHTML = data.map(l => `
     <tr>
-      <td><span style="font-family:JetBrains Mono;font-size:11px;color:var(--text-muted)">${l.id}</span></td>
-      <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.title)}</td>
-      <td><span class="badge badge-active">${esc(l.cat)}</span></td>
-      <td>📍 ${esc(l.city)}</td>
-      <td style="max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px">${esc(l.contact || '—')}</td>
-      <td>${esc(l.user)}</td>
-      <td><span class="badge ${statusMap[l.status]||'badge-active'}">${l.status}</span></td>
-      <td style="font-size:11px;color:var(--text-dim);white-space:nowrap">${l.time}</td>
-      <td>
+      <td data-label="选择"><input type="checkbox" class="listing-row-check" data-id="${l._id || String(l.id).replace(/\D/g,'')}"></td>
+      <td data-label="ID"><span style="font-family:JetBrains Mono;font-size:11px;color:var(--text-muted)">${l.id}</span></td>
+      <td data-label="标题" style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.title)}</td>
+      <td data-label="分类"><span class="badge badge-active">${esc(l.cat)}</span></td>
+      <td data-label="城市">📍 ${esc(l.city)}</td>
+      <td data-label="联系方式" style="max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px">${esc(l.contact || '—')}</td>
+      <td data-label="发布者">${esc(l.user)}</td>
+      <td data-label="状态"><span class="badge ${statusMap[l.status]||'badge-active'}">${l.status}</span></td>
+      <td data-label="发布时间" style="font-size:11px;color:var(--text-dim);white-space:nowrap">${l.time}</td>
+      <td data-label="操作">
         <div class="action-btns">
           ${l.status==='已上线' ? `<button class="btn btn-red" onclick="takeDown('${l.id}')">下架</button>` : `<button class="btn btn-green" onclick="bringUp('${l.id}')">上线</button>`}
           <button class="btn btn-blue" onclick="openListingModal('${l.id}')">详情</button>
@@ -1884,19 +1985,136 @@ function filterListings() {
   renderListings(data);
 }
 
+function selectedListingIds() {
+  return [...document.querySelectorAll('.listing-row-check:checked')]
+    .map(input => Number(input.dataset.id))
+    .filter(Number.isInteger);
+}
+
+function toggleListingAll(el) {
+  document.querySelectorAll('.listing-row-check').forEach(input => { input.checked = el.checked; });
+}
+
+async function runListingBatch(action, ids) {
+  return adminApi('/api/admin-listing-batch', { action, ids });
+}
+
+async function batchListingAction(action, ids = selectedListingIds()) {
+  const labels = {
+    approve: '审批通过',
+    online: '上架',
+    offline: '下架',
+    reject: '拒绝',
+    delete: '删除'
+  };
+  const selected = [...new Set(ids.map(Number).filter(Number.isInteger))];
+  if (!selected.length) {
+    showToast('请先勾选要批量操作的信息', 'error');
+    return;
+  }
+  const label = labels[action] || '操作';
+  if (action === 'delete' && !confirm(`确定批量删除 ${selected.length} 条信息吗？删除后无法恢复。`)) return;
+  try {
+    const result = await runListingBatch(action, selected);
+    showToast(`已${label} ${result.changed || selected.length} 条信息`, action === 'delete' || action === 'offline' || action === 'reject' ? 'info' : 'success');
+    const listingCheckAll = document.getElementById('listingCheckAll');
+    const reviewCheckAll = document.getElementById('checkAll');
+    if (listingCheckAll) listingCheckAll.checked = false;
+    if (reviewCheckAll) reviewCheckAll.checked = false;
+    await Promise.all([
+      canManageSection('listings') ? loadRealListings() : Promise.resolve(),
+      canManageSection('review') ? loadRealReview() : Promise.resolve(),
+      loadRealStats()
+    ]);
+  } catch (error) {
+    showToast(`批量${label}失败：${error.message}`, 'error');
+  }
+}
+
+function parseCsvLine(line) {
+  const cells = [];
+  let cell = '';
+  let quoted = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    const next = line[i + 1];
+    if (ch === '"' && quoted && next === '"') {
+      cell += '"';
+      i++;
+    } else if (ch === '"') {
+      quoted = !quoted;
+    } else if (ch === ',' && !quoted) {
+      cells.push(cell.trim());
+      cell = '';
+    } else {
+      cell += ch;
+    }
+  }
+  cells.push(cell.trim());
+  return cells;
+}
+
+function parseListingsCsv(text) {
+  const lines = String(text || '').replace(/^\uFEFF/, '').split(/\r?\n/).filter(line => line.trim());
+  if (lines.length < 2) return [];
+  const headers = parseCsvLine(lines[0]).map(h => normalizeSearchText(h));
+  const alias = {
+    title: ['title', '标题', '名称', '商家名', 'name'],
+    category: ['category', '分类', '类别'],
+    city: ['city', '城市', '地区', '省份'],
+    address: ['address', '地址'],
+    contact: ['contact', '联系方式', '电话', '手机', '微信'],
+    description: ['description', '描述', '介绍', '详情'],
+    price: ['price', '价格']
+  };
+  const headerIndex = key => headers.findIndex(header => alias[key].some(name => normalizeSearchText(name) === header));
+  const indexes = Object.fromEntries(Object.keys(alias).map(key => [key, headerIndex(key)]));
+  return lines.slice(1).map(line => {
+    const cells = parseCsvLine(line);
+    const row = {};
+    Object.entries(indexes).forEach(([key, index]) => {
+      if (index >= 0) row[key] = cells[index] || '';
+    });
+    return row;
+  }).filter(row => row.title && row.contact);
+}
+
+async function uploadListingsCsv(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  try {
+    const rows = parseListingsCsv(await file.text());
+    if (!rows.length) {
+      showToast('CSV 里没有识别到有效信息，请包含标题和联系方式', 'error');
+      return;
+    }
+    const result = await adminApi('/api/admin-import-merchants', {
+      rows,
+      source: `admin csv upload: ${file.name}`
+    });
+    showToast(`批量上传完成：新增 ${result.imported || 0} 条，跳过 ${result.skipped || 0} 条`, 'success');
+    await loadRealListings();
+    await loadRealStats();
+  } catch (error) {
+    showToast('批量上传失败：' + error.message, 'error');
+  } finally {
+    input.value = '';
+  }
+}
+
 function renderReview() {
   document.getElementById('reviewCount').textContent = `(${reviewItems.length})`;
   document.getElementById('page-review').querySelector('.stat-card-val') && null;
   document.getElementById('reviewTbody').innerHTML = reviewItems.map((r,i) => `
     <tr>
-      <td><input type="checkbox" class="row-check" data-id="${r.id}"></td>
-      <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.title)}</td>
-      <td><span class="badge badge-active">${esc(r.cat)}</span></td>
-      <td>📍 ${esc(r.city)}</td>
-      <td>${esc(r.user)}</td>
-      <td style="font-size:12px">${esc(r.contact)}</td>
-      <td style="font-size:11px;color:var(--text-dim)">${r.time}</td>
-      <td>
+      <td data-label="选择"><input type="checkbox" class="row-check" data-id="${r.id}"></td>
+      <td data-label="标题" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.title)}</td>
+      <td data-label="分类"><span class="badge badge-active">${esc(r.cat)}</span></td>
+      <td data-label="城市">📍 ${esc(r.city)}</td>
+      <td data-label="发布者">${esc(r.user)}</td>
+      <td data-label="联系方式" style="font-size:12px">${esc(r.contact)}</td>
+      <td data-label="提交时间" style="font-size:11px;color:var(--text-dim)">${r.time}</td>
+      <td data-label="操作">
         <div class="action-btns">
           <button class="btn btn-blue" onclick="openReviewModal(${i})">详情</button>
           <button class="btn btn-green" onclick="approveItem(${i})">✅ 通过</button>
@@ -1911,13 +2129,13 @@ function renderReports() {
   const statusMap = { '未处理':'badge-reported', '处理中':'badge-pending', '已处理':'badge-approved' };
   document.getElementById('reportsTbody').innerHTML = reportItems.map(r => `
     <tr>
-      <td style="font-family:JetBrains Mono;font-size:11px;color:var(--text-muted)">${r.id}</td>
-      <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.listing)}</td>
-      <td>${esc(r.reason)}</td>
-      <td>${esc(r.reporter)}</td>
-      <td><span class="badge ${statusMap[r.status]||'badge-active'}">${r.status}</span></td>
-      <td style="font-size:11px;color:var(--text-dim)">${r.time}</td>
-      <td>
+      <td data-label="举报ID" style="font-family:JetBrains Mono;font-size:11px;color:var(--text-muted)">${r.id}</td>
+      <td data-label="被举报信息" style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.listing)}</td>
+      <td data-label="举报原因">${esc(r.reason)}</td>
+      <td data-label="举报人">${esc(r.reporter)}</td>
+      <td data-label="状态"><span class="badge ${statusMap[r.status]||'badge-active'}">${r.status}</span></td>
+      <td data-label="时间" style="font-size:11px;color:var(--text-dim)">${r.time}</td>
+      <td data-label="操作">
         <div class="action-btns">
           <button class="btn btn-green" onclick="resolveReport(${r._id})">标记处理</button>
           <button class="btn btn-red" onclick="dismissReport(${r._id})">驳回举报</button>
@@ -1931,14 +2149,14 @@ function renderReports() {
 function renderPinned() {
   document.getElementById('pinnedTbody').innerHTML = pinnedItems.map(p => `
     <tr>
-      <td>${esc(p.title)}</td>
-      <td><span class="badge badge-active">${esc(p.cat)}</span></td>
-      <td>📍 ${esc(p.city)}</td>
-      <td>${p.type}</td>
-      <td style="font-size:12px">${p.start}</td>
-      <td style="font-size:12px">${p.end}</td>
-      <td><span class="badge ${p.status==='进行中'?'badge-pinned':'badge-rejected'}">${p.status}</span></td>
-      <td>
+      <td data-label="信息标题">${esc(p.title)}</td>
+      <td data-label="分类"><span class="badge badge-active">${esc(p.cat)}</span></td>
+      <td data-label="城市">📍 ${esc(p.city)}</td>
+      <td data-label="置顶类型">${p.type}</td>
+      <td data-label="开始时间" style="font-size:12px">${p.start}</td>
+      <td data-label="到期时间" style="font-size:12px">${p.end}</td>
+      <td data-label="状态"><span class="badge ${p.status==='进行中'?'badge-pinned':'badge-rejected'}">${p.status}</span></td>
+      <td data-label="操作">
         <div class="action-btns">
           <button class="btn btn-red" onclick="showToast('已取消置顶','success')">取消置顶</button>
           ${p.status==='已到期'?`<button class="btn btn-gold" onclick="showToast('已续期7天','success')">续期</button>`:''}
@@ -1964,7 +2182,7 @@ function renderUsers(data) {
   const colors = ['#E53935','#3B82F6','#00C896','#F5A623','#8B5CF6'];
   document.getElementById('usersTbody').innerHTML = data.map((u,i) => `
     <tr>
-      <td>
+      <td data-label="用户">
         <div class="user-cell">
           <div class="user-avatar" style="background:${colors[i%5]}22;color:${colors[i%5]}">${esc(u.name[0] || '?')}</div>
           <div>
@@ -1973,16 +2191,16 @@ function renderUsers(data) {
           </div>
         </div>
       </td>
-      <td>📍 ${esc(u.city)}</td>
-      <td style="font-family:JetBrains Mono;font-size:12px">${esc(u.phone)}</td>
-      <td>
+      <td data-label="城市">📍 ${esc(u.city)}</td>
+      <td data-label="手机号" style="font-family:JetBrains Mono;font-size:12px">${esc(u.phone)}</td>
+      <td data-label="后台权限">
         <div><span class="badge ${u.role==='none'?'badge-active':(u.role==='super_admin'?'badge-pinned':'badge-approved')}">${esc(adminRoleLabel(u))}</span></div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:4px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(adminSectionsLabel(u))}</div>
       </td>
-      <td style="font-size:11px;color:var(--text-dim)">${u.reg}</td>
-      <td><span style="font-family:JetBrains Mono;color:var(--blue)">${u.posts}</span></td>
-      <td><span class="badge ${u.status==='正常'?'badge-approved':'badge-banned'}">${u.status}</span></td>
-      <td>
+      <td data-label="注册时间" style="font-size:11px;color:var(--text-dim)">${u.reg}</td>
+      <td data-label="发布数"><span style="font-family:JetBrains Mono;color:var(--blue)">${u.posts}</span></td>
+      <td data-label="状态"><span class="badge ${u.status==='正常'?'badge-approved':'badge-banned'}">${u.status}</span></td>
+      <td data-label="操作">
         <div class="action-btns">
           ${u.status==='正常'
             ? `<button class="btn btn-red" onclick="setBanTarget('${u._id || ''}')">封禁</button>`
@@ -2259,27 +2477,13 @@ function openReviewModal(idx) {
 async function approveItem(idx) {
   const r = reviewItems[idx];
   if(!r) return;
-  const { error } = await sb.from('listings').update({ status:'approved' }).eq('id', r._id);
-  if(error) { showToast('操作失败：'+error.message, 'error'); return; }
-  await sbLog('approve','listing', r._id);
-  reviewItems.splice(idx, 1);
-  renderReview();
-  document.getElementById('pendingCount').textContent = reviewItems.length;
-  showToast('✅ 审核通过，信息已上线', 'success');
-  loadRealListings();
+  await batchListingAction('approve', [r._id]);
 }
 
 async function rejectItem(idx) {
   const r = reviewItems[idx];
   if(!r) return;
-  const { error } = await sb.from('listings').update({ status:'rejected' }).eq('id', r._id);
-  if(error) { showToast('操作失败：'+error.message, 'error'); return; }
-  await sbLog('reject','listing', r._id);
-  reviewItems.splice(idx, 1);
-  renderReview();
-  document.getElementById('pendingCount').textContent = reviewItems.length;
-  showToast('❌ 已拒绝发布', 'error');
-  loadRealListings();
+  await batchListingAction('reject', [r._id]);
 }
 
 function approveOne() { if(currentReviewIdx>=0) approveItem(currentReviewIdx); }
@@ -2289,22 +2493,14 @@ async function approveAll() {
   const checked = [...document.querySelectorAll('.row-check:checked')];
   if(checked.length === 0) { showToast('请先勾选要操作的信息', 'error'); return; }
   const ids = checked.map(c => reviewItems.find(r => r.id === c.dataset.id)?._id).filter(Boolean);
-  const { error } = await sb.from('listings').update({ status:'approved' }).in('id', ids);
-  if(error) { showToast('批量操作失败：'+error.message, 'error'); return; }
-  showToast(`✅ 已通过 ${checked.length} 条信息`, 'success');
-  loadRealReview();
-  loadRealListings();
+  await batchListingAction('approve', ids);
 }
 
 async function rejectAll() {
   const checked = [...document.querySelectorAll('.row-check:checked')];
   if(checked.length === 0) { showToast('请先勾选要操作的信息', 'error'); return; }
   const ids = checked.map(c => reviewItems.find(r => r.id === c.dataset.id)?._id).filter(Boolean);
-  const { error } = await sb.from('listings').update({ status:'rejected' }).in('id', ids);
-  if(error) { showToast('批量操作失败：'+error.message, 'error'); return; }
-  showToast(`❌ 已拒绝 ${checked.length} 条信息`, 'error');
-  loadRealReview();
-  loadRealListings();
+  await batchListingAction('reject', ids);
 }
 
 function toggleAll(el) {
@@ -2313,19 +2509,11 @@ function toggleAll(el) {
 
 async function takeDown(id) {
   const numId = parseInt(id.replace('L',''), 10);
-  const { error } = await sb.from('listings').update({ status:'offline' }).eq('id', numId);
-  if(error) { showToast('操作失败：'+error.message, 'error'); return; }
-  await sbLog('takedown','listing', numId);
-  showToast(`已下架信息 ${id}`, 'success');
-  loadRealListings();
+  await batchListingAction('offline', [numId]);
 }
 async function bringUp(id) {
   const numId = parseInt(id.replace('L',''), 10);
-  const { error } = await sb.from('listings').update({ status:'approved' }).eq('id', numId);
-  if(error) { showToast('操作失败：'+error.message, 'error'); return; }
-  await sbLog('approve','listing', numId);
-  showToast(`已上线信息 ${id}`, 'success');
-  loadRealListings();
+  await batchListingAction('online', [numId]);
 }
 
 function findDeleteLabel(type, id) {
@@ -2424,6 +2612,38 @@ function saveSettings() {
   showToast('💾 设置已保存', 'success');
 }
 
+function authPasswordFromAdminInput(value) {
+  const password = String(value || '').trim();
+  if (/^\d{4}$/.test(password)) return `${password}#EspanaLife2026`;
+  return password;
+}
+
+async function changeAdminPassword() {
+  const password = document.getElementById('adminNewPassword')?.value.trim() || '';
+  const confirmPassword = document.getElementById('adminNewPassword2')?.value.trim() || '';
+  if (!password || !confirmPassword) {
+    showToast('请填写并确认新密码', 'error');
+    return;
+  }
+  if (password !== confirmPassword) {
+    showToast('两次输入的新密码不一致', 'error');
+    return;
+  }
+  if (!/^\d{4}$/.test(password) && password.length < 8) {
+    showToast('管理员邮箱账号密码至少8位；手机号账号可用4位数字', 'error');
+    return;
+  }
+  if (!confirm('确定修改当前后台账号密码吗？修改后需要用新密码登录。')) return;
+  const { error } = await sb.auth.updateUser({ password: authPasswordFromAdminInput(password) });
+  if (error) {
+    showToast('修改密码失败：' + error.message, 'error');
+    return;
+  }
+  document.getElementById('adminNewPassword').value = '';
+  document.getElementById('adminNewPassword2').value = '';
+  showToast('后台密码已修改，请记好新密码', 'success');
+}
+
 async function testConnection() {
   const url = document.getElementById('sbUrl').value;
   if(!url) { showToast('请先填写 Supabase URL', 'error'); return; }
@@ -2484,6 +2704,8 @@ function applyAdminPermissions() {
   if (paymentNav) paymentNav.style.display = canManageSection('payment') ? '' : 'none';
   const topReviewBtn = document.querySelector('.topbar-btn[onclick*="review"]');
   if (topReviewBtn) topReviewBtn.style.display = canManageSection('review') ? '' : 'none';
+  const newUsersBtn = document.getElementById('newUsersBtn');
+  if (newUsersBtn) newUsersBtn.style.display = canManageSection('users') ? '' : 'none';
   if (!document.querySelector('.page.active')) {
     const first = ADMIN_ALL_SECTIONS.find(section => canManageSection(section));
     if (first) showPage(first, document.querySelector(`[data-section="${first}"]`));

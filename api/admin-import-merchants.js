@@ -2,6 +2,7 @@ const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
 
 const CATEGORY_ALLOWLIST = new Set([
+  '\u62db\u5de5',
   '\u751f\u610f',
   '\u670d\u52a1',
   '\u6559\u80b2',
@@ -54,7 +55,9 @@ async function requireAdmin(req) {
   const profileResponse = await serviceFetch(`/rest/v1/profiles?select=is_admin&id=eq.${encodeURIComponent(user.id)}&limit=1`);
   if (!profileResponse.ok) return { error: 'admin_check_failed', status: 403 };
   const profiles = await profileResponse.json();
-  if (!profiles[0]?.is_admin) return { error: 'not_admin', status: 403 };
+  const isSuper = Boolean(profiles[0]?.is_admin || user.app_metadata?.admin_role === 'super_admin');
+  const sections = Array.isArray(user.app_metadata?.admin_sections) ? user.app_metadata.admin_sections : [];
+  if (!isSuper && !sections.includes('listings')) return { error: 'not_admin', status: 403 };
   return { user };
 }
 

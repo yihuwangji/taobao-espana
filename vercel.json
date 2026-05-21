@@ -7,6 +7,7 @@
     { "src": "/api/register", "dest": "/api/register.js" },
     { "src": "/api/referral", "dest": "/api/referral.js" },
     { "src": "/api/admin-delete", "dest": "/api/admin-delete.js" },
+    { "src": "/api/admin-listing-batch", "dest": "/api/admin-listing-batch.js" },
     { "src": "/api/admin-user-permissions", "dest": "/api/admin-user-permissions.js" },
     { "src": "/api/admin-import-merchants", "dest": "/api/admin-import-merchants.js" },
     { "src": "/api/admin-update-merchant-contacts", "dest": "/api/admin-update-merchant-contacts.js" },
