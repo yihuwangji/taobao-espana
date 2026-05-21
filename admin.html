@@ -1065,17 +1065,18 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         <div class="card-header">
           <div class="card-title">📋 全部信息管理</div>
           <div class="card-actions">
-            <input class="search-input" placeholder="🔍 搜索标题/城市…" oninput="filterListings(this.value)">
-            <select class="select-input" id="catFilter" onchange="filterListings('')">
+            <input class="search-input" id="listingSearch" placeholder="🔍 搜索商家名/电话/城市/地址/关键词…" oninput="filterListings()">
+            <select class="select-input" id="catFilter" onchange="filterListings()">
               <option value="">全部分类</option>
               <option value="招工">招工求职</option>
               <option value="租房">租房买房</option>
               <option value="生意">生意转让</option>
-              <option value="二手车">二手车</option>
-              <option value="交友">交友相亲</option>
-              <option value="二手物品">二手物品</option>
+              <option value="goods">二手物品/车</option>
+              <option value="服务">生活服务</option>
+              <option value="教育">教育培训</option>
+              <option value="merchant">商家/货源</option>
             </select>
-            <select class="select-input" id="statusFilter" onchange="filterListings('')">
+            <select class="select-input" id="statusFilter" onchange="filterListings()">
               <option value="">全部状态</option>
               <option value="已上线">已上线</option>
               <option value="待审核">待审核</option>
@@ -1091,6 +1092,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
                 <th>标题</th>
                 <th>分类</th>
                 <th>城市</th>
+                <th>联系方式</th>
                 <th>发布者</th>
                 <th>状态</th>
                 <th>发布时间</th>
@@ -1463,7 +1465,7 @@ async function loadRealListings() {
   const { data } = await sb.from('listings')
     .select('id, title, category, city, price, address, description, contact, images, status, created_at, user_id, profiles(nickname, phone)')
     .order('created_at', { ascending: false })
-    .limit(50);
+    .limit(1000);
   if(data && data.length > 0) {
     allListings.length = 0;
     data.forEach(r => allListings.push({
@@ -1479,7 +1481,7 @@ async function loadRealListings() {
       time: new Date(r.created_at).toLocaleString('zh-CN')
     }));
   }
-  renderListings(allListings);
+  filterListings();
 }
 
 async function loadRealReview() {
@@ -1668,6 +1670,7 @@ function renderListings(data) {
       <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.title)}</td>
       <td><span class="badge badge-active">${esc(l.cat)}</span></td>
       <td>📍 ${esc(l.city)}</td>
+      <td style="max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px">${esc(l.contact || '—')}</td>
       <td>${esc(l.user)}</td>
       <td><span class="badge ${statusMap[l.status]||'badge-active'}">${l.status}</span></td>
       <td style="font-size:11px;color:var(--text-dim);white-space:nowrap">${l.time}</td>
@@ -1683,12 +1686,80 @@ function renderListings(data) {
   document.getElementById('listingsInfo').textContent = `共 ${data.length} 条记录`;
 }
 
-function filterListings(q) {
+function normalizeSearchText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function compactDigits(value) {
+  return String(value || '').replace(/\D/g, '');
+}
+
+function listingMatchesCategory(listing, cat) {
+  if (!cat) return true;
+  if (cat === 'goods') return listing.cat === '二手物品' || listing.cat === '二手车';
+  if (cat === 'merchant') {
+    const haystack = normalizeSearchText([
+      listing.title,
+      listing.cat,
+      listing.city,
+      listing.address,
+      listing.contact,
+      listing.desc
+    ].join(' '));
+    return haystack.includes('平台代登记商家信息') ||
+      haystack.includes('商家') ||
+      haystack.includes('批发') ||
+      haystack.includes('货源') ||
+      haystack.includes('供应商') ||
+      haystack.includes('贸易') ||
+      haystack.includes('import') ||
+      haystack.includes('export');
+  }
+  return listing.cat === cat;
+}
+
+function listingMatchesQuery(listing, query) {
+  const q = normalizeSearchText(query);
+  if (!q) return true;
+  const text = normalizeSearchText([
+    listing.id,
+    listing._id,
+    listing.title,
+    listing.cat,
+    listing.city,
+    listing.user,
+    listing.price,
+    listing.address,
+    listing.contact,
+    listing.desc,
+    listing.status,
+    listing.time
+  ].join(' '));
+  const digits = compactDigits([
+    listing.id,
+    listing._id,
+    listing.contact,
+    listing.city,
+    listing.title,
+    listing.address
+  ].join(' '));
+  const queryDigits = compactDigits(q);
+  return q.split(/\s+/).every(part => text.includes(part)) ||
+    (queryDigits.length >= 3 && digits.includes(queryDigits));
+}
+
+function filterListings() {
+  const q = document.getElementById('listingSearch')?.value || '';
   const cat = document.getElementById('catFilter').value;
   const status = document.getElementById('statusFilter').value;
   let data = allListings.filter(l =>
-    (!q || l.title.includes(q) || l.city.includes(q)) &&
-    (!cat || l.cat === cat) &&
+    listingMatchesQuery(l, q) &&
+    listingMatchesCategory(l, cat) &&
     (!status || l.status === status)
   );
   renderListings(data);
