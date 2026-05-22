@@ -42,19 +42,19 @@
 已生成的 Google Play 上传包：
 
 ```text
-android-release/xibanyalife-1.0.3-4-release.aab
+android-release/xibanyalife-1.0.4-5-release.aab
 ```
 
 已生成的通用 Android 安装包：
 
 ```text
-android-release/xibanyalife-1.0.3-4-release.apk
+android-release/xibanyalife-1.0.4-5-release.apk
 ```
 
 已生成的市场上传压缩包：
 
 ```text
-android-release/xibanyalife-android-1.0.3-4-upload-package.zip
+android-release/xibanyalife-android-1.0.4-5-upload-package.zip
 ```
 
 签名密钥保存在本机且已被 `.gitignore` 排除：
