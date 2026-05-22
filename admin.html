@@ -549,6 +549,24 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .form-group select:focus,
 .form-group textarea:focus { border-color: rgba(229,57,53,0.5); }
 
+.listing-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.listing-edit-grid .form-group.full {
+  grid-column: 1 / -1;
+}
+
+.listing-edit-help {
+  margin-top: -6px;
+  margin-bottom: 12px;
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .modal-footer {
   display: flex;
   gap: 8px;
@@ -894,6 +912,9 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     display: grid;
     grid-template-columns: 1fr;
     justify-content: stretch;
+  }
+  .listing-edit-grid {
+    grid-template-columns: 1fr;
   }
   .modal-overlay {
     align-items: flex-end;
@@ -1436,6 +1457,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     <div id="reviewDetail"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('review')">关闭</button>
+      <button class="btn btn-blue" id="adminEditListingBtn" onclick="openListingEditFromModal()">编辑信息</button>
       <button class="btn btn-red" id="reviewRejectBtn" onclick="rejectOne(); closeModal('review')">❌ 拒绝</button>
       <button class="btn btn-green" id="reviewApproveBtn" onclick="approveOne(); closeModal('review')">✅ 通过</button>
     </div>
@@ -1732,6 +1754,7 @@ async function loadRealListings() {
       images: Array.isArray(r.images) ? r.images : [],
       contact: r.contact || r.profiles?.phone || '—',
       desc: r.description || '',
+      rawStatus: r.status,
       status: { pending:'待审核', approved:'已上线', rejected:'已下架', offline:'已下架' }[r.status] || r.status,
       time: new Date(r.created_at).toLocaleString('zh-CN')
     });
@@ -1742,7 +1765,7 @@ async function loadRealListings() {
 
 async function loadRealReview() {
   const { data } = await sb.from('listings')
-    .select('id, title, category, city, address, description, contact, images, created_at, user_id, profiles(nickname, phone)')
+    .select('id, title, category, city, price, address, description, contact, images, created_at, user_id, profiles(nickname, phone)')
     .eq('status', 'pending')
     .order('created_at', { ascending: true });
   if(data) {
@@ -1754,6 +1777,8 @@ async function loadRealReview() {
       city: r.city, user: r.profiles?.nickname || (r.user_id ? '未知用户' : '游客发布'),
       images: Array.isArray(r.images) ? r.images : [],
       contact: r.contact || r.profiles?.phone || '—',
+      price: r.price || '',
+      rawStatus: 'pending',
       time: new Date(r.created_at).toLocaleString('zh-CN'),
       desc: r.description || ''
     }));
@@ -1946,6 +1971,7 @@ function renderListings(data) {
         <div class="action-btns">
           ${l.status==='已上线' ? `<button class="btn btn-red" onclick="takeDown('${l.id}')">下架</button>` : `<button class="btn btn-green" onclick="bringUp('${l.id}')">上线</button>`}
           <button class="btn btn-blue" onclick="openListingModal('${l.id}')">详情</button>
+          <button class="btn btn-gold" onclick="openListingEdit('${l.id}')">编辑</button>
           <button class="btn btn-red" onclick="deleteAdminItem('listing','${l._id || l.id}')">删除</button>
         </div>
       </td>
@@ -2449,12 +2475,32 @@ function updateChart(period) {
 
 // ═══════════ ACTIONS ═══════════
 let currentReviewIdx = -1;
+let currentModalListingId = null;
+
+const LISTING_STATUS_LABELS = {
+  pending: '待审核',
+  approved: '已上线',
+  rejected: '已下架',
+  offline: '已下架'
+};
+
+const LISTING_STATUS_FROM_LABEL = Object.fromEntries(
+  Object.entries(LISTING_STATUS_LABELS).map(([value, label]) => [label, value])
+);
+
+const ADMIN_EDIT_CATEGORIES = ['招工', '租房', '生意', '二手物品', '二手车', '服务', '教育'];
+
+function listingStatusValue(item) {
+  return item?.rawStatus || LISTING_STATUS_FROM_LABEL[item?.status] || 'pending';
+}
 
 function setReviewActionsVisible(visible) {
   const approveBtn = document.getElementById('reviewApproveBtn');
   const rejectBtn = document.getElementById('reviewRejectBtn');
+  const editBtn = document.getElementById('adminEditListingBtn');
   if (approveBtn) approveBtn.style.display = visible ? '' : 'none';
   if (rejectBtn) rejectBtn.style.display = visible ? '' : 'none';
+  if (editBtn) editBtn.style.display = currentModalListingId && canManageSection('listings') ? '' : 'none';
 }
 
 function detailBlock(label, value, extraStyle = '') {
@@ -2524,13 +2570,191 @@ function renderListingDetail(r) {
   `;
 }
 
+function getAdminListingById(listingId) {
+  return allListings.find(l => l.id === listingId || String(l._id) === String(listingId)) ||
+    reviewItems.find(l => l.id === listingId || String(l._id) === String(listingId));
+}
+
+function imagesToTextarea(images) {
+  return normalizeDetailImages(images).join('\n');
+}
+
+function renderListingEditForm(item) {
+  const category = item.rawCat || (item.cat === '商家' ? '服务' : item.cat) || '服务';
+  const status = listingStatusValue(item);
+  return `
+    <div class="listing-edit-help">管理员修改后会直接保存到线上信息，请确认标题、联系方式和状态无误。</div>
+    <div class="listing-edit-grid">
+      <input type="hidden" id="adminEditListingId" value="${esc(item._id || String(item.id).replace(/\D/g,''))}">
+      <div class="form-group">
+        <label>分类</label>
+        <select id="adminEditCategory">
+          ${ADMIN_EDIT_CATEGORIES.map(cat => `<option value="${esc(cat)}" ${cat === category ? 'selected' : ''}>${esc(cat)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>状态</label>
+        <select id="adminEditStatus">
+          <option value="pending" ${status === 'pending' ? 'selected' : ''}>待审核</option>
+          <option value="approved" ${status === 'approved' ? 'selected' : ''}>已上线</option>
+          <option value="offline" ${status === 'offline' ? 'selected' : ''}>已下架</option>
+          <option value="rejected" ${status === 'rejected' ? 'selected' : ''}>已拒绝</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>标题</label>
+        <input type="text" id="adminEditTitle" value="${esc(item.title)}" maxlength="120">
+      </div>
+      <div class="form-group full">
+        <label>详细描述</label>
+        <textarea id="adminEditDescription" rows="6">${esc(item.desc || '')}</textarea>
+      </div>
+      <div class="form-group">
+        <label>省份 / 城市</label>
+        <input type="text" id="adminEditCity" value="${esc(item.city || '')}" maxlength="80">
+      </div>
+      <div class="form-group">
+        <label>价格 / 薪资</label>
+        <input type="text" id="adminEditPrice" value="${esc(item.price || '')}" maxlength="80">
+      </div>
+      <div class="form-group full">
+        <label>店铺地址 / 地图位置</label>
+        <input type="text" id="adminEditAddress" value="${esc(item.address || '')}" maxlength="300">
+      </div>
+      <div class="form-group full">
+        <label>联系方式</label>
+        <input type="text" id="adminEditContact" value="${esc(item.contact || '')}" maxlength="200">
+      </div>
+      <div class="form-group full">
+        <label>图片链接（每行一张，最多6张）</label>
+        <textarea id="adminEditImages" rows="4" placeholder="https://...">${esc(imagesToTextarea(item.images))}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+function openListingEdit(listingId = currentModalListingId) {
+  const item = getAdminListingById(listingId);
+  if (!item) {
+    showToast('没有找到这条信息', 'error');
+    return;
+  }
+  if (!canManageSection('listings')) {
+    showToast('没有信息管理权限，不能编辑', 'error');
+    return;
+  }
+  currentModalListingId = item._id || String(item.id).replace(/\D/g, '');
+  document.querySelector('#reviewModal h3').textContent = '✏️ 编辑发布信息';
+  setReviewActionsVisible(false);
+  const editBtn = document.getElementById('adminEditListingBtn');
+  if (editBtn) editBtn.style.display = 'none';
+  document.getElementById('reviewDetail').innerHTML = renderListingEditForm(item);
+  const footer = document.querySelector('#reviewModal .modal-footer');
+  if (footer) footer.dataset.mode = 'edit';
+  renderListingEditFooter();
+  openModal('review');
+}
+
+function openListingEditFromModal() {
+  openListingEdit(currentModalListingId);
+}
+
+function renderListingReadFooter() {
+  const footer = document.querySelector('#reviewModal .modal-footer');
+  if (!footer || footer.dataset.mode !== 'edit') return;
+  footer.dataset.mode = 'read';
+  footer.innerHTML = `
+    <button class="btn" onclick="closeModal('review')">关闭</button>
+    <button class="btn btn-blue" id="adminEditListingBtn" onclick="openListingEditFromModal()">编辑信息</button>
+    <button class="btn btn-red" id="reviewRejectBtn" onclick="rejectOne(); closeModal('review')">❌ 拒绝</button>
+    <button class="btn btn-green" id="reviewApproveBtn" onclick="approveOne(); closeModal('review')">✅ 通过</button>
+  `;
+}
+
+function renderListingEditFooter() {
+  const footer = document.querySelector('#reviewModal .modal-footer');
+  if (!footer) return;
+  footer.dataset.mode = 'edit';
+  footer.innerHTML = `
+    <button class="btn" onclick="cancelListingEdit()">取消</button>
+    <button class="btn btn-green" id="adminSaveListingBtn" onclick="saveAdminListingEdit()">保存修改</button>
+  `;
+}
+
+function cancelListingEdit() {
+  renderListingReadFooter();
+  const item = getAdminListingById(currentModalListingId);
+  if (!item) {
+    closeModal('review');
+    return;
+  }
+  document.querySelector('#reviewModal h3').textContent = currentReviewIdx >= 0 ? '📋 信息详情审核' : '📋 信息详情';
+  setReviewActionsVisible(currentReviewIdx >= 0);
+  document.getElementById('reviewDetail').innerHTML = renderListingDetail({
+    ...item,
+    status: item.status || LISTING_STATUS_LABELS[listingStatusValue(item)] || ''
+  });
+}
+
+function formValue(id) {
+  return document.getElementById(id)?.value.trim() || '';
+}
+
+async function saveAdminListingEdit() {
+  const id = formValue('adminEditListingId');
+  const payload = {
+    id,
+    category: formValue('adminEditCategory'),
+    status: formValue('adminEditStatus'),
+    title: formValue('adminEditTitle'),
+    description: document.getElementById('adminEditDescription')?.value.trim() || '',
+    city: formValue('adminEditCity'),
+    price: formValue('adminEditPrice'),
+    address: formValue('adminEditAddress'),
+    contact: formValue('adminEditContact'),
+    images: (document.getElementById('adminEditImages')?.value || '')
+      .split(/\r?\n|,/)
+      .map(url => url.trim())
+      .filter(Boolean)
+  };
+  if (!payload.title || !payload.contact) {
+    showToast('标题和联系方式不能为空', 'error');
+    return;
+  }
+  const btn = document.getElementById('adminSaveListingBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '保存中...';
+  }
+  try {
+    await adminApi('/api/admin-listing-update', payload);
+    showToast('信息已保存', 'success');
+    renderListingReadFooter();
+    closeModal('review');
+    await Promise.all([
+      canManageSection('listings') ? loadRealListings() : Promise.resolve(),
+      canManageSection('review') ? loadRealReview() : Promise.resolve(),
+      loadRealStats()
+    ]);
+  } catch (error) {
+    showToast('保存失败：' + error.message, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '保存修改';
+    }
+  }
+}
+
 function openListingModal(listingId) {
+  renderListingReadFooter();
   currentReviewIdx = -1;
   const item = allListings.find(l => l.id === listingId || String(l._id) === String(listingId));
   if (!item) {
     showToast('没有找到这条信息', 'error');
     return;
   }
+  currentModalListingId = item._id || String(item.id).replace(/\D/g, '');
   document.querySelector('#reviewModal h3').textContent = '📋 信息详情';
   setReviewActionsVisible(false);
   document.getElementById('reviewDetail').innerHTML = renderListingDetail(item);
@@ -2538,9 +2762,11 @@ function openListingModal(listingId) {
 }
 
 function openReviewModal(idx) {
+  renderListingReadFooter();
   currentReviewIdx = idx;
   const r = reviewItems[idx];
   if (!r) return;
+  currentModalListingId = r._id || String(r.id).replace(/\D/g, '');
   document.querySelector('#reviewModal h3').textContent = '📋 信息详情审核';
   setReviewActionsVisible(true);
   document.getElementById('reviewDetail').innerHTML = renderListingDetail({
