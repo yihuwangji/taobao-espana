@@ -1,9 +1,16 @@
 const crypto = require('crypto');
 
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
-const SITE_URL = 'https://taobao-espana.vercel.app';
+const DEFAULT_SITE_URL = 'https://taobao-espana.vercel.app';
 const TARGET_COUNT = 10;
 const VIP_DAYS = 365;
+
+function getRequestSiteUrl(req) {
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  if (!host) return DEFAULT_SITE_URL;
+  const proto = String(req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim() || 'https';
+  return `${proto}://${host}`.replace(/\/+$/, '');
+}
 
 function json(res, status, body, extraHeaders = {}) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -154,7 +161,7 @@ async function handleStatus(req, res) {
 
   return json(res, 200, {
     referralCode,
-    inviteUrl: `${SITE_URL}/?ref=${encodeURIComponent(referralCode)}`,
+    inviteUrl: `${getRequestSiteUrl(req)}/?ref=${encodeURIComponent(referralCode)}`,
     count,
     target: TARGET_COUNT,
     remaining: Math.max(0, TARGET_COUNT - count),

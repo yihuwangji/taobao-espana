@@ -3111,7 +3111,7 @@ window.openPublishPage = openPublishPage;
 function updateDocumentShareMeta(listing) {
   const desc = [getListingDisplayCategory(listing), normalizeProvinceName(listing.city), listing.address, listing.price || '面议'].filter(Boolean).join(' · ');
   const title = `西班牙生活通｜${listing.title}`;
-  const logo = 'https://taobao-espana.vercel.app/assets/icons/wechat-share-logo-20260521.jpg';
+  const logo = new URL('/assets/icons/wechat-share-logo-20260521.jpg', window.location.origin).toString();
   document.title = title;
   [
     ['meta[name="description"]', desc],

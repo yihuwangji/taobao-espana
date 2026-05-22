@@ -1,9 +1,15 @@
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
-const SITE_URL = 'https://taobao-espana.vercel.app';
+const DEFAULT_SITE_URL = 'https://taobao-espana.vercel.app';
 const SITE_NAME = '西班牙生活通';
-const SITE_LOGO_URL = `${SITE_URL}/assets/icons/wechat-share-logo-20260521.jpg`;
 const IMPORTED_MERCHANT_MARK = '平台代登记商家信息';
+
+function getRequestSiteUrl(req) {
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  if (!host) return DEFAULT_SITE_URL;
+  const proto = String(req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim() || 'https';
+  return `${proto}://${host}`.replace(/\/+$/, '');
+}
 
 function escapeHTML(value) {
   return String(value ?? '').replace(/[&<>"']/g, ch => ({
@@ -41,6 +47,8 @@ function listingDescription(listing) {
 }
 
 module.exports = async function handler(req, res) {
+  const siteUrl = getRequestSiteUrl(req);
+  const siteLogoUrl = `${siteUrl}/assets/icons/wechat-share-logo-20260521.jpg`;
   const id = compact(req.query.id);
   const numericId = id.match(/^\d+$/) ? id : '';
   let listing = null;
@@ -71,8 +79,8 @@ module.exports = async function handler(req, res) {
     ? `${SITE_NAME}｜${compact(listing.title)}`
     : `${SITE_NAME}｜西班牙华人生活服务平台`;
   const description = listingDescription(listing);
-  const targetUrl = numericId ? `${SITE_URL}/?listing=${encodeURIComponent(numericId)}` : SITE_URL;
-  const shareUrl = numericId ? `${SITE_URL}/s/${encodeURIComponent(numericId)}` : SITE_URL;
+  const targetUrl = numericId ? `${siteUrl}/?listing=${encodeURIComponent(numericId)}` : siteUrl;
+  const shareUrl = numericId ? `${siteUrl}/s/${encodeURIComponent(numericId)}` : siteUrl;
   const ogType = numericId ? 'article' : 'website';
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -88,8 +96,8 @@ module.exports = async function handler(req, res) {
 <meta property="og:site_name" content="${escapeHTML(SITE_NAME)}">
 <meta property="og:title" content="${escapeHTML(pageTitle)}">
 <meta property="og:description" content="${escapeHTML(description)}">
-<meta property="og:image" content="${escapeHTML(SITE_LOGO_URL)}">
-<meta property="og:image:secure_url" content="${escapeHTML(SITE_LOGO_URL)}">
+<meta property="og:image" content="${escapeHTML(siteLogoUrl)}">
+<meta property="og:image:secure_url" content="${escapeHTML(siteLogoUrl)}">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="300">
 <meta property="og:image:height" content="300">
@@ -97,8 +105,8 @@ module.exports = async function handler(req, res) {
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="${escapeHTML(pageTitle)}">
 <meta name="twitter:description" content="${escapeHTML(description)}">
-<meta name="twitter:image" content="${escapeHTML(SITE_LOGO_URL)}">
-<link rel="image_src" href="${escapeHTML(SITE_LOGO_URL)}">
+<meta name="twitter:image" content="${escapeHTML(siteLogoUrl)}">
+<link rel="image_src" href="${escapeHTML(siteLogoUrl)}">
 <link rel="canonical" href="${escapeHTML(targetUrl)}">
 <meta name="theme-color" content="#D42B2B">
 <script>
@@ -128,8 +136,8 @@ a,button{display:flex;align-items:center;justify-content:center;width:100%;min-h
 </head>
 <body>
 <main class="card">
-  <div class="site"><img src="${escapeHTML(SITE_LOGO_URL)}" alt="">${escapeHTML(SITE_NAME)}</div>
-  <img src="${escapeHTML(SITE_LOGO_URL)}" alt="${escapeHTML(SITE_NAME)}">
+  <div class="site"><img src="${escapeHTML(siteLogoUrl)}" alt="">${escapeHTML(SITE_NAME)}</div>
+  <img src="${escapeHTML(siteLogoUrl)}" alt="${escapeHTML(SITE_NAME)}">
   <h1>${escapeHTML(pageTitle)}</h1>
   <p>${escapeHTML(description)}</p>
   <a id="open-detail-btn" href="${escapeHTML(targetUrl)}" target="_self" rel="noopener">打开查看详情</a>
