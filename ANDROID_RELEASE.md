@@ -2,7 +2,7 @@
 
 ## 推荐路线
 
-使用 PWA + Trusted Web Activity (TWA) 打包。应用安装后以全屏 App 方式打开 `https://taobao-espana.vercel.app/`，网站继续由 Vercel 更新，Android 包只负责启动与系统集成。
+使用 PWA + Trusted Web Activity (TWA) 打包。应用安装后以全屏 App 方式打开 `https://espanalife.app/`，网站继续由 Vercel 更新，Android 包只负责启动与系统集成。
 
 ## 上架基本信息
 
@@ -10,8 +10,8 @@
 - 推荐包名：`com.xibanyalife.app`
 - 应用类型：生活 / 本地服务 / 分类信息
 - 默认语言：中文（简体）
-- 网站地址：`https://taobao-espana.vercel.app/`
-- 隐私政策地址：`https://taobao-espana.vercel.app/privacy.html`
+- 网站地址：`https://espanalife.app/`
+- 隐私政策地址：`https://espanalife.app/privacy.html`
 
 不要用 `淘宝西班牙` 作为 Google Play 展示名称。`淘宝` 是第三方商标，可能触发商标或冒充审核风险；上架名称建议统一为 `西班牙生活通`。
 

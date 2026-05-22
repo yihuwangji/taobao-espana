@@ -46,7 +46,7 @@
         \"relation\": [\"delegate_permission/common.handle_all_urls\"],
         \"target\": {
             \"namespace\": \"web\",
-            \"site\": \"https://taobao-espana.vercel.app\"
+            \"site\": \"https://espanalife.app\"
         }
     }]
     

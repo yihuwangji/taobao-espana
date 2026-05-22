@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
-const DEFAULT_SITE_URL = 'https://taobao-espana.vercel.app';
+const DEFAULT_SITE_URL = 'https://espanalife.app';
 const SITE_NAME = '西班牙生活通';
 const IMPORTED_MERCHANT_MARK = '平台代登记商家信息';
 

@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
-const DEFAULT_SITE_URL = 'https://taobao-espana.vercel.app';
+const DEFAULT_SITE_URL = 'https://espanalife.app';
 const TARGET_COUNT = 10;
 const VIP_DAYS = 365;
 
