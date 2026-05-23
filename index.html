@@ -2852,7 +2852,7 @@ const I18N = {
     'post.addressTip': '填写后详情页会显示地图入口，适合店铺、生意、服务和培训机构。',
     'post.photos': '照片', 'post.photosTip': '最多6张，每张不超过5MB', 'post.photosCategoryTip': '除招工外，其他分类都可以发布照片，方便以后做广告展示。',
     'post.contact': '联系方式（微信/手机/WhatsApp）*', 'post.contactPlaceholder': '+34 6XX XXX XXX 或 微信号',
-    'post.submit': '🚀 立即发布（限时免费）', 'post.agree': '发布即表示同意 <a href="#" style="color:var(--red)">用户协议</a> 及 <a href="#" style="color:var(--red)">隐私政策</a>',
+    'post.submit': '🚀 立即发布（限时免费）', 'post.agree': '发布即表示同意 <a href="#" onclick="openModal(\'userAgreement\');return false;" style="color:var(--red)">用户协议</a> 及 <a href="#" onclick="openModal(\'privacyPolicy\');return false;" style="color:var(--red)">隐私政策</a>',
     'post.jobTitlePlaceholder': '例如：马德里女生求餐馆/百元店工作，可马上上班',
     'post.jobDescPlaceholder': '可补充年龄段、语言、经验、期望工种、可上班时间等…',
     'post.jobPricePlaceholder': '期望薪资，如 1200€/月 或 面议',
@@ -2916,7 +2916,7 @@ const I18N = {
     'post.addressTip': 'Si rellenas la dirección, el detalle mostrará acceso al mapa. Útil para tiendas, negocios, servicios y centros de formación.',
     'post.photos': 'Fotos', 'post.photosTip': 'Máximo 6 fotos, hasta 5 MB cada una', 'post.photosCategoryTip': 'Todas las categorías excepto empleo pueden publicar fotos.',
     'post.contact': 'Contacto (WeChat / móvil / WhatsApp) *', 'post.contactPlaceholder': '+34 6XX XXX XXX o WeChat',
-    'post.submit': '🚀 Publicar ahora (gratis por tiempo limitado)', 'post.agree': 'Al publicar aceptas el <a href="#" style="color:var(--red)">acuerdo de usuario</a> y la <a href="#" style="color:var(--red)">política de privacidad</a>',
+    'post.submit': '🚀 Publicar ahora (gratis por tiempo limitado)', 'post.agree': 'Al publicar, aceptas el <a href="#" onclick="openModal(\'userAgreement\');return false;" style="color:var(--red)">Acuerdo de Usuario</a> y la <a href="#" onclick="openModal(\'privacyPolicy\');return false;" style="color:var(--red)">Política de Privacidad</a>.',
     'post.jobTitlePlaceholder': 'Ej.: Busco trabajo en restaurante o bazar en Madrid',
     'post.jobDescPlaceholder': 'Añade edad aproximada, idiomas, experiencia, tipo de trabajo y disponibilidad…',
     'post.jobPricePlaceholder': 'Salario esperado, ej.: 1200€/mes o a negociar',
@@ -2962,6 +2962,8 @@ function applyLanguage(lang = currentLang) {
   updatePostForm();
   syncListingTitle();
   renderListings();
+  if (document.getElementById('userAgreementModal')?.classList.contains('open')) renderLegalModal('userAgreement');
+  if (document.getElementById('privacyPolicyModal')?.classList.contains('open')) renderLegalModal('privacyPolicy');
   if (window.refreshLocalizedPlanButton) window.refreshLocalizedPlanButton();
 }
 
@@ -4036,9 +4038,130 @@ function syncModalScrollLock() {
   document.body.style.overflow = hasOpenModal ? 'hidden' : '';
 }
 
+const LEGAL_CONTENT = {
+  zh: {
+    userAgreementTitle: '📋 用户协议',
+    userAgreementBody: `
+      <p style="color:#999;margin-bottom:16px">最后更新：2026年5月23日</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">一、总则</h4>
+      <p style="margin-bottom:12px">欢迎使用西班牙生活通（espanalife.app，以下简称“本平台”）。使用本平台浏览、注册或发布信息，即表示您同意遵守本协议。</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">二、账号与注册</h4>
+      <p style="margin-bottom:12px">用户应提供真实、准确的手机、昵称、所在省份等资料。账号、密码和验证码由用户自行保管，因用户保管不当造成的损失由用户自行承担。</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">三、信息发布规范</h4>
+      <p style="margin-bottom:8px">发布内容必须真实、合法，不得包含以下内容：</p>
+      <ul style="padding-left:18px;margin-bottom:12px;color:#555">
+        <li style="margin-bottom:4px">虚假招聘、诈骗、钓鱼链接或诱导转账</li>
+        <li style="margin-bottom:4px">违反西班牙或欧盟法律法规的内容</li>
+        <li style="margin-bottom:4px">侵犯他人隐私、肖像、商标或其他合法权益的内容</li>
+        <li style="margin-bottom:4px">色情、暴力、歧视、仇恨或其他不适当内容</li>
+        <li style="margin-bottom:4px">恶意刷屏、重复发布、骚扰或垃圾广告</li>
+      </ul>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">四、审核与处理</h4>
+      <p style="margin-bottom:12px">本平台可对信息进行人工或自动审核，并有权下架、编辑展示状态、限制账号或删除违规内容。用户可通过举报或客服渠道反馈问题。</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">五、交易风险与免责声明</h4>
+      <p style="margin-bottom:12px">本平台仅提供本地分类信息发布与展示服务，不参与用户之间的雇佣、租赁、交易或服务合同。请用户自行核实身份、资质、价格和合同条件，线下交易风险由双方自行承担。</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">六、协议变更</h4>
+      <p style="margin-bottom:12px">本平台可根据业务和法律要求更新本协议。更新后继续使用本平台，即视为接受新版本条款。</p>
+      <p style="font-size:12px;color:#999;text-align:center;padding-top:12px;border-top:1px solid #f0f0f0">如有疑问，请联系 contact@espana-life.com</p>
+    `,
+    privacyPolicyTitle: '🔒 隐私政策',
+    privacyPolicyBody: `
+      <p style="color:#999;margin-bottom:16px">最后更新：2026年5月23日</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">一、我们收集的信息</h4>
+      <p style="margin-bottom:12px">我们可能收集注册资料（昵称、手机、城市/省份、账号标识）、发布信息内容、联系方式、图片、举报与认领资料，以及浏览、分享和邀请活动所需的访问记录。</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">二、信息用途</h4>
+      <ul style="padding-left:18px;margin-bottom:12px;color:#555">
+        <li style="margin-bottom:4px">提供注册、登录、发布、审核、搜索和展示服务</li>
+        <li style="margin-bottom:4px">联系用户处理审核、举报、商家认领和客服问题</li>
+        <li style="margin-bottom:4px">统计邀请访问次数，用于VIP活动核验</li>
+        <li style="margin-bottom:4px">维护平台安全，防止诈骗、垃圾信息和违规使用</li>
+      </ul>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">三、公开展示</h4>
+      <p style="margin-bottom:12px">用户主动发布的信息、联系方式、图片和商家地址可能在网站或分享页面公开展示。请勿发布不希望公开的个人隐私。</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">四、信息保存与保护</h4>
+      <p style="margin-bottom:12px">我们使用加密连接和权限控制保护数据，并仅在提供服务、合规、安全和争议处理所需期间保存相关信息。</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">五、第三方服务</h4>
+      <p style="margin-bottom:12px">本平台使用 Supabase、Vercel 等基础服务提供数据库、认证、存储和托管能力。相关数据可能按照这些服务的安全机制处理。</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">六、用户权利</h4>
+      <p style="margin-bottom:12px">您可以请求查看、更正或删除个人资料，也可以要求下架自己发布的信息。请通过 contact@espana-life.com 联系我们。</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">七、政策更新</h4>
+      <p style="margin-bottom:12px">本隐私政策可能根据功能、法律或运营需要更新。继续使用本平台即表示您接受更新后的政策。</p>
+      <p style="font-size:12px;color:#999;text-align:center;padding-top:12px;border-top:1px solid #f0f0f0">如有疑问，请联系 contact@espana-life.com</p>
+    `
+  },
+  es: {
+    userAgreementTitle: '📋 Acuerdo de Usuario',
+    userAgreementBody: `
+      <p style="color:#999;margin-bottom:16px">Última actualización: 23 de mayo de 2026</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">1. Condiciones generales</h4>
+      <p style="margin-bottom:12px">Bienvenido a España Life / espanalife.app (“la Plataforma”). Al navegar, registrarte o publicar un anuncio, aceptas estas condiciones de uso.</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">2. Cuenta y registro</h4>
+      <p style="margin-bottom:12px">El usuario debe proporcionar datos reales y actualizados, como teléfono, apodo y provincia. El usuario es responsable de conservar su cuenta, contraseña y códigos de acceso de forma segura.</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">3. Normas de publicación</h4>
+      <p style="margin-bottom:8px">Los anuncios deben ser reales, legales y respetuosos. No se permite publicar:</p>
+      <ul style="padding-left:18px;margin-bottom:12px;color:#555">
+        <li style="margin-bottom:4px">Ofertas falsas, estafas, enlaces de phishing o solicitudes engañosas de pago</li>
+        <li style="margin-bottom:4px">Contenido contrario a la legislación española o de la Unión Europea</li>
+        <li style="margin-bottom:4px">Contenido que vulnere privacidad, imagen, marcas u otros derechos de terceros</li>
+        <li style="margin-bottom:4px">Contenido sexual, violento, discriminatorio, de odio o inapropiado</li>
+        <li style="margin-bottom:4px">Spam, anuncios repetidos, acoso o publicidad abusiva</li>
+      </ul>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">4. Revisión y moderación</h4>
+      <p style="margin-bottom:12px">La Plataforma puede revisar anuncios manual o automáticamente, retirar contenidos, cambiar su estado de publicación, limitar cuentas o eliminar información que incumpla estas normas.</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">5. Riesgos y responsabilidad</h4>
+      <p style="margin-bottom:12px">La Plataforma solo facilita la publicación y consulta de anuncios locales. No participa en contratos de empleo, alquiler, compraventa o servicios entre usuarios. Cada usuario debe verificar identidad, condiciones, precios, licencias y documentación antes de contratar o pagar.</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">6. Cambios en las condiciones</h4>
+      <p style="margin-bottom:12px">Podemos actualizar estas condiciones por motivos legales, técnicos u operativos. El uso continuado de la Plataforma implica la aceptación de la versión vigente.</p>
+      <p style="font-size:12px;color:#999;text-align:center;padding-top:12px;border-top:1px solid #f0f0f0">Para consultas: contact@espana-life.com</p>
+    `,
+    privacyPolicyTitle: '🔒 Política de Privacidad',
+    privacyPolicyBody: `
+      <p style="color:#999;margin-bottom:16px">Última actualización: 23 de mayo de 2026</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">1. Datos que recopilamos</h4>
+      <p style="margin-bottom:12px">Podemos recopilar datos de registro (apodo, teléfono, provincia, identificador de cuenta), contenido de anuncios, datos de contacto, imágenes, solicitudes de reclamación de comercios, reportes y registros necesarios para navegación, seguridad y campañas de invitación.</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">2. Finalidad del uso</h4>
+      <ul style="padding-left:18px;margin-bottom:12px;color:#555">
+        <li style="margin-bottom:4px">Permitir registro, inicio de sesión, publicación, revisión, búsqueda y visualización de anuncios</li>
+        <li style="margin-bottom:4px">Contactar con usuarios para revisión, soporte, reportes o reclamaciones de comercios</li>
+        <li style="margin-bottom:4px">Contabilizar visitas de enlaces de invitación para promociones VIP</li>
+        <li style="margin-bottom:4px">Mantener la seguridad y prevenir fraude, spam y uso indebido</li>
+      </ul>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">3. Información pública</h4>
+      <p style="margin-bottom:12px">Los anuncios, contactos, fotos, direcciones comerciales y otra información que el usuario publique voluntariamente pueden mostrarse públicamente en la web o en enlaces compartidos. No publiques información privada que no quieras hacer pública.</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">4. Conservación y seguridad</h4>
+      <p style="margin-bottom:12px">Usamos conexiones cifradas, control de permisos y servicios técnicos seguros para proteger los datos. Conservamos la información durante el tiempo necesario para prestar el servicio, cumplir obligaciones, resolver incidencias y proteger la Plataforma.</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">5. Servicios de terceros</h4>
+      <p style="margin-bottom:12px">La Plataforma utiliza servicios como Supabase y Vercel para base de datos, autenticación, almacenamiento y alojamiento. Los datos pueden tratarse conforme a los mecanismos de seguridad de estos proveedores.</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">6. Derechos del usuario</h4>
+      <p style="margin-bottom:12px">Puedes solicitar acceso, corrección o eliminación de tus datos, así como la retirada de anuncios publicados por ti. Escríbenos a contact@espana-life.com.</p>
+      <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">7. Actualizaciones</h4>
+      <p style="margin-bottom:12px">Esta política puede actualizarse por cambios legales, técnicos o de funcionamiento. El uso continuado de la Plataforma implica la aceptación de la política vigente.</p>
+      <p style="font-size:12px;color:#999;text-align:center;padding-top:12px;border-top:1px solid #f0f0f0">Para consultas: contact@espana-life.com</p>
+    `
+  }
+};
+
+function renderLegalModal(name) {
+  const lang = currentLang === 'es' ? 'es' : 'zh';
+  const content = LEGAL_CONTENT[lang];
+  if (name === 'userAgreement') {
+    const title = document.getElementById('userAgreementTitle');
+    const body = document.getElementById('userAgreementBody');
+    if (title) title.innerHTML = content.userAgreementTitle;
+    if (body) body.innerHTML = content.userAgreementBody;
+  }
+  if (name === 'privacyPolicy') {
+    const title = document.getElementById('privacyPolicyTitle');
+    const body = document.getElementById('privacyPolicyBody');
+    if (title) title.innerHTML = content.privacyPolicyTitle;
+    if (body) body.innerHTML = content.privacyPolicyBody;
+  }
+}
+
 function openModal(name) {
   const modal = document.getElementById(name+'Modal');
   if (!modal) return;
+  if (name === 'userAgreement' || name === 'privacyPolicy') renderLegalModal(name);
   ensureModalRoot(modal);
   modal.classList.add('open');
   syncModalScrollLock();
@@ -4749,8 +4872,8 @@ loadListings().then(handleInitialDeepLink);
 <div class="modal-overlay" id="userAgreementModal">
   <div class="modal relative" style="max-width:580px;max-height:80vh;overflow-y:auto">
     <button class="modal-close" onclick="closeModal('userAgreement')">✕</button>
-    <h3 style="font-size:20px;font-weight:700;color:var(--red);margin-bottom:16px">📋 用户协议</h3>
-    <div style="line-height:1.8;color:#333;font-size:13px">
+    <h3 id="userAgreementTitle" style="font-size:20px;font-weight:700;color:var(--red);margin-bottom:16px">📋 用户协议</h3>
+    <div id="userAgreementBody" style="line-height:1.8;color:#333;font-size:13px">
       <p style="color:#999;margin-bottom:16px">最后更新：2025年1月1日</p>
       <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">一、总则</h4>
       <p style="margin-bottom:12px">欢迎使用西班牙生活通（以下简称"本平台"）。本协议是您与本平台之间关于使用本平台服务的法律协议。使用本平台即表示您同意遵守本协议的所有条款。</p>
@@ -4780,8 +4903,8 @@ loadListings().then(handleInitialDeepLink);
 <div class="modal-overlay" id="privacyPolicyModal">
   <div class="modal relative" style="max-width:580px;max-height:80vh;overflow-y:auto">
     <button class="modal-close" onclick="closeModal('privacyPolicy')">✕</button>
-    <h3 style="font-size:20px;font-weight:700;color:var(--red);margin-bottom:16px">🔒 隐私政策</h3>
-    <div style="line-height:1.8;color:#333;font-size:13px">
+    <h3 id="privacyPolicyTitle" style="font-size:20px;font-weight:700;color:var(--red);margin-bottom:16px">🔒 隐私政策</h3>
+    <div id="privacyPolicyBody" style="line-height:1.8;color:#333;font-size:13px">
       <p style="color:#999;margin-bottom:16px">最后更新：2025年1月1日</p>
       <h4 style="font-weight:700;margin-bottom:8px;color:#1a1a1a">一、信息收集</h4>
       <p style="margin-bottom:12px">我们收集的信息包括：注册时填写的昵称、手机号码和省份/地区；发布信息时填写的内容；您在使用本平台过程中产生的浏览记录、操作日志，以及邀请活动中用于去重统计的加密访问标识。</p>
@@ -4918,8 +5041,8 @@ function handlePlaceholderLinkClick(event) {
     return;
   }
 
-  if (text.includes('用户协议')) { openModal('userAgreement'); return; }
-  if (text.includes('隐私政策')) { openModal('privacyPolicy'); return; }
+  if (text.includes('用户协议') || text.includes('Acuerdo de Usuario') || text.includes('acuerdo de usuario')) { openModal('userAgreement'); return; }
+  if (text.includes('隐私政策') || text.includes('Política de Privacidad') || text.includes('política de privacidad')) { openModal('privacyPolicy'); return; }
   if (text.includes('公众号') || text.includes('微信群') || text.includes('WhatsApp') || text.includes('Facebook')) {
     openModal('contactUs');
     return;
