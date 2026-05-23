@@ -169,6 +169,20 @@
     letter-spacing: 1px;
   }
 
+  .brand-domain {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-top: 4px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.14);
+    color: #fff7df;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0;
+  }
+
   .search-bar {
     flex: 1;
     min-width: 200px;
@@ -520,6 +534,31 @@
     margin: 0 auto;
     position: relative;
     z-index: 1;
+  }
+
+  .hero-brandmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 14px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.28);
+    color: #fff7df;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+  }
+
+  .hero-brandmark strong {
+    color: #fff;
+    font-size: 15px;
+  }
+
+  .hero-brandmark span {
+    color: var(--gold-light);
   }
 
   .hero-kicker {
@@ -1672,6 +1711,10 @@
       letter-spacing: 0;
     }
     .logo-text span { font-size: 10px; }
+    .brand-domain {
+      font-size: 10px;
+      padding: 2px 6px;
+    }
     .search-bar {
       order: 3;
       flex-basis: 100%;
@@ -1719,6 +1762,17 @@
     }
     .hero::before,
     .hero::after { display: none; }
+    .hero-brandmark {
+      max-width: 100%;
+      margin-bottom: 12px;
+      padding: 7px 10px;
+      gap: 7px;
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-brandmark strong {
+      font-size: 14px;
+    }
     .hero-kicker {
       margin-bottom: 10px;
       font-size: 11px;
@@ -2169,6 +2223,7 @@
       <div class="logo-text">
         <h1>西班牙生活通</h1>
         <span data-i18n="brand.sub">全西班牙华人分类信息平台</span>
+        <span class="brand-domain">espanalife.app</span>
       </div>
     </a>
     <div class="search-bar">
@@ -2198,6 +2253,10 @@
 <!-- ===== HERO ===== -->
 <div class="hero">
   <div class="hero-inner">
+    <div class="hero-brandmark" aria-label="espanalife.app">
+      <strong>espanalife.app</strong>
+      <span>西班牙生活通</span>
+    </div>
     <details class="hero-activity">
       <summary>
         <div class="hero-index">
