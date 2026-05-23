@@ -2186,6 +2186,7 @@
   <nav class="nav-cats">
     <a href="#" class="nav-cat active" onclick="filterCat('all',this)" data-i18n="nav.all">🏠 全部</a>
     <a href="#" class="nav-cat" onclick="filterCat('worker',this)" data-i18n="nav.worker">👷 招工求职</a>
+    <a href="#" class="nav-cat" onclick="filterCat('jobseeker',this)" data-i18n="nav.jobseeker">🙋 求职自荐</a>
     <a href="#" class="nav-cat" onclick="filterCat('house',this)" data-i18n="nav.house">🏡 租房买房</a>
     <a href="#" class="nav-cat" onclick="filterCat('business',this)" data-i18n="nav.business">🏪 生意转让</a>
     <a href="#" class="nav-cat" onclick="filterCat('goods',this)" data-i18n="nav.goods">📦 二手物品/车</a>
@@ -2302,6 +2303,11 @@
       <span class="cat-icon">👷</span>
       <span class="cat-name" data-i18n="cat.worker">招工求职</span>
       <span class="cat-count" data-i18n="cat.workerCount">1,234 条信息</span>
+    </a>
+    <a href="#" class="cat-card" style="--cat-color:#E05A00" onclick="filterCat('jobseeker',null);return false;">
+      <span class="cat-icon">🙋</span>
+      <span class="cat-name" data-i18n="cat.jobseeker">求职自荐</span>
+      <span class="cat-count" data-i18n="cat.jobseekerCount">中西双语介绍</span>
     </a>
     <a href="#" class="cat-card" style="--cat-color:#2563EB" onclick="filterCat('house',null);return false;">
       <span class="cat-icon">🏡</span>
@@ -2475,6 +2481,7 @@
       <select id="postCat" onchange="updatePostForm()">
         <option value="" data-i18n="post.categoryPlaceholder">— 请选择类别 —</option>
         <option value="招工" data-i18n="nav.worker">👷 招工求职</option>
+        <option value="求职" data-i18n="nav.jobseeker">🙋 求职自荐</option>
         <option value="租房" data-i18n="nav.house">🏡 租房买房</option>
         <option value="生意" data-i18n="nav.business">🏪 生意转让</option>
         <option value="二手物品" data-i18n="nav.goods">📦 二手物品/车</option>
@@ -2489,6 +2496,12 @@
     <div class="form-group">
       <label data-i18n="post.desc">详细描述</label>
       <textarea id="postDesc" rows="4" placeholder="详细描述您的信息，包括要求、薪资/价格、工作内容等…" data-i18n-placeholder="post.descPlaceholder"></textarea>
+    </div>
+    <div class="form-group" id="jobIntroGroup" style="display:none">
+      <label data-i18n="post.jobIntroTitle">求职自我介绍（中文 + 西班牙语）</label>
+      <textarea id="jobIntroZh" rows="3" placeholder="中文介绍：我会做什么、工作经验、可上班时间、所在城市…" data-i18n-placeholder="post.jobIntroZhPlaceholder" style="margin-bottom:8px"></textarea>
+      <textarea id="jobIntroEs" rows="3" placeholder="Español: experiencia, disponibilidad, ciudad y tipo de trabajo que busca…" data-i18n-placeholder="post.jobIntroEsPlaceholder"></textarea>
+      <div class="photo-upload-tip" style="margin-top:8px" data-i18n="post.jobIntroTip">建议写清楚身份/语言、经验、可做工种、是否有工作许可、可上班时间。不会西语也可以先写中文。</div>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -2720,10 +2733,10 @@ const fallbackListings = [
 
 // ===== 分类图标映射 =====
 const IMPORTED_MERCHANT_MARK = '平台代登记商家信息';
-const catIcons = { '招工':'👷','租房':'🏡','生意':'🏪','商家黄页':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚' };
-const catBadge = { '招工':'招聘','租房':'出租','生意':'转让','商家黄页':'商家','二手车':'车辆','交友':'征友','二手物品':'出售','服务':'服务','教育':'招生' };
-const catMap   = { worker:'招工', house:'租房', business:'生意', merchant:'商家黄页', wholesale:'生意', wholesale_100:'生意', wholesale_bar:'生意', dating:'交友', goods:'二手物品', service:'服务', edu:'教育' };
-const uiCatMap = { '招工':'worker', '租房':'house', '生意':'business', '商家黄页':'merchant', '二手车':'goods', '交友':'dating', '二手物品':'goods', '服务':'service', '教育':'edu' };
+const catIcons = { '招工':'👷','求职':'🙋','租房':'🏡','生意':'🏪','商家黄页':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚' };
+const catBadge = { '招工':'招聘','求职':'求职','租房':'出租','生意':'转让','商家黄页':'商家','二手车':'车辆','交友':'征友','二手物品':'出售','服务':'服务','教育':'招生' };
+const catMap   = { worker:'招工', jobseeker:'求职', house:'租房', business:'生意', merchant:'商家黄页', wholesale:'生意', wholesale_100:'生意', wholesale_bar:'生意', dating:'交友', goods:'二手物品', service:'服务', edu:'教育' };
+const uiCatMap = { '招工':'worker', '求职':'jobseeker', '租房':'house', '生意':'business', '商家黄页':'merchant', '二手车':'goods', '交友':'dating', '二手物品':'goods', '服务':'service', '教育':'edu' };
 
 const I18N = {
   zh: {
@@ -2735,7 +2748,7 @@ const I18N = {
     'search.placeholder': '搜索招工、房源、二手车、生意转让…',
     'search.button': '🔍 搜索',
     'actions.publish': '＋ 发布信息',
-    'nav.all': '🏠 全部', 'nav.worker': '👷 招工求职', 'nav.house': '🏡 租房买房', 'nav.business': '🏪 生意转让',
+    'nav.all': '🏠 全部', 'nav.worker': '👷 招工求职', 'nav.jobseeker': '🙋 求职自荐', 'nav.house': '🏡 租房买房', 'nav.business': '🏪 生意转让',
     'nav.goods': '📦 二手物品/车', 'nav.service': '🛠 生活服务', 'nav.edu': '📚 教育培训',
     'hero.index': '限时活动-免费领1年VIP', 'hero.rules': '查看规则',
     'hero.kicker': '限时活动 · 截至2026年9月30日',
@@ -2752,15 +2765,15 @@ const I18N = {
     'trust.mobileTitle': '手机端优先', 'trust.mobileText': '适合微信/WhatsApp 转发',
     'trust.spainTitle': '覆盖全西省份', 'trust.spainText': 'Madrid、Barcelona、Valencia 等',
     'catSection.title': '信息分类', 'catSection.all': '查看全部 →',
-    'cat.worker': '招工求职', 'cat.house': '租房买房', 'cat.business': '生意转让', 'cat.goods': '二手物品/车', 'cat.service': '生活服务', 'cat.edu': '教育培训',
-    'cat.workerCount': '1,234 条信息', 'cat.houseCount': '2,567 条信息', 'cat.businessCount': '389 条信息', 'cat.goodsCount': '含二手车', 'cat.serviceCount': '945 条信息', 'cat.eduCount': '421 条信息',
+    'cat.worker': '招工求职', 'cat.jobseeker': '求职自荐', 'cat.house': '租房买房', 'cat.business': '生意转让', 'cat.goods': '二手物品/车', 'cat.service': '生活服务', 'cat.edu': '教育培训',
+    'cat.workerCount': '1,234 条信息', 'cat.jobseekerCount': '中西双语介绍', 'cat.houseCount': '2,567 条信息', 'cat.businessCount': '389 条信息', 'cat.goodsCount': '含二手车', 'cat.serviceCount': '945 条信息', 'cat.eduCount': '421 条信息',
     'footer.desc': '面向西班牙华人社区的本地分类信息平台，帮助用户更快找到工作、房源、服务与生意机会。',
     'footer.categories': '信息分类', 'footer.moreServices': '更多服务', 'footer.follow': '关注我们', 'footer.help': '帮助中心',
     'footer.copy': '© 2026 西班牙生活通 · 版权所有', 'footer.coverage': '西班牙华人生活服务平台 | 覆盖西班牙省份/地区',
     'mobile.home': '首页', 'mobile.jobs': '招工', 'mobile.publish': '发布', 'mobile.latest': '最新',
     'list.emptyTitle': '暂无相关信息', 'list.emptyText': '试试其他条件，或发布第一条信息',
     'list.share': '微信分享', 'list.map': '📍 地图', 'list.open': '点开看详情 ›',
-    'listing.all': '最新信息', 'listing.worker': '招工求职', 'listing.house': '租房买房', 'listing.business': '生意转让',
+    'listing.all': '最新信息', 'listing.worker': '招工求职', 'listing.jobseeker': '求职自荐', 'listing.house': '租房买房', 'listing.business': '生意转让',
     'listing.wholesale': '批发市场', 'listing.wholesale_100': '百元店/百货', 'listing.wholesale_bar': '酒吧/Bar',
     'listing.dating': '交友相亲', 'listing.goods': '二手物品/车', 'listing.service': '生活服务', 'listing.edu': '教育培训',
     'merchant.prefix': '商家黄页', 'province.all': '全部省份', 'province.select': '选择省份',
@@ -2780,7 +2793,15 @@ const I18N = {
     'post.addressTip': '填写后详情页会显示地图入口，适合店铺、生意、服务和培训机构。',
     'post.photos': '照片', 'post.photosTip': '最多6张，每张不超过5MB', 'post.photosCategoryTip': '除招工外，其他分类都可以发布照片，方便以后做广告展示。',
     'post.contact': '联系方式（微信/手机/WhatsApp）*', 'post.contactPlaceholder': '+34 6XX XXX XXX 或 微信号',
-    'post.submit': '🚀 立即发布（限时免费）', 'post.agree': '发布即表示同意 <a href="#" style="color:var(--red)">用户协议</a> 及 <a href="#" style="color:var(--red)">隐私政策</a>'
+    'post.submit': '🚀 立即发布（限时免费）', 'post.agree': '发布即表示同意 <a href="#" style="color:var(--red)">用户协议</a> 及 <a href="#" style="color:var(--red)">隐私政策</a>',
+    'post.jobTitlePlaceholder': '例如：马德里女生求餐馆/百元店工作，可马上上班',
+    'post.jobDescPlaceholder': '可补充年龄段、语言、经验、期望工种、可上班时间等…',
+    'post.jobPricePlaceholder': '期望薪资，如 1200€/月 或 面议',
+    'post.jobContactPlaceholder': '+34 手机 / WhatsApp / 微信号',
+    'post.jobIntroTitle': '求职自我介绍（中文 + 西班牙语）',
+    'post.jobIntroZhPlaceholder': '中文介绍：我会做什么、工作经验、可上班时间、所在城市…',
+    'post.jobIntroEsPlaceholder': 'Español: experiencia, disponibilidad, ciudad y tipo de trabajo que busca…',
+    'post.jobIntroTip': '建议写清楚身份/语言、经验、可做工种、是否有工作许可、可上班时间。不会西语也可以先写中文。'
   },
   es: {
     'meta.title': 'España Life - Empleo, servicios y anuncios en España',
@@ -2791,7 +2812,7 @@ const I18N = {
     'search.placeholder': 'Buscar empleo, alquiler, coche, negocio…',
     'search.button': '🔍 Buscar',
     'actions.publish': '＋ Publicar anuncio',
-    'nav.all': '🏠 Todo', 'nav.worker': '👷 Empleo', 'nav.house': '🏡 Vivienda', 'nav.business': '🏪 Traspasos',
+    'nav.all': '🏠 Todo', 'nav.worker': '👷 Empleo', 'nav.jobseeker': '🙋 Busco trabajo', 'nav.house': '🏡 Vivienda', 'nav.business': '🏪 Traspasos',
     'nav.goods': '📦 Segunda mano/coches', 'nav.service': '🛠 Servicios', 'nav.edu': '📚 Formación',
     'hero.index': 'Promoción: 1 año VIP gratis', 'hero.rules': 'Ver reglas',
     'hero.kicker': 'Promoción limitada · hasta el 30/09/2026',
@@ -2808,15 +2829,15 @@ const I18N = {
     'trust.mobileTitle': 'Pensado para móvil', 'trust.mobileText': 'Listo para compartir por WeChat/WhatsApp',
     'trust.spainTitle': 'Toda España', 'trust.spainText': 'Madrid, Barcelona, Valencia y más',
     'catSection.title': 'Categorías', 'catSection.all': 'Ver todo →',
-    'cat.worker': 'Empleo', 'cat.house': 'Vivienda', 'cat.business': 'Traspasos', 'cat.goods': 'Segunda mano/coches', 'cat.service': 'Servicios', 'cat.edu': 'Formación',
-    'cat.workerCount': '1.234 anuncios', 'cat.houseCount': '2.567 anuncios', 'cat.businessCount': '389 anuncios', 'cat.goodsCount': 'Incluye coches', 'cat.serviceCount': '945 anuncios', 'cat.eduCount': '421 anuncios',
+    'cat.worker': 'Empleo', 'cat.jobseeker': 'Busco trabajo', 'cat.house': 'Vivienda', 'cat.business': 'Traspasos', 'cat.goods': 'Segunda mano/coches', 'cat.service': 'Servicios', 'cat.edu': 'Formación',
+    'cat.workerCount': '1.234 anuncios', 'cat.jobseekerCount': 'Presentación bilingüe', 'cat.houseCount': '2.567 anuncios', 'cat.businessCount': '389 anuncios', 'cat.goodsCount': 'Incluye coches', 'cat.serviceCount': '945 anuncios', 'cat.eduCount': '421 anuncios',
     'footer.desc': 'Plataforma local de anuncios para encontrar empleo, vivienda, servicios y oportunidades de negocio en España.',
     'footer.categories': 'Categorías', 'footer.moreServices': 'Más servicios', 'footer.follow': 'Síguenos', 'footer.help': 'Ayuda',
     'footer.copy': '© 2026 España Life · Todos los derechos reservados', 'footer.coverage': 'Anuncios locales en España | Provincias de toda España',
     'mobile.home': 'Inicio', 'mobile.jobs': 'Empleo', 'mobile.publish': 'Publicar', 'mobile.latest': 'Recientes',
     'list.emptyTitle': 'No hay anuncios relacionados', 'list.emptyText': 'Prueba otros filtros o publica el primer anuncio',
     'list.share': 'Compartir', 'list.map': '📍 Mapa', 'list.open': 'Ver detalles ›',
-    'listing.all': 'Anuncios recientes', 'listing.worker': 'Empleo', 'listing.house': 'Vivienda', 'listing.business': 'Traspasos',
+    'listing.all': 'Anuncios recientes', 'listing.worker': 'Empleo', 'listing.jobseeker': 'Busco trabajo', 'listing.house': 'Vivienda', 'listing.business': 'Traspasos',
     'listing.wholesale': 'Mayoristas', 'listing.wholesale_100': 'Bazares / todo a 100', 'listing.wholesale_bar': 'Bares',
     'listing.dating': 'Amistad y contactos', 'listing.goods': 'Segunda mano/coches', 'listing.service': 'Servicios', 'listing.edu': 'Formación',
     'merchant.prefix': 'Directorio', 'province.all': 'Todas las provincias', 'province.select': 'Seleccionar provincia',
@@ -2836,7 +2857,15 @@ const I18N = {
     'post.addressTip': 'Si rellenas la dirección, el detalle mostrará acceso al mapa. Útil para tiendas, negocios, servicios y centros de formación.',
     'post.photos': 'Fotos', 'post.photosTip': 'Máximo 6 fotos, hasta 5 MB cada una', 'post.photosCategoryTip': 'Todas las categorías excepto empleo pueden publicar fotos.',
     'post.contact': 'Contacto (WeChat / móvil / WhatsApp) *', 'post.contactPlaceholder': '+34 6XX XXX XXX o WeChat',
-    'post.submit': '🚀 Publicar ahora (gratis por tiempo limitado)', 'post.agree': 'Al publicar aceptas el <a href="#" style="color:var(--red)">acuerdo de usuario</a> y la <a href="#" style="color:var(--red)">política de privacidad</a>'
+    'post.submit': '🚀 Publicar ahora (gratis por tiempo limitado)', 'post.agree': 'Al publicar aceptas el <a href="#" style="color:var(--red)">acuerdo de usuario</a> y la <a href="#" style="color:var(--red)">política de privacidad</a>',
+    'post.jobTitlePlaceholder': 'Ej.: Busco trabajo en restaurante o bazar en Madrid',
+    'post.jobDescPlaceholder': 'Añade edad aproximada, idiomas, experiencia, tipo de trabajo y disponibilidad…',
+    'post.jobPricePlaceholder': 'Salario esperado, ej.: 1200€/mes o a negociar',
+    'post.jobContactPlaceholder': '+34 móvil / WhatsApp / WeChat',
+    'post.jobIntroTitle': 'Presentación para buscar trabajo (chino + español)',
+    'post.jobIntroZhPlaceholder': '中文介绍：我会做什么、工作经验、可上班时间、所在城市…',
+    'post.jobIntroEsPlaceholder': 'Español: experiencia, disponibilidad, ciudad y tipo de trabajo que busca…',
+    'post.jobIntroTip': 'Recomendado: idiomas, experiencia, tipo de trabajo, permiso de trabajo, ciudad y disponibilidad. Si no hablas español, puedes escribir solo en chino.'
   }
 };
 
@@ -2847,13 +2876,13 @@ function tr(key) {
 }
 
 function categoryLabel(category) {
-  const keyByCategory = { '招工':'cat.worker', '租房':'cat.house', '生意':'cat.business', '商家黄页':'merchant.prefix', '二手车':'cat.goods', '交友':'listing.dating', '二手物品':'cat.goods', '服务':'cat.service', '教育':'cat.edu' };
+  const keyByCategory = { '招工':'cat.worker', '求职':'cat.jobseeker', '租房':'cat.house', '生意':'cat.business', '商家黄页':'merchant.prefix', '二手车':'cat.goods', '交友':'listing.dating', '二手物品':'cat.goods', '服务':'cat.service', '教育':'cat.edu' };
   return tr(keyByCategory[category] || '') || category || tr('listing.all');
 }
 
 function badgeLabel(category, fallback = '信息') {
   if (currentLang !== 'es') return fallback;
-  const labels = { '招工':'Empleo', '租房':'Alquiler', '生意':'Traspaso', '商家黄页':'Comercio', '二手车':'Coche', '交友':'Contacto', '二手物品':'Venta', '服务':'Servicio', '教育':'Curso' };
+  const labels = { '招工':'Empleo', '求职':'Busco trabajo', '租房':'Alquiler', '生意':'Traspaso', '商家黄页':'Comercio', '二手车':'Coche', '交友':'Contacto', '二手物品':'Venta', '服务':'Servicio', '教育':'Curso' };
   return labels[category] || 'Anuncio';
 }
 
@@ -2871,6 +2900,7 @@ function applyLanguage(lang = currentLang) {
   document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
   populateProvinceControls();
   renderMerchantFilters();
+  updatePostForm();
   syncListingTitle();
   renderListings();
   if (window.refreshLocalizedPlanButton) window.refreshLocalizedPlanButton();
@@ -3176,7 +3206,7 @@ function normalizeListingImages(images) {
 }
 
 function isPhotoCategory(category) {
-  return String(category || '') !== '招工';
+  return !['招工', '求职'].includes(String(category || ''));
 }
 
 function isMapCategory(category) {
@@ -3191,13 +3221,36 @@ function selectedPostCategory() {
 function updatePostForm() {
   const imageGroup = document.getElementById('postImagesGroup');
   const addressGroup = document.getElementById('postAddressGroup');
+  const jobIntroGroup = document.getElementById('jobIntroGroup');
+  const titleInput = document.getElementById('postTitle');
+  const descInput = document.getElementById('postDesc');
+  const priceInput = document.getElementById('postPrice');
+  const contactInput = document.getElementById('postContact');
   const category = selectedPostCategory();
   const showImages = isPhotoCategory(category);
   const showAddress = isMapCategory(category);
+  const showJobIntro = category === '求职';
   if (imageGroup) imageGroup.style.display = showImages ? 'block' : 'none';
   if (addressGroup) addressGroup.style.display = showAddress ? 'block' : 'none';
+  if (jobIntroGroup) jobIntroGroup.style.display = showJobIntro ? 'block' : 'none';
+  if (titleInput) titleInput.placeholder = tr(showJobIntro ? 'post.jobTitlePlaceholder' : 'post.titlePlaceholder');
+  if (descInput) descInput.placeholder = tr(showJobIntro ? 'post.jobDescPlaceholder' : 'post.descPlaceholder');
+  if (priceInput) priceInput.placeholder = tr(showJobIntro ? 'post.jobPricePlaceholder' : 'post.pricePlaceholder');
+  if (contactInput) contactInput.placeholder = tr(showJobIntro ? 'post.jobContactPlaceholder' : 'post.contactPlaceholder');
   if (!showImages) clearPostImages();
   if (!showAddress) clearPostAddress();
+}
+
+function buildPostDescription(category, desc) {
+  const base = String(desc || '').trim();
+  if (category !== '求职') return base;
+  const introZh = document.getElementById('jobIntroZh')?.value.trim() || '';
+  const introEs = document.getElementById('jobIntroEs')?.value.trim() || '';
+  return [
+    base,
+    introZh ? `【中文自我介绍】\n${introZh}` : '',
+    introEs ? `【Presentación en español】\n${introEs}` : ''
+  ].filter(Boolean).join('\n\n');
 }
 
 function clearPostImages() {
@@ -3210,6 +3263,13 @@ function clearPostImages() {
 function clearPostAddress() {
   const input = document.getElementById('postAddress');
   if (input) input.value = '';
+}
+
+function clearJobIntro() {
+  ['jobIntroZh', 'jobIntroEs'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.value = '';
+  });
 }
 
 function previewPostImages() {
@@ -3799,7 +3859,7 @@ async function viewListing(id) {
     }
 
     const displayCategory = getListingDisplayCategory(data);
-    const catIcons = {'招工':'👷','租房':'🏡','生意':'🏪','商家黄页':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚'};
+    const catIcons = {'招工':'👷','求职':'🙋','租房':'🏡','生意':'🏪','商家黄页':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚'};
     const icon = catIcons[displayCategory] || catIcons[data.category] || '📋';
     const timeStr = new Date(data.created_at).toLocaleString('zh-CN');
     const safeCategory = escapeHTML(categoryLabel(displayCategory));
@@ -4067,9 +4127,10 @@ async function submitPost() {
     return;
   }
   if(btn) btn.textContent = '发布中…';
+  const finalDescription = buildPostDescription(catZh, desc) || title;
   const { error } = await sb.from('listings').insert([{
     user_id: currentUser.id,
-    title, description: desc || title,
+    title, description: finalDescription,
     category: catZh, city,
     price: price || '面议', contact,
     address: address || null,
@@ -4081,6 +4142,7 @@ async function submitPost() {
   closeModal('post');
   clearPostImages();
   clearPostAddress();
+  clearJobIntro();
   showToast('🎉 发布成功！您的信息将在管理员审核后上线');
 }
 
@@ -4287,8 +4349,9 @@ async function submitGuestPost() {
     return;
   }
   if (btn) btn.textContent = '发布中…';
+  const finalDescription = buildPostDescription(catZh, desc) || title;
   const { error } = await sb.from('listings').insert([{
-    title, description: desc || title,
+    title, description: finalDescription,
     category: catZh, city,
     price: price || '面议', contact,
     address: address || null,
@@ -4301,6 +4364,7 @@ async function submitGuestPost() {
   closeModal('post');
   clearPostImages();
   clearPostAddress();
+  clearJobIntro();
   showToast('🎉 发布成功！信息将在审核后上线');
 }
 
@@ -4384,7 +4448,7 @@ loadListings().then(handleInitialDeepLink);
   window.selectVipPlan=function(p){window._selectedVipPlan=p;var m=document.getElementById('vipPlanMonth'),y=document.getElementById('vipPlanYear');if(p==='monthly'){if(m){m.style.border='2px solid #e09518';m.style.background='#fffbf2';}if(y){y.style.border='2px solid #e0e0e0';y.style.background='#fff';}}else{if(y){y.style.border='2px solid #e09518';y.style.background='#fffbf2';}if(m){m.style.border='2px solid #e0e0e0';m.style.background='#fff';}}};
   window.confirmVipUpgrade=function(){var p=window._selectedVipPlan,pr=p==='yearly'?'€68.8/年':'€9.9/月';navigator.clipboard&&navigator.clipboard.writeText('espana_life').catch(function(){});var v=document.getElementById('vipUpgradeModal');if(v)v.style.display='none';var t=document.getElementById('toast');if(t){t.textContent='客服微信espana_life已复制，请添加后完成'+pr+'付款';t.style.display='block';setTimeout(function(){t.style.display='none';},4000);}};
   window.switchProfileTab=function(tab,btn){document.querySelectorAll('#profileTabBar button').forEach(function(b){b.style.color='#888';b.style.borderBottom='none';});if(btn){btn.style.color='#e09518';btn.style.borderBottom='2px solid #e09518';}var lp=document.getElementById('myListingsPanel'),ep=document.getElementById('editListingPanel'),ap=document.getElementById('accountPanel');if(lp)lp.style.display=tab==='listings'?'block':'none';if(ep)ep.style.display='none';if(ap)ap.style.display=tab==='account'?'block':'none';if(tab==='listings')window.loadMyListings&&window.loadMyListings();};
-  window.loadMyListings=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var panel=document.getElementById('myListingsPanel');if(!panel)return;panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">⏳ 加载中…</div>';var r=await sb.from('listings').select('*').eq('user_id',sess.user.id).order('created_at',{ascending:false});if(r.error){panel.innerHTML='<div style="color:#c62828;padding:20px;">❌ '+r.error.message+'</div>';return;}if(!r.data||!r.data.length){panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">📭 暂无发布记录</div>';return;}var tv=r.data.reduce(function(s,d){return s+(d.view_count||0);},0);['statPostCount','statViewCount'].forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=i===0?r.data.length:tv;});var cn={worker:'招工',house:'租房',business:'生意转让',wholesale:'批发',dating:'交友',goods:'二手',service:'生活',edu:'教育'};var sm={approved:{l:'已上线',c:'approved'},pending:{l:'审核中',c:'pending'},rejected:{l:'已拒绝',c:'rejected'}};panel.innerHTML=r.data.map(function(item){var s=sm[item.status]||{l:item.status,c:'pending'};var dt=new Date(item.created_at).toLocaleDateString('zh-CN');return '<div class="my-listing-card"><div class="mlc-title">'+item.title+(item.is_pinned?' 📌':'')+'</div><div class="mlc-meta"><span>'+(cn[item.category]||item.category)+'</span><span>📍'+(normalizeProvinceName(item.city)||'')+'</span><span>👁'+(item.view_count||0)+'</span><span>'+dt+'</span><span class="mlc-status '+s.c+'">'+s.l+'</span>'+(item.reject_reason?'<span style="color:#c62828;">拒绝:'+item.reject_reason+'</span>':'')+'</div><div class="mlc-actions"><button class="mlc-btn view" onclick="viewMyListing('+item.id+')">查看详情</button><button class="mlc-btn edit" onclick="startEdit('+item.id+')">✏️ 编辑</button>'+(!item.is_pinned?'<button class="mlc-btn pin" onclick="pinListing('+item.id+',this)">📌 置顶</button>':'<button class="mlc-btn pin" disabled>已置顶</button>')+'<button class="mlc-btn del" onclick="deleteListing('+item.id+',this)">🗑 删除</button></div></div>';}).join('');};
+  window.loadMyListings=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var panel=document.getElementById('myListingsPanel');if(!panel)return;panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">⏳ 加载中…</div>';var r=await sb.from('listings').select('*').eq('user_id',sess.user.id).order('created_at',{ascending:false});if(r.error){panel.innerHTML='<div style="color:#c62828;padding:20px;">❌ '+r.error.message+'</div>';return;}if(!r.data||!r.data.length){panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">📭 暂无发布记录</div>';return;}var tv=r.data.reduce(function(s,d){return s+(d.view_count||0);},0);['statPostCount','statViewCount'].forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=i===0?r.data.length:tv;});var cn={worker:'招工',house:'租房',business:'生意转让',wholesale:'批发',dating:'交友',goods:'二手',service:'生活',edu:'教育','求职':'求职'};var sm={approved:{l:'已上线',c:'approved'},pending:{l:'审核中',c:'pending'},rejected:{l:'已拒绝',c:'rejected'}};panel.innerHTML=r.data.map(function(item){var s=sm[item.status]||{l:item.status,c:'pending'};var dt=new Date(item.created_at).toLocaleDateString('zh-CN');return '<div class="my-listing-card"><div class="mlc-title">'+item.title+(item.is_pinned?' 📌':'')+'</div><div class="mlc-meta"><span>'+(cn[item.category]||item.category)+'</span><span>📍'+(normalizeProvinceName(item.city)||'')+'</span><span>👁'+(item.view_count||0)+'</span><span>'+dt+'</span><span class="mlc-status '+s.c+'">'+s.l+'</span>'+(item.reject_reason?'<span style="color:#c62828;">拒绝:'+item.reject_reason+'</span>':'')+'</div><div class="mlc-actions"><button class="mlc-btn view" onclick="viewMyListing('+item.id+')">查看详情</button><button class="mlc-btn edit" onclick="startEdit('+item.id+')">✏️ 编辑</button>'+(!item.is_pinned?'<button class="mlc-btn pin" onclick="pinListing('+item.id+',this)">📌 置顶</button>':'<button class="mlc-btn pin" disabled>已置顶</button>')+'<button class="mlc-btn del" onclick="deleteListing('+item.id+',this)">🗑 删除</button></div></div>';}).join('');};
   window.viewMyListing=async function(id){var sb=window.getSb();var content=document.getElementById('detailContent');if(!content)return;content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px;margin-bottom:10px">⏳</div><div>加载中…</div></div>';openModal('detail');var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999">信息加载失败</div>';return;}var d=r.data;var safe=function(v){return escapeHTML(v||'')};var sm={approved:'已上线',pending:'审核中',rejected:'已拒绝',offline:'已下线'};content.innerHTML='<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="font-size:34px">📋</span><div><span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">'+safe(d.category)+'</span><h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">'+safe(d.title)+'</h3></div></div><div style="background:#fff8e1;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:#8a5a00;font-size:13px;font-weight:700">状态：'+(sm[d.status]||safe(d.status))+(d.reject_reason?' · 原因：'+safe(d.reject_reason):'')+'</div><div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">详细描述</div><div style="font-size:14px;line-height:1.7;color:#333;white-space:pre-wrap">'+safe(d.description||'暂无描述')+'</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:#fef3f2;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">价格</div><div style="font-size:16px;font-weight:700;color:#c0392b">'+safe(d.price||'面议')+' €</div></div><div style="background:#f0fdf4;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">省份/地区</div><div style="font-size:15px;font-weight:600;color:#166534">'+safe(normalizeProvinceName(d.city))+'</div></div></div><div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px"><div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">联系方式</div><div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">'+safe(d.contact||'未填写')+'</div></div><div class="detail-actions"><button class="detail-action" onclick="startEdit('+d.id+');closeModal(&quot;detail&quot;)">编辑这条信息</button></div></div>';};
   window.startEdit=async function(id){var sb=window.getSb();var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){alert('加载失败');return;}populateProvinceControls();document.getElementById('myListingsPanel').style.display='none';document.getElementById('editListingPanel').style.display='block';['editListingId','editCat','editTitle','editDesc','editCity','editPrice','editContact'].forEach(function(eid){var el=document.getElementById(eid);if(!el)return;var key={editListingId:'id',editCat:'category',editTitle:'title',editDesc:'description',editCity:'city',editPrice:'price',editContact:'contact'}[eid];if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=r.data[key]||'';else if(el.tagName==='SELECT'){if(eid==='editCity')el.value=normalizeProvinceName(r.data[key])||'Barcelona';else el.value=r.data[key]||'';}});};
   window.cancelEdit=function(){document.getElementById('editListingPanel').style.display='none';document.getElementById('myListingsPanel').style.display='block';};
@@ -4398,7 +4462,19 @@ loadListings().then(handleInitialDeepLink);
   </script>
   <script>
   (function(){
+    function ensureEditJobseekerOption(){
+      var cat=document.getElementById('editCat');
+      if(!cat)return;
+      var opt=cat.querySelector('option[value="求职"]');
+      if(!opt){
+        opt=document.createElement('option');
+        opt.value='求职';
+        cat.insertBefore(opt,cat.querySelector('option[value="租房"]')||cat.children[1]||null);
+      }
+      opt.textContent=currentLang==='es'?'🙋 Busco trabajo':'求职自荐';
+    }
     function ensureEditAddressField(){
+      ensureEditJobseekerOption();
       var contact=document.getElementById('editContact');
       if(!contact||document.getElementById('editAddress'))return;
       var input=document.createElement('input');
@@ -4416,12 +4492,14 @@ loadListings().then(handleInitialDeepLink);
     if(oldStart&&!oldStart._mapPatched){
       window.startEdit=async function(id){
         await oldStart(id);
+        ensureEditJobseekerOption();
         ensureEditAddressField();
         var input=document.getElementById('editAddress');
         var cat=document.getElementById('editCat');
         if(cat&&input){input.style.display=isMapCategory(cat.value)?'block':'none';}
         try{
-          var r=await window.getSb().from('listings').select('address').eq('id',id).single();
+          var r=await window.getSb().from('listings').select('address,category').eq('id',id).single();
+          if(cat&&r.data&&r.data.category)cat.value=r.data.category;
           if(input)input.value=r.data&&r.data.address?r.data.address:'';
         }catch(e){}
       };
@@ -4741,6 +4819,9 @@ function categoryFromLinkText(text) {
   const normalized = String(text || '').replace(/\s+/g, '');
   const entries = [
     ['招工', 'worker'],
+    ['求职', 'jobseeker'],
+    ['自荐', 'jobseeker'],
+    ['Busco', 'jobseeker'],
     ['租房', 'house'],
     ['生意', 'business'],
     ['批发', 'wholesale'],
