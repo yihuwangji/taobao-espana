@@ -57,7 +57,59 @@
     width: 100%;
     max-width: 920px;
     margin: 0 auto;
-    padding: 34px 18px 28px;
+    padding: 18px 18px 28px;
+  }
+  .top-download {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 18px;
+    padding: 16px;
+    border-radius: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #d42b2b 0%, #9e1c1c 58%, #f1b43b 140%);
+    box-shadow: 0 16px 34px rgba(158, 28, 28, 0.24);
+  }
+  .top-download img {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    object-fit: cover;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+  }
+  .top-download-title {
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.18;
+    margin-bottom: 4px;
+  }
+  .top-download-sub {
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.84);
+  }
+  .top-download-btn {
+    min-height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    padding: 0 20px;
+    color: #8d1b10;
+    background: #fff4d5;
+    text-decoration: none;
+    font-weight: 900;
+    white-space: nowrap;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.16);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+  }
+  .top-download-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.2);
+  }
+  .top-download-btn:active {
+    transform: scale(0.98);
   }
   .download-panel {
     display: grid;
@@ -173,6 +225,26 @@
     header { padding: 12px 14px; }
     .home-link { font-size: 13px; }
     main { padding: 22px 14px 24px; }
+    .top-download {
+      grid-template-columns: 52px minmax(0, 1fr);
+      gap: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      margin-bottom: 14px;
+    }
+    .top-download img {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+    }
+    .top-download-title { font-size: 20px; }
+    .top-download-sub { font-size: 12px; }
+    .top-download-btn {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-height: 54px;
+      font-size: 17px;
+    }
     .download-panel {
       grid-template-columns: 1fr;
       padding: 22px 16px;
@@ -183,7 +255,7 @@
     .download-btn,
     .secondary-btn { width: 100%; }
     .notes { grid-template-columns: 1fr; }
-    .app-card { order: -1; }
+    .app-card { order: 0; }
   }
 </style>
 </head>
@@ -199,6 +271,14 @@
       </div>
     </header>
     <main>
+      <section class="top-download" aria-label="安卓APP下载">
+        <img src="/assets/icons/icon-192.png?v=20260521" alt="">
+        <div>
+          <div class="top-download-title">安卓APP下载</div>
+          <div class="top-download-sub">西班牙生活通官方安装包 · 适合安卓手机直接安装</div>
+        </div>
+        <a class="top-download-btn" href="/downloads/xibanyalife-1.0.4.apk" download>立即下载安卓APP</a>
+      </section>
       <section class="download-panel">
         <div>
           <div class="kicker">Android APK</div>
