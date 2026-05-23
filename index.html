@@ -2427,10 +2427,10 @@
     <div class="footer-col">
       <h4 data-i18n="footer.follow">关注我们</h4>
       <ul>
-        <li><a href="#">💬 微信公众号</a></li>
-        <li><a href="#">📢 微信群</a></li>
-        <li><a href="#">📱 WhatsApp</a></li>
-        <li><a href="#">📘 Facebook</a></li>
+        <li><a href="#" id="footerOfficialAccount" onclick="openModal('contactUs'); return false;">💬 微信公众号</a></li>
+        <li><a href="#" id="footerWechatGroup" onclick="openModal('contactUs'); return false;">📢 微信群</a></li>
+        <li><a href="#" id="footerWhatsapp" onclick="openModal('contactUs'); return false;">📱 WhatsApp</a></li>
+        <li><a href="#" id="footerFacebook" onclick="openModal('contactUs'); return false;">📘 Facebook</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -4222,7 +4222,11 @@ const CONTACT_CONTENT = {
 
 const DEFAULT_CONTACT_INFO = {
   officialAccount: '西班牙生活通',
+  wechatGroup: '西班牙华人生活交流群',
   wechatId: 'espana_life',
+  whatsapp: '+34 ',
+  facebookName: 'España Life',
+  facebookUrl: '',
   email: 'aladaya@gmail.com',
   supportHours: '9:00-22:00',
   groupZh: '加入西班牙华人生活交流群，与更多华人朋友互动',
@@ -4238,7 +4242,11 @@ let siteContactInfo = { ...DEFAULT_CONTACT_INFO };
 function normalizeContactInfo(value = {}) {
   return {
     officialAccount: String(value.officialAccount || DEFAULT_CONTACT_INFO.officialAccount).trim() || DEFAULT_CONTACT_INFO.officialAccount,
+    wechatGroup: String(value.wechatGroup || DEFAULT_CONTACT_INFO.wechatGroup).trim() || DEFAULT_CONTACT_INFO.wechatGroup,
     wechatId: String(value.wechatId || DEFAULT_CONTACT_INFO.wechatId).trim() || DEFAULT_CONTACT_INFO.wechatId,
+    whatsapp: String(value.whatsapp || DEFAULT_CONTACT_INFO.whatsapp).trim() || DEFAULT_CONTACT_INFO.whatsapp,
+    facebookName: String(value.facebookName || DEFAULT_CONTACT_INFO.facebookName).trim() || DEFAULT_CONTACT_INFO.facebookName,
+    facebookUrl: String(value.facebookUrl || DEFAULT_CONTACT_INFO.facebookUrl).trim() || DEFAULT_CONTACT_INFO.facebookUrl,
     email: String(value.email || DEFAULT_CONTACT_INFO.email).trim() || DEFAULT_CONTACT_INFO.email,
     supportHours: String(value.supportHours || DEFAULT_CONTACT_INFO.supportHours).trim() || DEFAULT_CONTACT_INFO.supportHours,
     groupZh: String(value.groupZh || DEFAULT_CONTACT_INFO.groupZh).trim() || DEFAULT_CONTACT_INFO.groupZh,
@@ -4262,6 +4270,15 @@ function contactCard(icon, title, text) {
   `;
 }
 
+function facebookDisplay(info) {
+  return info.facebookUrl ? `${info.facebookName} · ${info.facebookUrl}` : info.facebookName;
+}
+
+function whatsappHref(value) {
+  const digits = String(value || '').replace(/\D/g, '');
+  return digits.length >= 8 ? `https://wa.me/${digits}` : '';
+}
+
 function buildContactContent(lang) {
   const info = normalizeContactInfo(siteContactInfo);
   if (lang === 'es') {
@@ -4271,9 +4288,11 @@ function buildContactContent(lang) {
         <p style="margin-bottom:16px">${escapeHTML(info.introEs)}</p>
         <div style="display:flex;flex-direction:column;gap:12px">
           ${contactCard('💬', 'Cuenta oficial de WeChat', `Busca “${info.officialAccount}” y síguenos en WeChat`)}
-          ${contactCard('📱', 'Atención por WeChat', `Añade: ${info.wechatId}. Horario: ${info.supportHours} (hora de España)`)}
+          ${contactCard('📢', 'Grupo de WeChat', `${info.wechatGroup} · ${info.groupEs}`)}
+          ${contactCard('📱', 'WhatsApp', info.whatsapp)}
+          ${contactCard('📘', 'Facebook', facebookDisplay(info))}
+          ${contactCard('💚', 'Atención por WeChat', `Añade: ${info.wechatId}. Horario: ${info.supportHours} (hora de España)`)}
           ${contactCard('📧', 'Correo electrónico', info.email)}
-          ${contactCard('📢', 'Grupo de WeChat', info.groupEs)}
         </div>
         <p style="margin-top:16px;font-size:12px;color:#999;text-align:center">${escapeHTML(info.responseEs)}</p>
       `
@@ -4285,9 +4304,11 @@ function buildContactContent(lang) {
       <p style="margin-bottom:16px">${escapeHTML(info.introZh)}</p>
       <div style="display:flex;flex-direction:column;gap:12px">
         ${contactCard('💬', '微信公众号', `搜索“${info.officialAccount}”关注我们的公众号`)}
-        ${contactCard('📱', '微信客服', `添加客服微信：${info.wechatId}，工作时间 ${info.supportHours}（西班牙时间）`)}
+        ${contactCard('📢', '微信群', `${info.wechatGroup} · ${info.groupZh}`)}
+        ${contactCard('📱', 'WhatsApp', info.whatsapp)}
+        ${contactCard('📘', 'Facebook', facebookDisplay(info))}
+        ${contactCard('💚', '微信客服', `添加客服微信：${info.wechatId}，工作时间 ${info.supportHours}（西班牙时间）`)}
         ${contactCard('📧', '电子邮件', info.email)}
-        ${contactCard('📢', '微信交流群', info.groupZh)}
       </div>
       <p style="margin-top:16px;font-size:12px;color:#999;text-align:center">${escapeHTML(info.responseZh)}</p>
     `
@@ -4299,9 +4320,44 @@ function updateContactFooter() {
   const wechat = document.getElementById('helpContactWechat');
   const email = document.getElementById('helpContactEmail');
   const hours = document.getElementById('helpContactHours');
+  const official = document.getElementById('footerOfficialAccount');
+  const group = document.getElementById('footerWechatGroup');
+  const whatsapp = document.getElementById('footerWhatsapp');
+  const facebook = document.getElementById('footerFacebook');
   if (wechat) wechat.textContent = info.wechatId;
   if (email) email.textContent = info.email;
   if (hours) hours.textContent = info.supportHours;
+  if (official) official.textContent = `💬 ${info.officialAccount}`;
+  if (group) group.textContent = `📢 ${info.wechatGroup}`;
+  if (whatsapp) {
+    const href = whatsappHref(info.whatsapp);
+    whatsapp.textContent = `📱 ${info.whatsapp || 'WhatsApp'}`;
+    if (href) {
+      whatsapp.href = href;
+      whatsapp.target = '_blank';
+      whatsapp.rel = 'noopener noreferrer';
+      whatsapp.onclick = null;
+    } else {
+      whatsapp.href = '#';
+      whatsapp.removeAttribute('target');
+      whatsapp.removeAttribute('rel');
+      whatsapp.onclick = function() { openModal('contactUs'); return false; };
+    }
+  }
+  if (facebook) {
+    facebook.textContent = `📘 ${info.facebookName || 'Facebook'}`;
+    if (info.facebookUrl) {
+      facebook.href = info.facebookUrl;
+      facebook.target = '_blank';
+      facebook.rel = 'noopener noreferrer';
+      facebook.onclick = null;
+    } else {
+      facebook.href = '#';
+      facebook.removeAttribute('target');
+      facebook.removeAttribute('rel');
+      facebook.onclick = function() { openModal('contactUs'); return false; };
+    }
+  }
 }
 
 async function loadSiteContactInfo() {

@@ -28,7 +28,11 @@ values (
   'contact_info',
   jsonb_build_object(
     'officialAccount', '西班牙生活通',
+    'wechatGroup', '西班牙华人生活交流群',
     'wechatId', 'espana_life',
+    'whatsapp', '+34 ',
+    'facebookName', 'España Life',
+    'facebookUrl', '',
     'email', 'aladaya@gmail.com',
     'supportHours', '9:00-22:00',
     'groupZh', '加入西班牙华人生活交流群，与更多华人朋友互动',

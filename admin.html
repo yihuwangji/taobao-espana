@@ -1421,8 +1421,24 @@ tr:hover td { background: rgba(255,255,255,0.02); }
               <input type="text" id="contactOfficialAccount" placeholder="西班牙生活通">
             </div>
             <div class="config-row">
+              <label>微信群</label>
+              <input type="text" id="contactWechatGroup" placeholder="西班牙华人生活交流群">
+            </div>
+            <div class="config-row">
               <label>客服微信</label>
               <input type="text" id="contactWechatId" placeholder="espana_life">
+            </div>
+            <div class="config-row">
+              <label>WhatsApp</label>
+              <input type="text" id="contactWhatsapp" placeholder="+34 6XX XXX XXX">
+            </div>
+            <div class="config-row">
+              <label>Facebook 名称</label>
+              <input type="text" id="contactFacebookName" placeholder="España Life">
+            </div>
+            <div class="config-row">
+              <label>Facebook 链接</label>
+              <input type="text" id="contactFacebookUrl" placeholder="https://www.facebook.com/...">
             </div>
             <div class="config-row">
               <label>电子邮件</label>
@@ -3093,7 +3109,11 @@ function openPinModal() { openModal('pin'); }
 
 const DEFAULT_CONTACT_SETTINGS = {
   officialAccount: '西班牙生活通',
+  wechatGroup: '西班牙华人生活交流群',
   wechatId: 'espana_life',
+  whatsapp: '+34 ',
+  facebookName: 'España Life',
+  facebookUrl: '',
   email: 'aladaya@gmail.com',
   supportHours: '9:00-22:00',
   groupZh: '加入西班牙华人生活交流群，与更多华人朋友互动',
@@ -3112,7 +3132,11 @@ function fillContactSettings(value = {}) {
   const settings = { ...DEFAULT_CONTACT_SETTINGS, ...(value || {}) };
   const pairs = {
     contactOfficialAccount: settings.officialAccount,
+    contactWechatGroup: settings.wechatGroup,
     contactWechatId: settings.wechatId,
+    contactWhatsapp: settings.whatsapp,
+    contactFacebookName: settings.facebookName,
+    contactFacebookUrl: settings.facebookUrl,
     contactEmail: settings.email,
     contactSupportHours: settings.supportHours,
     contactIntroZh: settings.introZh,
@@ -3131,7 +3155,11 @@ function fillContactSettings(value = {}) {
 function collectContactSettings() {
   return {
     officialAccount: contactInputValue('contactOfficialAccount', DEFAULT_CONTACT_SETTINGS.officialAccount),
+    wechatGroup: contactInputValue('contactWechatGroup', DEFAULT_CONTACT_SETTINGS.wechatGroup),
     wechatId: contactInputValue('contactWechatId', DEFAULT_CONTACT_SETTINGS.wechatId),
+    whatsapp: contactInputValue('contactWhatsapp', DEFAULT_CONTACT_SETTINGS.whatsapp),
+    facebookName: contactInputValue('contactFacebookName', DEFAULT_CONTACT_SETTINGS.facebookName),
+    facebookUrl: contactInputValue('contactFacebookUrl', DEFAULT_CONTACT_SETTINGS.facebookUrl),
     email: contactInputValue('contactEmail', DEFAULT_CONTACT_SETTINGS.email),
     supportHours: contactInputValue('contactSupportHours', DEFAULT_CONTACT_SETTINGS.supportHours),
     introZh: contactInputValue('contactIntroZh', DEFAULT_CONTACT_SETTINGS.introZh),

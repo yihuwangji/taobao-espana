@@ -3,7 +3,11 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta
 
 const DEFAULT_CONTACT_INFO = {
   officialAccount: '西班牙生活通',
+  wechatGroup: '西班牙华人生活交流群',
   wechatId: 'espana_life',
+  whatsapp: '+34 ',
+  facebookName: 'España Life',
+  facebookUrl: '',
   email: 'aladaya@gmail.com',
   supportHours: '9:00-22:00',
   groupZh: '加入西班牙华人生活交流群，与更多华人朋友互动',
@@ -40,7 +44,11 @@ function cleanEmail(value) {
 function normalizeContactInfo(value = {}) {
   return {
     officialAccount: cleanText(value.officialAccount, 80) || DEFAULT_CONTACT_INFO.officialAccount,
+    wechatGroup: cleanText(value.wechatGroup, 120) || DEFAULT_CONTACT_INFO.wechatGroup,
     wechatId: cleanText(value.wechatId, 80) || DEFAULT_CONTACT_INFO.wechatId,
+    whatsapp: cleanText(value.whatsapp, 80) || DEFAULT_CONTACT_INFO.whatsapp,
+    facebookName: cleanText(value.facebookName, 120) || DEFAULT_CONTACT_INFO.facebookName,
+    facebookUrl: cleanText(value.facebookUrl, 300) || DEFAULT_CONTACT_INFO.facebookUrl,
     email: cleanEmail(value.email),
     supportHours: cleanText(value.supportHours, 80) || DEFAULT_CONTACT_INFO.supportHours,
     groupZh: cleanText(value.groupZh, 220) || DEFAULT_CONTACT_INFO.groupZh,
