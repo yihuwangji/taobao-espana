@@ -80,6 +80,35 @@
   .header-top a { color: var(--gold-light); text-decoration: none; margin-left: 16px; }
   .header-top a:hover { color: white; }
 
+  .lang-switch {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 12px;
+    padding: 2px;
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    vertical-align: middle;
+  }
+
+  .lang-btn {
+    border: 0;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font: inherit;
+    font-size: 11px;
+    color: rgba(255,255,255,0.82);
+    background: transparent;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .lang-btn.active {
+    background: var(--gold);
+    color: var(--ink);
+    font-weight: 800;
+  }
+
   .header-main {
     padding: 14px 24px;
     display: flex;
@@ -178,6 +207,10 @@
   .header-actions {
     display: flex;
     gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .header-lang {
     flex-shrink: 0;
   }
 
@@ -1617,6 +1650,13 @@
     }
     .header-top > div:last-child,
     .header-actions { display: none; }
+    .header-lang {
+      margin-left: auto;
+    }
+    .header-lang .lang-btn {
+      padding: 5px 8px;
+      font-size: 11px;
+    }
     .header-main {
       padding: 10px 14px 12px;
       gap: 10px;
@@ -2114,13 +2154,13 @@
 <!-- ===== HEADER ===== -->
 <header>
   <div class="header-top">
-    <div>🇪🇸 西班牙华人生活服务平台 · España China Community</div>
+    <div data-i18n="top.tagline">🇪🇸 西班牙华人生活服务平台 · España China Community</div>
     <div>
-      <a href="#" onclick="openModal('login')">登录</a>
-      <a href="#" onclick="openModal('register')">注册</a>
-      <a href="#" onclick="openModal('profile');return false;" id="myInfoLink">我的信息</a>
-      <a href="/download">下载APP</a>
-      <a href="#" onclick="openModal('helpCenter'); return false;">帮助中心</a>
+      <a href="#" onclick="openModal('login')" data-i18n="top.login">登录</a>
+      <a href="#" onclick="openModal('register')" data-i18n="top.register">注册</a>
+      <a href="#" onclick="openModal('profile');return false;" id="myInfoLink" data-i18n="top.myInfo">我的信息</a>
+      <a href="/download" data-i18n="top.download">下载APP</a>
+      <a href="#" onclick="openModal('helpCenter'); return false;" data-i18n="top.help">帮助中心</a>
     </div>
   </div>
   <div class="header-main">
@@ -2128,25 +2168,29 @@
       <div class="logo-icon"><img src="/assets/icons/icon-192.png?v=20260521" alt="西班牙生活通"></div>
       <div class="logo-text">
         <h1>西班牙生活通</h1>
-        <span>全西班牙华人分类信息平台</span>
+        <span data-i18n="brand.sub">全西班牙华人分类信息平台</span>
       </div>
     </a>
     <div class="search-bar">
-      <input type="text" placeholder="搜索招工、房源、二手车、生意转让…" id="searchInput">
-      <button onclick="doSearch()">🔍 搜索</button>
+      <input type="text" placeholder="搜索招工、房源、二手车、生意转让…" id="searchInput" data-i18n-placeholder="search.placeholder">
+      <button onclick="doSearch()" data-i18n="search.button">🔍 搜索</button>
     </div>
     <div class="header-actions">
-      <button class="btn-gold" onclick="openModal('post')">＋ 发布信息</button>
+      <button class="btn-gold" onclick="openModal('post')" data-i18n="actions.publish">＋ 发布信息</button>
+    </div>
+    <div class="header-lang lang-switch" aria-label="Language">
+      <button type="button" class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">中文</button>
+      <button type="button" class="lang-btn" data-lang="es" onclick="setLanguage('es')">ES</button>
     </div>
   </div>
   <nav class="nav-cats">
-    <a href="#" class="nav-cat active" onclick="filterCat('all',this)">🏠 全部</a>
-    <a href="#" class="nav-cat" onclick="filterCat('worker',this)">👷 招工求职</a>
-    <a href="#" class="nav-cat" onclick="filterCat('house',this)">🏡 租房买房</a>
-    <a href="#" class="nav-cat" onclick="filterCat('business',this)">🏪 生意转让</a>
-    <a href="#" class="nav-cat" onclick="filterCat('goods',this)">📦 二手物品/车</a>
-    <a href="#" class="nav-cat" onclick="filterCat('service',this)">🛠 生活服务</a>
-    <a href="#" class="nav-cat" onclick="filterCat('edu',this)">📚 教育培训</a>
+    <a href="#" class="nav-cat active" onclick="filterCat('all',this)" data-i18n="nav.all">🏠 全部</a>
+    <a href="#" class="nav-cat" onclick="filterCat('worker',this)" data-i18n="nav.worker">👷 招工求职</a>
+    <a href="#" class="nav-cat" onclick="filterCat('house',this)" data-i18n="nav.house">🏡 租房买房</a>
+    <a href="#" class="nav-cat" onclick="filterCat('business',this)" data-i18n="nav.business">🏪 生意转让</a>
+    <a href="#" class="nav-cat" onclick="filterCat('goods',this)" data-i18n="nav.goods">📦 二手物品/车</a>
+    <a href="#" class="nav-cat" onclick="filterCat('service',this)" data-i18n="nav.service">🛠 生活服务</a>
+    <a href="#" class="nav-cat" onclick="filterCat('edu',this)" data-i18n="nav.edu">📚 教育培训</a>
   </nav>
 </header>
 
@@ -2157,24 +2201,24 @@
       <summary>
         <div class="hero-index">
           <span class="hero-index-icon">🎁</span>
-          <span class="hero-index-text">限时活动-免费领1年VIP</span>
-          <span class="hero-index-hint">查看规则</span>
+          <span class="hero-index-text" data-i18n="hero.index">限时活动-免费领1年VIP</span>
+          <span class="hero-index-hint" data-i18n="hero.rules">查看规则</span>
         </div>
       </summary>
       <div class="hero-activity-body">
-        <div class="hero-kicker">限时活动 · 截至2026年9月30日</div>
-        <h2>注册账号，邀请10位好友访问，免费领1年VIP</h2>
-        <p>活动期内注册西班牙生活通，分享你的专属链接。累计10位不同好友打开访问后，即可获得1年VIP，享置顶优先、VIP标识和更多曝光。</p>
+        <div class="hero-kicker" data-i18n="hero.kicker">限时活动 · 截至2026年9月30日</div>
+        <h2 data-i18n="hero.title">注册账号，邀请10位好友访问，免费领1年VIP</h2>
+        <p data-i18n="hero.desc">活动期内注册西班牙生活通，分享你的专属链接。累计10位不同好友打开访问后，即可获得1年VIP，享置顶优先、VIP标识和更多曝光。</p>
         <div class="hero-promo-steps" aria-label="活动步骤">
-          <span>1. 注册账号</span>
-          <span>2. 分享专属链接</span>
-          <span>3. 邀请10位好友</span>
-          <span>4. 免费领1年VIP</span>
+          <span data-i18n="hero.step1">1. 注册账号</span>
+          <span data-i18n="hero.step2">2. 分享专属链接</span>
+          <span data-i18n="hero.step3">3. 邀请10位好友</span>
+          <span data-i18n="hero.step4">4. 免费领1年VIP</span>
         </div>
         <div class="hero-actions">
-          <button class="hero-action primary" onclick="openModal('register')">立即注册</button>
-          <button class="hero-action" onclick="openReferralCenter()">我的转发码</button>
-          <a class="hero-action" href="#listingsGrid">最新信息</a>
+          <button class="hero-action primary" onclick="openModal('register')" data-i18n="hero.register">立即注册</button>
+          <button class="hero-action" onclick="openReferralCenter()" data-i18n="hero.referral">我的转发码</button>
+          <a class="hero-action" href="#listingsGrid" data-i18n="hero.latest">最新信息</a>
         </div>
         <div id="heroReferralCard" class="hero-referral-card" aria-live="polite"></div>
       </div>
@@ -2186,8 +2230,8 @@
   <div class="wechat-save-inner">
     <div class="wechat-dots">...</div>
     <div>
-      <div class="wechat-save-title">微信里下次找不到？先收藏本站</div>
-      <div class="wechat-save-text">
+      <div class="wechat-save-title" data-i18n="wechat.title">微信里下次找不到？先收藏本站</div>
+      <div class="wechat-save-text" data-i18n="wechat.text">
         看右上角绿色箭头，点微信浏览器的 <strong>...</strong>，选择 <strong>添加到收藏</strong>；想放到手机桌面，就选 <strong>添加到桌面</strong>。
       </div>
     </div>
@@ -2199,8 +2243,8 @@
 
 <div class="section merchant-filter-section">
   <div class="section-title">
-    <h3>商家服务筛选</h3>
-    <a href="#" class="see-all" onclick="filterMerchant('all');return false;">商家黄页 →</a>
+    <h3 data-i18n="merchant.title">商家服务筛选</h3>
+    <a href="#" class="see-all" onclick="filterMerchant('all');return false;" data-i18n="merchant.allLink">商家黄页 →</a>
   </div>
   <div class="merchant-filter-grid" id="merchantFilterGrid"></div>
 </div>
@@ -2209,12 +2253,12 @@
 <div class="section">
   <div class="section-title">
     <h3 id="listingTitle">最新信息</h3>
-    <a href="#" class="see-all">查看更多 →</a>
+    <a href="#" class="see-all" data-i18n="listing.more">查看更多 →</a>
   </div>
 
   <!-- Province filter -->
   <div class="city-tabs">
-    <button class="city-tab active" onclick="filterCity('全部',this)">🌐 Todas las provincias</button>
+    <button class="city-tab active" onclick="filterCity('全部',this)" data-i18n="province.all">🌐 全部省份</button>
     <select id="provinceFilter" class="city-tab province-select" onchange="filterCity(this.value,this)" aria-label="Provincia">
       <option value="全部">Seleccionar provincia</option>
     </select>
@@ -2226,63 +2270,63 @@
 <!-- Trust strip -->
 <div class="section trust-strip">
   <div class="trust-strip-grid">
-    <button class="trust-item publish-entry-card" type="button" onclick="openPublishPage(event)" aria-label="免费发布信息">
+    <button class="trust-item publish-entry-card" type="button" onclick="openPublishPage(event)" aria-label="免费发布信息" data-i18n-aria="publish.aria">
       <span class="publish-entry-icon">📢</span>
       <span class="publish-entry-copy">
-        <span class="publish-entry-title">免费发布信息</span>
-        <span class="publish-entry-text">招工、房源、二手、生意转让都可以发布</span>
+        <span class="publish-entry-title" data-i18n="publish.title">免费发布信息</span>
+        <span class="publish-entry-text" data-i18n="publish.text">招工、房源、二手、生意转让都可以发布</span>
       </span>
-      <span class="publish-entry-btn">立即发布 <span class="publish-entry-arrow">&gt;</span></span>
+      <span class="publish-entry-btn"><span data-i18n="publish.button">立即发布</span> <span class="publish-entry-arrow">&gt;</span></span>
     </button>
     <div class="trust-item">
       <span class="trust-icon">🛡</span>
-      <div><div class="trust-title">先审核后展示</div><div class="trust-text">减少诈骗与重复广告</div></div>
+      <div><div class="trust-title" data-i18n="trust.reviewTitle">先审核后展示</div><div class="trust-text" data-i18n="trust.reviewText">减少诈骗与重复广告</div></div>
     </div>
     <div class="trust-item">
       <span class="trust-icon">📱</span>
-      <div><div class="trust-title">手机端优先</div><div class="trust-text">适合微信/WhatsApp 转发</div></div>
+      <div><div class="trust-title" data-i18n="trust.mobileTitle">手机端优先</div><div class="trust-text" data-i18n="trust.mobileText">适合微信/WhatsApp 转发</div></div>
     </div>
     <div class="trust-item">
       <span class="trust-icon">🌍</span>
-      <div><div class="trust-title">覆盖全西省份</div><div class="trust-text">Madrid、Barcelona、Valencia 等</div></div>
+      <div><div class="trust-title" data-i18n="trust.spainTitle">覆盖全西省份</div><div class="trust-text" data-i18n="trust.spainText">Madrid、Barcelona、Valencia 等</div></div>
     </div>
   </div>
 </div>
 <div class="section">
   <div class="section-title">
-    <h3>信息分类</h3>
-    <a href="#" class="see-all">查看全部 →</a>
+    <h3 data-i18n="catSection.title">信息分类</h3>
+    <a href="#" class="see-all" data-i18n="catSection.all">查看全部 →</a>
   </div>
   <div class="cat-grid" id="catGrid">
     <a href="#" class="cat-card" style="--cat-color:#D42B2B" onclick="filterCat('worker',null);return false;">
       <span class="cat-icon">👷</span>
-      <span class="cat-name">招工求职</span>
-      <span class="cat-count">1,234 条信息</span>
+      <span class="cat-name" data-i18n="cat.worker">招工求职</span>
+      <span class="cat-count" data-i18n="cat.workerCount">1,234 条信息</span>
     </a>
     <a href="#" class="cat-card" style="--cat-color:#2563EB" onclick="filterCat('house',null);return false;">
       <span class="cat-icon">🏡</span>
-      <span class="cat-name">租房买房</span>
-      <span class="cat-count">2,567 条信息</span>
+      <span class="cat-name" data-i18n="cat.house">租房买房</span>
+      <span class="cat-count" data-i18n="cat.houseCount">2,567 条信息</span>
     </a>
     <a href="#" class="cat-card" style="--cat-color:#16A34A" onclick="filterCat('business',null);return false;">
       <span class="cat-icon">🏪</span>
-      <span class="cat-name">生意转让</span>
-      <span class="cat-count">389 条信息</span>
+      <span class="cat-name" data-i18n="cat.business">生意转让</span>
+      <span class="cat-count" data-i18n="cat.businessCount">389 条信息</span>
     </a>
     <a href="#" class="cat-card" style="--cat-color:#F59E0B" onclick="filterCat('goods',null);return false;">
       <span class="cat-icon">📦</span>
-      <span class="cat-name">二手物品/车</span>
-      <span class="cat-count">含二手车</span>
+      <span class="cat-name" data-i18n="cat.goods">二手物品/车</span>
+      <span class="cat-count" data-i18n="cat.goodsCount">含二手车</span>
     </a>
     <a href="#" class="cat-card" style="--cat-color:#0891B2" onclick="filterCat('service',null);return false;">
       <span class="cat-icon">🛠</span>
-      <span class="cat-name">生活服务</span>
-      <span class="cat-count">945 条信息</span>
+      <span class="cat-name" data-i18n="cat.service">生活服务</span>
+      <span class="cat-count" data-i18n="cat.serviceCount">945 条信息</span>
     </a>
     <a href="#" class="cat-card" style="--cat-color:#059669" onclick="filterCat('edu',null);return false;">
       <span class="cat-icon">📚</span>
-      <span class="cat-name">教育培训</span>
-      <span class="cat-count">421 条信息</span>
+      <span class="cat-name" data-i18n="cat.edu">教育培训</span>
+      <span class="cat-count" data-i18n="cat.eduCount">421 条信息</span>
     </a>
   </div>
 </div>
@@ -2294,10 +2338,10 @@
   <div class="footer-grid">
     <div class="footer-col">
       <div class="footer-logo"><img src="/assets/icons/icon-192.png?v=20260521" alt=""> 西班牙生活通</div>
-      <p style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.5);">面向西班牙华人社区的本地分类信息平台，帮助用户更快找到工作、房源、服务与生意机会。</p>
+      <p style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.5);" data-i18n="footer.desc">面向西班牙华人社区的本地分类信息平台，帮助用户更快找到工作、房源、服务与生意机会。</p>
     </div>
     <div class="footer-col">
-      <h4>信息分类</h4>
+      <h4 data-i18n="footer.categories">信息分类</h4>
       <ul>
         <li><a href="#">👷 招工求职</a></li>
         <li><a href="#">🏡 租房买房</a></li>
@@ -2306,7 +2350,7 @@
       </ul>
     </div>
     <div class="footer-col">
-      <h4>更多服务</h4>
+      <h4 data-i18n="footer.moreServices">更多服务</h4>
       <ul>
         <li><a href="#">📦 二手物品</a></li>
         <li><a href="#">🛠 生活服务</a></li>
@@ -2316,7 +2360,7 @@
       </ul>
     </div>
     <div class="footer-col">
-      <h4>关注我们</h4>
+      <h4 data-i18n="footer.follow">关注我们</h4>
       <ul>
         <li><a href="#">💬 微信公众号</a></li>
         <li><a href="#">📢 微信群</a></li>
@@ -2325,7 +2369,7 @@
       </ul>
     </div>
     <div class="footer-col">
-      <h4>帮助中心</h4>
+      <h4 data-i18n="footer.help">帮助中心</h4>
       <ul>
         <li><a href="#" onclick="openModal('howToPost'); return false;">如何发布信息</a></li>
         <li><a href="#" onclick="openModal('contactUs'); return false;">联系我们</a></li>
@@ -2337,8 +2381,8 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <div>© 2026 西班牙生活通 · 版权所有</div>
-    <div>西班牙华人生活服务平台 | 覆盖西班牙省份/地区</div>
+    <div data-i18n="footer.copy">© 2026 西班牙生活通 · 版权所有</div>
+    <div data-i18n="footer.coverage">西班牙华人生活服务平台 | 覆盖西班牙省份/地区</div>
   </div>
 </footer>
 
@@ -2346,16 +2390,16 @@
 <nav class="mobile-nav">
   <div class="mobile-nav-items">
     <a href="#" class="mobile-nav-item active">
-      <span>🏠</span><span>首页</span>
+      <span>🏠</span><span data-i18n="mobile.home">首页</span>
     </a>
     <a href="#" class="mobile-nav-item" onclick="filterCat('worker',null);return false;">
-      <span>👷</span><span>招工</span>
+      <span>👷</span><span data-i18n="mobile.jobs">招工</span>
     </a>
     <a href="/publish" class="mobile-nav-item" onclick="openPublishPage(event)" style="color:var(--red)">
-      <span>➕</span><span>发布</span>
+      <span>➕</span><span data-i18n="mobile.publish">发布</span>
     </a>
     <a href="#listingsGrid" class="mobile-nav-item">
-      <span>📋</span><span>最新</span>
+      <span>📋</span><span data-i18n="mobile.latest">最新</span>
     </a>
     <a href="#" class="mobile-nav-item" onclick="openModal('profile');return false;">
       <span>👤</span><span>我的</span>
@@ -2417,67 +2461,67 @@
 <div class="modal-overlay" id="postModal">
   <div class="modal relative">
     <button class="modal-close" onclick="closeModal('post')">✕</button>
-    <h3>📢 发布信息</h3>
+    <h3 data-i18n="post.title">📢 发布信息</h3>
     <div id="postModeBar" style="display:flex;gap:8px;margin-bottom:14px;background:#f9f0e0;border-radius:8px;padding:4px">
-      <button onclick="setPostMode('member')" id="postModeBtn_member" style="flex:1;padding:7px;border:none;border-radius:6px;font-size:13px;cursor:pointer;background:var(--red);color:white;font-weight:600">🔑 已登录发布</button>
-      <button onclick="setPostMode('guest')" id="postModeBtn_guest" style="flex:1;padding:7px;border:none;border-radius:6px;font-size:13px;cursor:pointer;background:transparent;color:var(--ink-mid)">👤 游客快速发布</button>
+      <button onclick="setPostMode('member')" id="postModeBtn_member" style="flex:1;padding:7px;border:none;border-radius:6px;font-size:13px;cursor:pointer;background:var(--red);color:white;font-weight:600" data-i18n="post.memberMode">🔑 已登录发布</button>
+      <button onclick="setPostMode('guest')" id="postModeBtn_guest" style="flex:1;padding:7px;border:none;border-radius:6px;font-size:13px;cursor:pointer;background:transparent;color:var(--ink-mid)" data-i18n="post.guestMode">👤 游客快速发布</button>
     </div><div id="planSelectorWrapper" style="margin-bottom:4px;"><div style="font-size:13px;color:#666;margin-bottom:10px;font-weight:500;">请选择发布套餐：</div><div id="planSelector" style="display:flex;gap:12px;margin-bottom:18px;"><div id="planFree" onclick="selectPlan('free')" style="flex:1;border:2px solid #e09518;border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;background:#fffbf2;position:relative;"><div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#e09518,#f5c842);color:#fff;font-size:11px;font-weight:bold;padding:2px 10px;border-radius:20px;white-space:nowrap;">⏳ 限时免费</div><div style="font-size:24px;margin-bottom:4px;">🆓</div><div style="font-weight:bold;color:#333;margin-bottom:3px;">限时免费</div><div style="font-size:20px;font-weight:bold;color:#e09518;margin-bottom:3px;">€0</div><div style="font-size:11px;color:#888;">限时开放</div><ul style="margin-top:6px;font-size:11px;color:#555;text-align:left;list-style:none;padding:0;"><li>✓ 展示7天</li><li>✓ 普通排序</li></ul></div><div id="planVip" onclick="selectPlan('vip')" style="flex:1;border:2px solid #e0e0e0;border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;background:#fff;position:relative;"><div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#e09518,#f5c842);color:#fff;font-size:11px;font-weight:bold;padding:2px 10px;border-radius:20px;white-space:nowrap;">👑 推荐</div><div style="font-size:24px;margin-bottom:4px;">💎</div><div style="font-weight:bold;color:#333;margin-bottom:3px;">VIP会员</div><div id="vipPriceDisplay" style="font-size:20px;font-weight:bold;color:#c0830a;margin-bottom:3px;">€9.9<span style="font-size:12px;color:#888;">/月</span></div><div id="vipOriginalPrice" style="display:none;font-size:11px;color:#aaa;text-decoration:line-through;">原价 €118.8/年</div><div id="vipSavingTip" style="display:none;font-size:11px;color:#e05a00;font-weight:bold;">🎉 立省 €50！</div><div id="vipDesc" style="font-size:11px;color:#888;">全功能，优先曝光</div><div style="display:flex;gap:5px;margin:7px 0 5px;"><button id="btnMonthly" onclick="switchVipPeriod('monthly',event)" style="flex:1;padding:3px 0;font-size:11px;border-radius:5px;border:1.5px solid #e09518;background:#e09518;color:#fff;cursor:pointer;font-weight:bold;">月付</button><button id="btnYearly" onclick="switchVipPeriod('yearly',event)" style="flex:1;padding:3px 0;font-size:11px;border-radius:5px;border:1.5px solid #e0e0e0;background:#fff;color:#888;cursor:pointer;">年付</button></div><ul style="margin-top:6px;font-size:11px;color:#555;text-align:left;list-style:none;padding:0;"><li>★ 置顶优先</li><li>★ 展示30天</li><li>★ VIP标识</li><li>★ 无限刷新</li></ul></div></div></div>
     <div id="guestNameGroup" class="form-group" style="display:none">
-      <label>您的昵称 *</label>
-      <input type="text" id="guestNickname" placeholder="如：阿华 / 小李">
+      <label data-i18n="post.nickname">您的昵称 *</label>
+      <input type="text" id="guestNickname" placeholder="如：阿华 / 小李" data-i18n-placeholder="post.nicknamePlaceholder">
     </div>
     <div class="form-group">
-      <label>信息类别</label>
+      <label data-i18n="post.category">信息类别</label>
       <select id="postCat" onchange="updatePostForm()">
-        <option value="">— 请选择类别 —</option>
-        <option value="招工">👷 招工求职</option>
-        <option value="租房">🏡 租房买房</option>
-        <option value="生意">🏪 生意转让</option>
-        <option value="二手物品">📦 二手物品/车</option>
-        <option value="服务">🛠 生活服务</option>
-        <option value="教育">📚 教育培训</option>
+        <option value="" data-i18n="post.categoryPlaceholder">— 请选择类别 —</option>
+        <option value="招工" data-i18n="nav.worker">👷 招工求职</option>
+        <option value="租房" data-i18n="nav.house">🏡 租房买房</option>
+        <option value="生意" data-i18n="nav.business">🏪 生意转让</option>
+        <option value="二手物品" data-i18n="nav.goods">📦 二手物品/车</option>
+        <option value="服务" data-i18n="nav.service">🛠 生活服务</option>
+        <option value="教育" data-i18n="nav.edu">📚 教育培训</option>
       </select>
     </div>
     <div class="form-group">
-      <label>标题</label>
-      <input type="text" placeholder="简洁明了的标题，例如：Barcelona招中餐厨师一名" id="postTitle">
+      <label data-i18n="post.adTitle">标题</label>
+      <input type="text" placeholder="简洁明了的标题，例如：Barcelona招中餐厨师一名" id="postTitle" data-i18n-placeholder="post.titlePlaceholder">
     </div>
     <div class="form-group">
-      <label>详细描述</label>
-      <textarea id="postDesc" rows="4" placeholder="详细描述您的信息，包括要求、薪资/价格、工作内容等…"></textarea>
+      <label data-i18n="post.desc">详细描述</label>
+      <textarea id="postDesc" rows="4" placeholder="详细描述您的信息，包括要求、薪资/价格、工作内容等…" data-i18n-placeholder="post.descPlaceholder"></textarea>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>省份/地区</label>
+        <label data-i18n="post.province">省份/地区</label>
         <select id="postCity"></select>
       </div>
       <div class="form-group">
-        <label>价格/薪资（€）</label>
-        <input type="text" id="postPrice" placeholder="例：1200€/月 或 面议">
+        <label data-i18n="post.price">价格/薪资（€）</label>
+        <input type="text" id="postPrice" placeholder="例：1200€/月 或 面议" data-i18n-placeholder="post.pricePlaceholder">
       </div>
     </div>
     <div class="form-group" id="postAddressGroup" style="display:none">
-      <label>店铺地址 / 地图位置（可选）</label>
-      <input type="text" id="postAddress" placeholder="例：Carrer de Mallorca 123, Barcelona">
-      <div class="photo-upload-tip" style="margin-top:6px">填写后详情页会显示地图入口，适合店铺、生意、服务和培训机构。</div>
+      <label data-i18n="post.address">店铺地址 / 地图位置（可选）</label>
+      <input type="text" id="postAddress" placeholder="例：Carrer de Mallorca 123, Barcelona" data-i18n-placeholder="post.addressPlaceholder">
+      <div class="photo-upload-tip" style="margin-top:6px" data-i18n="post.addressTip">填写后详情页会显示地图入口，适合店铺、生意、服务和培训机构。</div>
     </div>
     <div class="form-group" id="postImagesGroup" style="display:none">
       <div class="photo-upload-box">
         <div class="photo-upload-head">
-          <div class="photo-upload-title">照片</div>
-          <div class="photo-upload-tip">最多6张，每张不超过5MB</div>
+          <div class="photo-upload-title" data-i18n="post.photos">照片</div>
+          <div class="photo-upload-tip" data-i18n="post.photosTip">最多6张，每张不超过5MB</div>
         </div>
         <input type="file" id="postImages" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="previewPostImages()">
-        <div class="photo-upload-tip" style="margin-top:8px">除招工外，其他分类都可以发布照片，方便以后做广告展示。</div>
+        <div class="photo-upload-tip" style="margin-top:8px" data-i18n="post.photosCategoryTip">除招工外，其他分类都可以发布照片，方便以后做广告展示。</div>
         <div id="postImagePreview" class="photo-preview-grid"></div>
       </div>
     </div>
     <div class="form-group">
-      <label>联系方式（微信/手机/WhatsApp）*</label>
-      <input type="text" id="postContact" placeholder="+34 6XX XXX XXX 或 微信号">
+      <label data-i18n="post.contact">联系方式（微信/手机/WhatsApp）*</label>
+      <input type="text" id="postContact" placeholder="+34 6XX XXX XXX 或 微信号" data-i18n-placeholder="post.contactPlaceholder">
     </div>
-    <button id="postBtn" class="btn-post" style="width:100%;padding:12px;font-size:16px;border-radius:8px;margin-top:8px" onclick="submitPost()">🚀 立即发布（限时免费）</button>
-    <p style="text-align:center;margin-top:10px;font-size:12px;color:var(--ink-light)">发布即表示同意 <a href="#" style="color:var(--red)">用户协议</a> 及 <a href="#" style="color:var(--red)">隐私政策</a></p>
+    <button id="postBtn" class="btn-post" style="width:100%;padding:12px;font-size:16px;border-radius:8px;margin-top:8px" onclick="submitPost()" data-i18n="post.submit">🚀 立即发布（限时免费）</button>
+    <p style="text-align:center;margin-top:10px;font-size:12px;color:var(--ink-light)" data-i18n="post.agree">发布即表示同意 <a href="#" style="color:var(--red)">用户协议</a> 及 <a href="#" style="color:var(--red)">隐私政策</a></p>
   </div>
 </div>
 
@@ -2681,6 +2725,163 @@ const catBadge = { '招工':'招聘','租房':'出租','生意':'转让','商家
 const catMap   = { worker:'招工', house:'租房', business:'生意', merchant:'商家黄页', wholesale:'生意', wholesale_100:'生意', wholesale_bar:'生意', dating:'交友', goods:'二手物品', service:'服务', edu:'教育' };
 const uiCatMap = { '招工':'worker', '租房':'house', '生意':'business', '商家黄页':'merchant', '二手车':'goods', '交友':'dating', '二手物品':'goods', '服务':'service', '教育':'edu' };
 
+const I18N = {
+  zh: {
+    'meta.title': '西班牙生活通 - 西班牙华人生活服务平台',
+    'meta.description': '西班牙生活通面向西班牙华人社区，提供招工求职、租房买房、生意转让、二手物品、生活服务等本地分类信息发布与搜索。',
+    'top.tagline': '🇪🇸 西班牙华人生活服务平台 · España China Community',
+    'top.login': '登录', 'top.register': '注册', 'top.myInfo': '我的信息', 'top.download': '下载APP', 'top.help': '帮助中心',
+    'brand.sub': '全西班牙华人分类信息平台',
+    'search.placeholder': '搜索招工、房源、二手车、生意转让…',
+    'search.button': '🔍 搜索',
+    'actions.publish': '＋ 发布信息',
+    'nav.all': '🏠 全部', 'nav.worker': '👷 招工求职', 'nav.house': '🏡 租房买房', 'nav.business': '🏪 生意转让',
+    'nav.goods': '📦 二手物品/车', 'nav.service': '🛠 生活服务', 'nav.edu': '📚 教育培训',
+    'hero.index': '限时活动-免费领1年VIP', 'hero.rules': '查看规则',
+    'hero.kicker': '限时活动 · 截至2026年9月30日',
+    'hero.title': '注册账号，邀请10位好友访问，免费领1年VIP',
+    'hero.desc': '活动期内注册西班牙生活通，分享你的专属链接。累计10位不同好友打开访问后，即可获得1年VIP，享置顶优先、VIP标识和更多曝光。',
+    'hero.step1': '1. 注册账号', 'hero.step2': '2. 分享专属链接', 'hero.step3': '3. 邀请10位好友', 'hero.step4': '4. 免费领1年VIP',
+    'hero.register': '立即注册', 'hero.referral': '我的转发码', 'hero.latest': '最新信息',
+    'wechat.title': '微信里下次找不到？先收藏本站',
+    'wechat.text': '看右上角绿色箭头，点微信浏览器的 <strong>...</strong>，选择 <strong>添加到收藏</strong>；想放到手机桌面，就选 <strong>添加到桌面</strong>。',
+    'merchant.title': '商家服务筛选', 'merchant.allLink': '商家黄页 →',
+    'listing.more': '查看更多 →',
+    'publish.aria': '免费发布信息', 'publish.title': '免费发布信息', 'publish.text': '招工、房源、二手、生意转让都可以发布', 'publish.button': '立即发布',
+    'trust.reviewTitle': '先审核后展示', 'trust.reviewText': '减少诈骗与重复广告',
+    'trust.mobileTitle': '手机端优先', 'trust.mobileText': '适合微信/WhatsApp 转发',
+    'trust.spainTitle': '覆盖全西省份', 'trust.spainText': 'Madrid、Barcelona、Valencia 等',
+    'catSection.title': '信息分类', 'catSection.all': '查看全部 →',
+    'cat.worker': '招工求职', 'cat.house': '租房买房', 'cat.business': '生意转让', 'cat.goods': '二手物品/车', 'cat.service': '生活服务', 'cat.edu': '教育培训',
+    'cat.workerCount': '1,234 条信息', 'cat.houseCount': '2,567 条信息', 'cat.businessCount': '389 条信息', 'cat.goodsCount': '含二手车', 'cat.serviceCount': '945 条信息', 'cat.eduCount': '421 条信息',
+    'footer.desc': '面向西班牙华人社区的本地分类信息平台，帮助用户更快找到工作、房源、服务与生意机会。',
+    'footer.categories': '信息分类', 'footer.moreServices': '更多服务', 'footer.follow': '关注我们', 'footer.help': '帮助中心',
+    'footer.copy': '© 2026 西班牙生活通 · 版权所有', 'footer.coverage': '西班牙华人生活服务平台 | 覆盖西班牙省份/地区',
+    'mobile.home': '首页', 'mobile.jobs': '招工', 'mobile.publish': '发布', 'mobile.latest': '最新',
+    'list.emptyTitle': '暂无相关信息', 'list.emptyText': '试试其他条件，或发布第一条信息',
+    'list.share': '微信分享', 'list.map': '📍 地图', 'list.open': '点开看详情 ›',
+    'listing.all': '最新信息', 'listing.worker': '招工求职', 'listing.house': '租房买房', 'listing.business': '生意转让',
+    'listing.wholesale': '批发市场', 'listing.wholesale_100': '百元店/百货', 'listing.wholesale_bar': '酒吧/Bar',
+    'listing.dating': '交友相亲', 'listing.goods': '二手物品/车', 'listing.service': '生活服务', 'listing.edu': '教育培训',
+    'merchant.prefix': '商家黄页', 'province.all': '全部省份', 'province.select': '选择省份',
+    'detail.loading': '加载中…', 'detail.failed': '信息加载失败', 'detail.error': '加载出错：',
+    'detail.description': '📝 详细描述', 'detail.price': '💰 价格', 'detail.area': '📍 省份/地区',
+    'detail.contact': '📞 联系方式', 'detail.contactHint': '可通过微信 / 手机 / WhatsApp 联系',
+    'detail.share': '微信分享这条信息', 'detail.map': '打开地图导航', 'detail.copy': '复制联系方式', 'detail.copied': '联系方式已复制', 'detail.views': '次浏览',
+    'common.negotiable': '面议', 'common.notFilled': '未填写',
+    'search.noResults': '未找到', 'search.resultSuffix': '相关信息', 'search.toastFound': '找到', 'search.toastItems': '条结果', 'search.failed': '搜索失败，请重试',
+    'post.title': '📢 发布信息', 'post.memberMode': '🔑 已登录发布', 'post.guestMode': '👤 游客快速发布',
+    'post.nickname': '您的昵称 *', 'post.nicknamePlaceholder': '如：阿华 / 小李',
+    'post.category': '信息类别', 'post.categoryPlaceholder': '— 请选择类别 —',
+    'post.adTitle': '标题', 'post.titlePlaceholder': '简洁明了的标题，例如：Barcelona招中餐厨师一名',
+    'post.desc': '详细描述', 'post.descPlaceholder': '详细描述您的信息，包括要求、薪资/价格、工作内容等…',
+    'post.province': '省份/地区', 'post.price': '价格/薪资（€）', 'post.pricePlaceholder': '例：1200€/月 或 面议',
+    'post.address': '店铺地址 / 地图位置（可选）', 'post.addressPlaceholder': '例：Carrer de Mallorca 123, Barcelona',
+    'post.addressTip': '填写后详情页会显示地图入口，适合店铺、生意、服务和培训机构。',
+    'post.photos': '照片', 'post.photosTip': '最多6张，每张不超过5MB', 'post.photosCategoryTip': '除招工外，其他分类都可以发布照片，方便以后做广告展示。',
+    'post.contact': '联系方式（微信/手机/WhatsApp）*', 'post.contactPlaceholder': '+34 6XX XXX XXX 或 微信号',
+    'post.submit': '🚀 立即发布（限时免费）', 'post.agree': '发布即表示同意 <a href="#" style="color:var(--red)">用户协议</a> 及 <a href="#" style="color:var(--red)">隐私政策</a>'
+  },
+  es: {
+    'meta.title': 'España Life - Empleo, servicios y anuncios en España',
+    'meta.description': 'España Life reúne ofertas de empleo, alquileres, negocios, segunda mano y servicios locales para la comunidad china y española en España.',
+    'top.tagline': '🇪🇸 Anuncios locales en España · Comunidad china y española',
+    'top.login': 'Entrar', 'top.register': 'Registrarse', 'top.myInfo': 'Mi cuenta', 'top.download': 'Descargar app', 'top.help': 'Ayuda',
+    'brand.sub': 'Empleo, vivienda y servicios en toda España',
+    'search.placeholder': 'Buscar empleo, alquiler, coche, negocio…',
+    'search.button': '🔍 Buscar',
+    'actions.publish': '＋ Publicar anuncio',
+    'nav.all': '🏠 Todo', 'nav.worker': '👷 Empleo', 'nav.house': '🏡 Vivienda', 'nav.business': '🏪 Traspasos',
+    'nav.goods': '📦 Segunda mano/coches', 'nav.service': '🛠 Servicios', 'nav.edu': '📚 Formación',
+    'hero.index': 'Promoción: 1 año VIP gratis', 'hero.rules': 'Ver reglas',
+    'hero.kicker': 'Promoción limitada · hasta el 30/09/2026',
+    'hero.title': 'Regístrate e invita a 10 amigos para recibir 1 año VIP gratis',
+    'hero.desc': 'Durante la campaña, comparte tu enlace personal. Al llegar a 10 visitas únicas, recibirás 1 año VIP con prioridad, distintivo VIP y más visibilidad.',
+    'hero.step1': '1. Crea tu cuenta', 'hero.step2': '2. Comparte tu enlace', 'hero.step3': '3. Invita a 10 amigos', 'hero.step4': '4. Recibe 1 año VIP',
+    'hero.register': 'Registrarme', 'hero.referral': 'Mi código', 'hero.latest': 'Anuncios recientes',
+    'wechat.title': '¿Lo abriste desde WeChat? Guarda la web',
+    'wechat.text': 'Toca los <strong>...</strong> de arriba a la derecha en WeChat y elige <strong>Guardar en favoritos</strong>. Para acceso rápido, usa <strong>Añadir a pantalla de inicio</strong>.',
+    'merchant.title': 'Servicios y comercios', 'merchant.allLink': 'Directorio →',
+    'listing.more': 'Ver más →',
+    'publish.aria': 'Publicar anuncio gratis', 'publish.title': 'Publicar anuncio gratis', 'publish.text': 'Empleo, vivienda, segunda mano y traspasos', 'publish.button': 'Publicar ahora',
+    'trust.reviewTitle': 'Anuncios revisados', 'trust.reviewText': 'Menos fraude y anuncios repetidos',
+    'trust.mobileTitle': 'Pensado para móvil', 'trust.mobileText': 'Listo para compartir por WeChat/WhatsApp',
+    'trust.spainTitle': 'Toda España', 'trust.spainText': 'Madrid, Barcelona, Valencia y más',
+    'catSection.title': 'Categorías', 'catSection.all': 'Ver todo →',
+    'cat.worker': 'Empleo', 'cat.house': 'Vivienda', 'cat.business': 'Traspasos', 'cat.goods': 'Segunda mano/coches', 'cat.service': 'Servicios', 'cat.edu': 'Formación',
+    'cat.workerCount': '1.234 anuncios', 'cat.houseCount': '2.567 anuncios', 'cat.businessCount': '389 anuncios', 'cat.goodsCount': 'Incluye coches', 'cat.serviceCount': '945 anuncios', 'cat.eduCount': '421 anuncios',
+    'footer.desc': 'Plataforma local de anuncios para encontrar empleo, vivienda, servicios y oportunidades de negocio en España.',
+    'footer.categories': 'Categorías', 'footer.moreServices': 'Más servicios', 'footer.follow': 'Síguenos', 'footer.help': 'Ayuda',
+    'footer.copy': '© 2026 España Life · Todos los derechos reservados', 'footer.coverage': 'Anuncios locales en España | Provincias de toda España',
+    'mobile.home': 'Inicio', 'mobile.jobs': 'Empleo', 'mobile.publish': 'Publicar', 'mobile.latest': 'Recientes',
+    'list.emptyTitle': 'No hay anuncios relacionados', 'list.emptyText': 'Prueba otros filtros o publica el primer anuncio',
+    'list.share': 'Compartir', 'list.map': '📍 Mapa', 'list.open': 'Ver detalles ›',
+    'listing.all': 'Anuncios recientes', 'listing.worker': 'Empleo', 'listing.house': 'Vivienda', 'listing.business': 'Traspasos',
+    'listing.wholesale': 'Mayoristas', 'listing.wholesale_100': 'Bazares / todo a 100', 'listing.wholesale_bar': 'Bares',
+    'listing.dating': 'Amistad y contactos', 'listing.goods': 'Segunda mano/coches', 'listing.service': 'Servicios', 'listing.edu': 'Formación',
+    'merchant.prefix': 'Directorio', 'province.all': 'Todas las provincias', 'province.select': 'Seleccionar provincia',
+    'detail.loading': 'Cargando…', 'detail.failed': 'No se pudo cargar el anuncio', 'detail.error': 'Error al cargar: ',
+    'detail.description': '📝 Descripción', 'detail.price': '💰 Precio', 'detail.area': '📍 Provincia/zona',
+    'detail.contact': '📞 Contacto', 'detail.contactHint': 'Puedes contactar por WeChat / móvil / WhatsApp',
+    'detail.share': 'Compartir este anuncio', 'detail.map': 'Abrir mapa', 'detail.copy': 'Copiar contacto', 'detail.copied': 'Contacto copiado', 'detail.views': 'vistas',
+    'common.negotiable': 'A negociar', 'common.notFilled': 'Sin indicar',
+    'search.noResults': 'No se encontraron anuncios para', 'search.resultSuffix': '', 'search.toastFound': 'encontrados', 'search.toastItems': 'resultados', 'search.failed': 'Error al buscar, inténtalo de nuevo',
+    'post.title': '📢 Publicar anuncio', 'post.memberMode': '🔑 Publicar con cuenta', 'post.guestMode': '👤 Publicar como visitante',
+    'post.nickname': 'Nombre o apodo *', 'post.nicknamePlaceholder': 'Ej.: Ana / Restaurante Sol',
+    'post.category': 'Categoría', 'post.categoryPlaceholder': '— Elige una categoría —',
+    'post.adTitle': 'Título', 'post.titlePlaceholder': 'Ej.: Se busca cocinero en Barcelona',
+    'post.desc': 'Descripción', 'post.descPlaceholder': 'Describe requisitos, salario/precio, horario, tareas y condiciones…',
+    'post.province': 'Provincia/zona', 'post.price': 'Precio/salario (€)', 'post.pricePlaceholder': 'Ej.: 1200€/mes o a negociar',
+    'post.address': 'Dirección / ubicación en mapa (opcional)', 'post.addressPlaceholder': 'Ej.: Carrer de Mallorca 123, Barcelona',
+    'post.addressTip': 'Si rellenas la dirección, el detalle mostrará acceso al mapa. Útil para tiendas, negocios, servicios y centros de formación.',
+    'post.photos': 'Fotos', 'post.photosTip': 'Máximo 6 fotos, hasta 5 MB cada una', 'post.photosCategoryTip': 'Todas las categorías excepto empleo pueden publicar fotos.',
+    'post.contact': 'Contacto (WeChat / móvil / WhatsApp) *', 'post.contactPlaceholder': '+34 6XX XXX XXX o WeChat',
+    'post.submit': '🚀 Publicar ahora (gratis por tiempo limitado)', 'post.agree': 'Al publicar aceptas el <a href="#" style="color:var(--red)">acuerdo de usuario</a> y la <a href="#" style="color:var(--red)">política de privacidad</a>'
+  }
+};
+
+let currentLang = (new URLSearchParams(location.search).get('lang') || localStorage.getItem('site_lang') || 'zh').toLowerCase().startsWith('es') ? 'es' : 'zh';
+
+function tr(key) {
+  return (I18N[currentLang] && I18N[currentLang][key]) || I18N.zh[key] || key;
+}
+
+function categoryLabel(category) {
+  const keyByCategory = { '招工':'cat.worker', '租房':'cat.house', '生意':'cat.business', '商家黄页':'merchant.prefix', '二手车':'cat.goods', '交友':'listing.dating', '二手物品':'cat.goods', '服务':'cat.service', '教育':'cat.edu' };
+  return tr(keyByCategory[category] || '') || category || tr('listing.all');
+}
+
+function badgeLabel(category, fallback = '信息') {
+  if (currentLang !== 'es') return fallback;
+  const labels = { '招工':'Empleo', '租房':'Alquiler', '生意':'Traspaso', '商家黄页':'Comercio', '二手车':'Coche', '交友':'Contacto', '二手物品':'Venta', '服务':'Servicio', '教育':'Curso' };
+  return labels[category] || 'Anuncio';
+}
+
+function applyLanguage(lang = currentLang) {
+  currentLang = String(lang || 'zh').toLowerCase().startsWith('es') ? 'es' : 'zh';
+  localStorage.setItem('site_lang', currentLang);
+  document.documentElement.lang = currentLang === 'es' ? 'es' : 'zh-CN';
+  document.body.dataset.lang = currentLang;
+  document.title = tr('meta.title');
+  const desc = document.querySelector('meta[name="description"]');
+  if (desc) desc.setAttribute('content', tr('meta.description'));
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.innerHTML = tr(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.setAttribute('placeholder', tr(el.dataset.i18nPlaceholder)); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', tr(el.dataset.i18nAria)); });
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
+  populateProvinceControls();
+  renderMerchantFilters();
+  syncListingTitle();
+  renderListings();
+  if (window.refreshLocalizedPlanButton) window.refreshLocalizedPlanButton();
+}
+
+function setLanguage(lang) {
+  applyLanguage(lang);
+}
+
+window.setLanguage = setLanguage;
+
 function isImportedMerchantListing(listing) {
   return listing
     && listing.user_id === null
@@ -2702,6 +2903,25 @@ const merchantFilters = [
   { id:'beauty', icon:'💅', name:'美容美发', sub:'美甲/美睫/理发', categories:['服务'], keywords:['美容','美发','美甲','美睫','理发'] },
   { id:'travel', icon:'🚐', name:'旅游接送', sub:'包车/机票/导游', categories:['服务'], keywords:['旅游','接送','包车','机票','导游','机场'] }
 ];
+
+const MERCHANT_FILTER_ES = {
+  all: ['Directorio', 'Tiendas / instituciones / servicios'],
+  renovation: ['Reformas y reparaciones', 'Obras / electricidad / aire'],
+  convenience: ['Gestiones y ayuda diaria', 'Recados / traducción / trámites'],
+  logistics: ['Logística y mudanzas', 'Envíos / aduanas / mudanzas'],
+  legal: ['Abogados y residencia', 'Visados / seguros / gestoría'],
+  restaurant: ['Hostelería y suministros', 'Equipos / bares / proveedores'],
+  health: ['Salud y terapias', 'Clínicas / dentistas / masajes'],
+  beauty: ['Belleza y peluquería', 'Uñas / pestañas / peluquería'],
+  travel: ['Viajes y traslados', 'Furgoneta / vuelos / guía']
+};
+
+function merchantFilterText(item, field) {
+  if (currentLang !== 'es') return item[field];
+  const translated = MERCHANT_FILTER_ES[item.id];
+  if (!translated) return item[field];
+  return field === 'name' ? translated[0] : translated[1];
+}
 
 let currentCat = 'all';
 let currentCity = '全部';
@@ -2764,7 +2984,7 @@ function provinceQueryValues(province) {
 
 function provinceOptionsHtml(selected = '', includeAll = false) {
   const normalizedSelected = normalizeProvinceName(selected) || 'Barcelona';
-  const allOption = includeAll ? '<option value="全部">Todas las provincias</option>' : '';
+  const allOption = includeAll ? `<option value="全部">${tr('province.select')}</option>` : '';
   return allOption + SPAIN_PROVINCES_BY_POPULATION.map(province => (
     `<option value="${province}"${province === normalizedSelected ? ' selected' : ''}>${province}</option>`
   )).join('');
@@ -2781,8 +3001,8 @@ function renderMerchantFilters() {
     <button class="merchant-filter-card${currentMerchant === item.id ? ' active' : ''}" data-merchant="${escapeHTML(item.id)}" onclick="filterMerchant('${escapeHTML(item.id)}')" type="button">
       <span class="merchant-filter-icon">${escapeHTML(item.icon)}</span>
       <span>
-        <span class="merchant-filter-name">${escapeHTML(item.name)}</span>
-        <span class="merchant-filter-sub">${escapeHTML(item.sub)}</span>
+        <span class="merchant-filter-name">${escapeHTML(merchantFilterText(item, 'name'))}</span>
+        <span class="merchant-filter-sub">${escapeHTML(merchantFilterText(item, 'sub'))}</span>
       </span>
     </button>
   `).join('');
@@ -2898,7 +3118,7 @@ async function loadListings() {
           cat: importedMerchant ? 'merchant' : (uiCatMap[r.category] || 'goods'),
           city: normalizeProvinceName(r.city),
           icon: catIcons[displayCategory] || catIcons[r.category] || '📋',
-          badge: importedMerchant ? '商家' : (catBadge[r.category] || '信息'),
+          badge: badgeLabel(displayCategory, importedMerchant ? '商家' : (catBadge[r.category] || '信息')),
           badgeType: r.is_pinned ? 'gold' : '',
           title: r.title,
           price: r.price || '面议',
@@ -3331,13 +3551,13 @@ async function openReferralCenter() {
 
 function publishEntryCardHtml(extraClass = '') {
   return `
-    <button class="publish-entry-card ${extraClass}" type="button" onclick="openPublishPage(event)" aria-label="免费发布信息">
+    <button class="publish-entry-card ${extraClass}" type="button" onclick="openPublishPage(event)" aria-label="${tr('publish.aria')}">
       <span class="publish-entry-icon">📢</span>
       <span class="publish-entry-copy">
-        <span class="publish-entry-title">免费发布信息</span>
-        <span class="publish-entry-text">招工、房源、二手、生意转让都可以发布</span>
+        <span class="publish-entry-title">${tr('publish.title')}</span>
+        <span class="publish-entry-text">${tr('publish.text')}</span>
       </span>
-      <span class="publish-entry-btn">立即发布 <span class="publish-entry-arrow">&gt;</span></span>
+      <span class="publish-entry-btn">${tr('publish.button')} <span class="publish-entry-arrow">&gt;</span></span>
     </button>
   `;
 }
@@ -3474,25 +3694,27 @@ function renderListings() {
   if(currentMerchant) filtered = filtered.filter(matchesMerchantFilter);
 
   if(filtered.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--ink-light)"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:16px">暂无相关信息</div><div style="font-size:13px;margin-top:8px">试试其他条件，或发布第一条信息</div>' + publishEntryCardHtml('empty-publish-entry') + '</div>';
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--ink-light)"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:16px">${tr('list.emptyTitle')}</div><div style="font-size:13px;margin-top:8px">${tr('list.emptyText')}</div>${publishEntryCardHtml('empty-publish-entry')}</div>`;
     return;
   }
 
   grid.innerHTML = filtered.map((l,i) => {
     const photos = normalizeListingImages(l.images);
+    const displayCat = l.tags?.[0] || catMap[l.cat] || l.badge;
+    const displayBadge = currentLang === 'es' ? badgeLabel(displayCat, l.badge) : l.badge;
     return `
     <div class="listing-card" style="animation-delay:${i*0.07}s" onclick="viewListing(${l.id})">
       <div class="listing-img ${photos.length ? 'has-photo' : ''}">
         ${photos.length ? `<img src="${escapeHTML(photos[0])}" alt="" loading="lazy">` : escapeHTML(l.icon)}
-        <div class="listing-badge ${escapeHTML(l.badgeType)}">${escapeHTML(l.badge)}</div>
+        <div class="listing-badge ${escapeHTML(l.badgeType)}">${escapeHTML(displayBadge)}</div>
         ${photos.length > 1 ? `<div class="listing-photo-count">📷 ${photos.length}</div>` : ''}
-        <button class="listing-share" onclick="shareListing(${l.id}, event)">微信分享</button>
+        <button class="listing-share" onclick="shareListing(${l.id}, event)">${tr('list.share')}</button>
       </div>
       <div class="listing-body">
         <div class="listing-title">${escapeHTML(l.title)}</div>
         <div class="listing-tags">
-          ${l.tags.map(t=>`<span class="tag">${escapeHTML(normalizeProvinceName(t))}</span>`).join('')}
-          ${l.address ? '<span class="listing-map-chip">📍 地图</span>' : ''}
+          ${l.tags.map(t=>`<span class="tag">${escapeHTML(categoryLabel(normalizeProvinceName(t)))}</span>`).join('')}
+          ${l.address ? `<span class="listing-map-chip">${tr('list.map')}</span>` : ''}
         </div>
         <div class="listing-meta">
           <div class="listing-price">${escapeHTML(l.price)}<span> ${escapeHTML(l.unit)}</span></div>
@@ -3500,7 +3722,7 @@ function renderListings() {
         </div>
         <div class="listing-open-hint">
           <span>🕐 ${escapeHTML(l.time)}</span>
-          <span>点开看详情 ›</span>
+          <span>${tr('list.open')}</span>
         </div>
       </div>
     </div>
@@ -3513,14 +3735,20 @@ function filterCat(cat, el) {
   updateMerchantFilterUI();
   document.querySelectorAll('.nav-cat').forEach(e => e.classList.remove('active'));
   if(el) el.classList.add('active');
-  const titles = {
-    all:'最新信息', worker:'招工求职', house:'租房买房',
-    business:'生意转让', wholesale:'批发市场', wholesale_100:'百元店/百货', wholesale_bar:'酒吧/Bar',
-    dating:'交友相亲', goods:'二手物品/车', service:'生活服务', edu:'教育培训'
-  };
-  document.getElementById('listingTitle').textContent = titles[cat] || '最新信息';
+  syncListingTitle();
   loadListings();
   document.getElementById('listingsGrid').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function syncListingTitle() {
+  const titleEl = document.getElementById('listingTitle');
+  if (!titleEl) return;
+  if (currentMerchant) {
+    const filter = getMerchantFilter();
+    titleEl.textContent = filter ? `${tr('merchant.prefix')} · ${merchantFilterText(filter, 'name')}` : tr('merchant.prefix');
+    return;
+  }
+  titleEl.textContent = tr(`listing.${currentCat}`) || tr('listing.all');
 }
 
 function filterMerchant(id) {
@@ -3531,7 +3759,7 @@ function filterMerchant(id) {
   if (allNav) allNav.classList.add('active');
   updateMerchantFilterUI();
   const filter = getMerchantFilter();
-  document.getElementById('listingTitle').textContent = filter ? `商家黄页 · ${filter.name}` : '商家黄页';
+  syncListingTitle();
   loadListings();
   document.getElementById('listingsGrid').scrollIntoView({behavior:'smooth', block:'start'});
 }
@@ -3553,7 +3781,7 @@ async function viewListing(id) {
   document.getElementById('detailContent').innerHTML = `
     <div style="text-align:center;padding:40px 0;color:#999">
       <div style="font-size:32px;margin-bottom:10px">⏳</div>
-      <div>加载中…</div>
+      <div>${tr('detail.loading')}</div>
     </div>`;
   openModal('detail');
 
@@ -3566,7 +3794,7 @@ async function viewListing(id) {
 
     if (error || !data) {
       document.getElementById('detailContent').innerHTML =
-        '<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">😕</div><div style="margin-top:10px">信息加载失败</div></div>';
+        `<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">😕</div><div style="margin-top:10px">${tr('detail.failed')}</div></div>`;
       return;
     }
 
@@ -3574,12 +3802,12 @@ async function viewListing(id) {
     const catIcons = {'招工':'👷','租房':'🏡','生意':'🏪','商家黄页':'🏪','二手车':'🚗','交友':'💕','二手物品':'📦','服务':'🛠','教育':'📚'};
     const icon = catIcons[displayCategory] || catIcons[data.category] || '📋';
     const timeStr = new Date(data.created_at).toLocaleString('zh-CN');
-    const safeCategory = escapeHTML(displayCategory);
+    const safeCategory = escapeHTML(categoryLabel(displayCategory));
     const safeTitle = escapeHTML(data.title);
     const safeDescription = escapeHTML(data.description);
-    const safePrice = escapeHTML(data.price || '面议');
+    const safePrice = escapeHTML(data.price || tr('common.negotiable'));
     const safeCity = escapeHTML(normalizeProvinceName(data.city));
-    const safeContact = escapeHTML(data.contact || '未填写');
+    const safeContact = escapeHTML(data.contact || tr('common.notFilled'));
     currentClaimListing = data;
     updateDocumentShareMeta(data);
 
@@ -3596,32 +3824,32 @@ async function viewListing(id) {
         ${renderBusinessMap(data.address, data.city)}
         ${renderMerchantClaimBox(data)}
         ${data.description ? `<div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px">
-          <div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">📝 详细描述</div>
+          <div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">${tr('detail.description')}</div>
           <div style="font-size:14px;line-height:1.7;color:#333">${safeDescription}</div>
         </div>` : ''}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
           <div style="background:#fef3f2;border-radius:8px;padding:12px 14px">
-            <div style="font-size:11px;color:#999;margin-bottom:4px">💰 价格</div>
+            <div style="font-size:11px;color:#999;margin-bottom:4px">${tr('detail.price')}</div>
             <div style="font-size:16px;font-weight:700;color:#c0392b">${safePrice} €</div>
           </div>
           <div style="background:#f0fdf4;border-radius:8px;padding:12px 14px">
-            <div style="font-size:11px;color:#999;margin-bottom:4px">📍 省份/地区</div>
+            <div style="font-size:11px;color:#999;margin-bottom:4px">${tr('detail.area')}</div>
             <div style="font-size:15px;font-weight:600;color:#166534">${safeCity}</div>
           </div>
         </div>
         <div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px">
-          <div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">📞 联系方式</div>
+          <div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">${tr('detail.contact')}</div>
           <div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">${safeContact}</div>
-          <div style="font-size:11px;color:#999;margin-top:6px">可通过微信 / 手机 / WhatsApp 联系</div>
+          <div style="font-size:11px;color:#999;margin-top:6px">${tr('detail.contactHint')}</div>
         </div>
         <div class="detail-actions">
-          <button class="detail-action primary" onclick="shareListing(${data.id}, event)">微信分享这条信息</button>
-          ${data.address ? `<a class="detail-action" href="${escapeHTML(getMapUrl(data.address, data.city))}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">打开地图导航</a>` : ''}
-          <button class="detail-action" onclick="copyText('${escapeHTML(data.contact || '')}').then(()=>showToast('联系方式已复制'))">复制联系方式</button>
+          <button class="detail-action primary" onclick="shareListing(${data.id}, event)">${tr('detail.share')}</button>
+          ${data.address ? `<a class="detail-action" href="${escapeHTML(getMapUrl(data.address, data.city))}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">${tr('detail.map')}</a>` : ''}
+          <button class="detail-action" onclick="copyText('${escapeHTML(data.contact || '')}').then(()=>showToast(tr('detail.copied')))">${tr('detail.copy')}</button>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px;color:#999;padding-top:10px;border-top:1px solid #f0f0f0">
           <span>🕐 ${timeStr}</span>
-          <span>👁 ${(data.view_count || 0) + 1} 次浏览</span>
+          <span>👁 ${(data.view_count || 0) + 1} ${tr('detail.views')}</span>
         </div>
       </div>`;
 
@@ -3630,7 +3858,7 @@ async function viewListing(id) {
 
   } catch(e) {
     document.getElementById('detailContent').innerHTML =
-      `<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">⚠️</div><div>加载出错：${escapeHTML(e.message)}</div></div>`;
+      `<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">⚠️</div><div>${tr('detail.error')}${escapeHTML(e.message)}</div></div>`;
   }
 }
 
@@ -3653,7 +3881,7 @@ async function doSearch() {
         return {
           id: r.id, cat: importedMerchant ? 'merchant' : 'all', city: normalizeProvinceName(r.city),
           icon: catIcons[displayCategory] || catIcons[r.category] || '📋',
-          badge: importedMerchant ? '商家' : (catBadge[r.category] || '信息'),
+          badge: badgeLabel(displayCategory, importedMerchant ? '商家' : (catBadge[r.category] || '信息')),
           badgeType: r.is_pinned ? 'gold' : '',
           title: r.title, price: r.price || '面议', address: r.address || '', description: r.description || '', isMerchant: importedMerchant, images: normalizeListingImages(r.images), unit: '',
           tags: [displayCategory, normalizeProvinceName(r.city)], time: timeAgo(r.created_at)
@@ -3661,14 +3889,14 @@ async function doSearch() {
       });
       currentCat = 'all'; currentCity = '全部'; currentMerchant = ''; populateProvinceControls(); updateMerchantFilterUI();
       showLoading(false); renderListings();
-      showToast(`搜索"${q}" 找到 ${uniqueRows.length} 条结果`);
+      showToast(`"${q}" ${tr('search.toastFound')} ${uniqueRows.length} ${tr('search.toastItems')}`);
     } else {
       showLoading(false);
-      document.getElementById('listingsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--ink-light)"><div style="font-size:48px">🔍</div><div style="margin-top:10px">未找到“'+escapeHTML(q)+'”相关信息</div>' + publishEntryCardHtml('empty-publish-entry') + '</div>';
+      document.getElementById('listingsGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--ink-light)"><div style="font-size:48px">🔍</div><div style="margin-top:10px">${tr('search.noResults')} “${escapeHTML(q)}” ${tr('search.resultSuffix')}</div>${publishEntryCardHtml('empty-publish-entry')}</div>`;
     }
   } catch(e) {
     showLoading(false);
-    showToast('搜索失败，请重试', true);
+    showToast(tr('search.failed'), true);
   }
 }
 
@@ -3723,6 +3951,7 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 document.addEventListener('DOMContentLoaded', function() {
   populateProvinceControls();
   renderMerchantFilters();
+  applyLanguage(currentLang);
   syncModalScrollLock();
   applyWeChatBrowserHints();
   trackReferralVisit();
@@ -4165,7 +4394,7 @@ loadListings().then(handleInitialDeepLink);
   window.saveAccount=async function(){var sb=window.getSb();var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var btn=document.getElementById('saveAccountBtn');btn.disabled=true;btn.textContent='保存中…';var u={nickname:document.getElementById('accNickname').value,phone:document.getElementById('accPhone').value,city:normalizeProvinceName(document.getElementById('accCity').value)||'Barcelona',updated_at:new Date().toISOString()};var r=await sb.from('profiles').update(u).eq('id',sess.user.id);btn.disabled=false;btn.textContent='✅ 保存设置';if(r.error){alert('失败');return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 设置已保存';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}var pn=document.getElementById('profileName');if(pn)pn.textContent=u.nickname||'用户';};
   window.doLogout=async function(){if(!confirm('确定退出？'))return;await window.getSb().auth.signOut();document.getElementById('profileModal').style.display='none';var t=document.getElementById('toast');if(t){t.textContent='✅ 已退出';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}setTimeout(function(){location.reload();},800);};
   window.refreshProfile=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;var pc=document.getElementById('profileContent'),lo=document.getElementById('profileLoggedOut');if(!sess){if(pc)pc.style.display='none';if(lo)lo.style.display='block';return;}populateProvinceControls();if(pc)pc.style.display='block';if(lo)lo.style.display='none';var r=await sb.from('profiles').select('*').eq('id',sess.user.id).single();if(r.data){var d=r.data;var province=normalizeProvinceName(d.city)||'Barcelona';var av=document.getElementById('profileAvatar');if(av)av.textContent=(d.nickname||'U').charAt(0).toUpperCase();var pn=document.getElementById('profileName');if(pn)pn.textContent=d.nickname||'用户';var pc2=document.getElementById('profileCity');if(pc2)pc2.textContent='📍 '+province;var spc=document.getElementById('statPostCount');if(spc)spc.textContent=d.post_count||0;var an=document.getElementById('accNickname');if(an)an.value=d.nickname||'';var ap=document.getElementById('accPhone');if(ap)ap.value=d.phone||'';var ac=document.getElementById('accCity');if(ac)ac.value=province;var ae=document.getElementById('accEmail');if(ae)ae.value=publicAccountLabel(sess.user.email,d.phone);var vu=d.vip_until?new Date(d.vip_until):null,isVip=vu&&vu>new Date();var vt=document.getElementById('vipStatusTitle'),vs=document.getElementById('vipStatusSub'),vb=document.getElementById('vipBadge'),vub=document.getElementById('vipUpgradeBtn');if(isVip){if(vt)vt.textContent='💎 VIP会员';if(vs)vs.textContent='到期：'+vu.toLocaleDateString('zh-CN');if(vb){vb.textContent='VIP';vb.style.background='linear-gradient(135deg,#c0830a,#f5c842)';vb.style.color='#fff';}if(vub)vub.textContent='续费VIP';}else{if(vt)vt.textContent='普通用户';if(vs)vs.textContent='升级VIP，享置顶展示和更多特权';if(vb){vb.textContent='FREE';vb.style.background='#eee';vb.style.color='#888';}if(vub)vub.textContent='升级VIP';}}window.loadReferralStatus&&window.loadReferralStatus();window.loadMyListings();};
-  document.addEventListener('DOMContentLoaded',function(){window.applyVipFreePromo&&window.applyVipFreePromo();var pb=document.getElementById('postBtn');if(pb)pb.innerHTML='🚀 立即发布（限时免费）';var origOpen=window.openModal;window.openModal=function(type){origOpen&&origOpen(type);if(type==='profile')setTimeout(function(){window.refreshProfile&&window.refreshProfile();},50);};});
+  document.addEventListener('DOMContentLoaded',function(){window.applyVipFreePromo&&window.applyVipFreePromo();var pb=document.getElementById('postBtn');if(pb)pb.innerHTML=tr('post.submit');var origOpen=window.openModal;window.openModal=function(type){origOpen&&origOpen(type);if(type==='profile')setTimeout(function(){window.refreshProfile&&window.refreshProfile();},50);};});
   </script>
   <script>
   (function(){
@@ -4576,6 +4805,38 @@ window.addEventListener('load', function() {
     openModal('post');
   }
 });
+</script>
+<script>
+// Keep late-added VIP/publish controls localized after language changes.
+(function(){
+  function vipPeriodSuffix() {
+    const yearly = window._vipPeriod === 'yearly';
+    if (currentLang === 'es') return yearly ? '€68.8/año' : '€9.9/mes';
+    return yearly ? '€68.8/年' : '€9.9/月';
+  }
+  window.refreshLocalizedPlanButton = function() {
+    const btn = document.getElementById('postBtn');
+    if (!btn) return;
+    if (window._selectedPlan === 'vip') {
+      btn.innerHTML = currentLang === 'es' ? `💎 Abrir VIP ${vipPeriodSuffix()}` : `💎 开通VIP ${vipPeriodSuffix()}`;
+    } else {
+      btn.innerHTML = tr('post.submit');
+    }
+  };
+  const oldSelectPlan = window.selectPlan;
+  window.selectPlan = function(plan) {
+    if (oldSelectPlan) oldSelectPlan(plan);
+    window._selectedPlan = plan;
+    window.refreshLocalizedPlanButton();
+  };
+  const oldSwitchVipPeriod = window.switchVipPeriod;
+  window.switchVipPeriod = function(period, event) {
+    if (oldSwitchVipPeriod) oldSwitchVipPeriod(period, event);
+    window._vipPeriod = period;
+    window.refreshLocalizedPlanButton();
+  };
+  document.addEventListener('DOMContentLoaded', window.refreshLocalizedPlanButton);
+})();
 </script>
 </body>
 </html>
