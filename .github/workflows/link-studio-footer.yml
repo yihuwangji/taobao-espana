@@ -1,0 +1,49 @@
+name: Link Studio Footer
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  link-footer:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Link footer copyright to studio page
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8-sig')
+          old = '''  <div class="footer-bottom">
+    <div>© 2026 西班牙生活通 · 版权所有</div>
+    <div>西班牙华人生活服务平台 | 覆盖西班牙省份/地区</div>
+  </div>'''
+          new = '''  <a class="footer-bottom" href="https://wang-song-studio.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="访问老王跟小宋工作室">
+    <div>© 2026 西班牙生活通 · 版权所有</div>
+    <div>西班牙华人生活服务平台 | 覆盖西班牙省份/地区</div>
+  </a>'''
+          if new in text:
+              raise SystemExit(0)
+          if old not in text:
+              raise SystemExit('Footer text not found')
+          text = text.replace(old, new, 1)
+          path.write_text('\ufeff' + text, encoding='utf-8')
+          PY
+      - name: Commit footer link
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Link product footer to studio page"
+          git push
