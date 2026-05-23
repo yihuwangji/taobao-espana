@@ -1415,6 +1415,52 @@ tr:hover td { background: rgba(255,255,255,0.02); }
             </div>
           </div>
           <div class="config-box">
+            <h4>📞 联系方式设置</h4>
+            <div class="config-row">
+              <label>微信公众号</label>
+              <input type="text" id="contactOfficialAccount" placeholder="西班牙生活通">
+            </div>
+            <div class="config-row">
+              <label>客服微信</label>
+              <input type="text" id="contactWechatId" placeholder="espana_life">
+            </div>
+            <div class="config-row">
+              <label>电子邮件</label>
+              <input type="email" id="contactEmail" placeholder="aladaya@gmail.com">
+            </div>
+            <div class="config-row">
+              <label>工作时间</label>
+              <input type="text" id="contactSupportHours" placeholder="9:00-22:00">
+            </div>
+            <div class="config-row">
+              <label>中文开头</label>
+              <input type="text" id="contactIntroZh" placeholder="感谢您使用西班牙生活通！如有任何问题或建议，请通过以下方式联系我们：">
+            </div>
+            <div class="config-row">
+              <label>西语开头</label>
+              <input type="text" id="contactIntroEs" placeholder="Gracias por usar España Life...">
+            </div>
+            <div class="config-row">
+              <label>微信群中文</label>
+              <input type="text" id="contactGroupZh" placeholder="加入西班牙华人生活交流群，与更多华人朋友互动">
+            </div>
+            <div class="config-row">
+              <label>微信群西语</label>
+              <input type="text" id="contactGroupEs" placeholder="Únete a la comunidad china en España...">
+            </div>
+            <div class="config-row">
+              <label>回复提示中文</label>
+              <input type="text" id="contactResponseZh" placeholder="我们通常在24小时内回复您的咨询">
+            </div>
+            <div class="config-row">
+              <label>回复提示西语</label>
+              <input type="text" id="contactResponseEs" placeholder="Normalmente respondemos en un plazo de 24 horas">
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:8px">
+              保存后前台“联系我们”窗口和帮助中心底部联系方式会自动更新。
+            </div>
+          </div>
+          <div class="config-box">
             <h4>🔐 后台密码</h4>
             <div class="config-row">
               <label>当前账号</label>
@@ -3045,10 +3091,88 @@ async function dismissReport(id) {
 function addPin() { closeModal('pin'); showToast('📌 置顶已添加', 'success'); }
 function openPinModal() { openModal('pin'); }
 
-function saveSettings() {
+const DEFAULT_CONTACT_SETTINGS = {
+  officialAccount: '西班牙生活通',
+  wechatId: 'espana_life',
+  email: 'aladaya@gmail.com',
+  supportHours: '9:00-22:00',
+  groupZh: '加入西班牙华人生活交流群，与更多华人朋友互动',
+  groupEs: 'Únete a la comunidad china en España para compartir información útil',
+  introZh: '感谢您使用西班牙生活通！如有任何问题或建议，请通过以下方式联系我们：',
+  introEs: 'Gracias por usar España Life. Si tienes alguna pregunta o sugerencia, puedes contactar con nosotros por estos medios:',
+  responseZh: '我们通常在24小时内回复您的咨询',
+  responseEs: 'Normalmente respondemos en un plazo de 24 horas'
+};
+
+function contactInputValue(id, fallback = '') {
+  return document.getElementById(id)?.value.trim() || fallback;
+}
+
+function fillContactSettings(value = {}) {
+  const settings = { ...DEFAULT_CONTACT_SETTINGS, ...(value || {}) };
+  const pairs = {
+    contactOfficialAccount: settings.officialAccount,
+    contactWechatId: settings.wechatId,
+    contactEmail: settings.email,
+    contactSupportHours: settings.supportHours,
+    contactIntroZh: settings.introZh,
+    contactIntroEs: settings.introEs,
+    contactGroupZh: settings.groupZh,
+    contactGroupEs: settings.groupEs,
+    contactResponseZh: settings.responseZh,
+    contactResponseEs: settings.responseEs
+  };
+  Object.entries(pairs).forEach(([id, val]) => {
+    const input = document.getElementById(id);
+    if (input) input.value = val || '';
+  });
+}
+
+function collectContactSettings() {
+  return {
+    officialAccount: contactInputValue('contactOfficialAccount', DEFAULT_CONTACT_SETTINGS.officialAccount),
+    wechatId: contactInputValue('contactWechatId', DEFAULT_CONTACT_SETTINGS.wechatId),
+    email: contactInputValue('contactEmail', DEFAULT_CONTACT_SETTINGS.email),
+    supportHours: contactInputValue('contactSupportHours', DEFAULT_CONTACT_SETTINGS.supportHours),
+    introZh: contactInputValue('contactIntroZh', DEFAULT_CONTACT_SETTINGS.introZh),
+    introEs: contactInputValue('contactIntroEs', DEFAULT_CONTACT_SETTINGS.introEs),
+    groupZh: contactInputValue('contactGroupZh', DEFAULT_CONTACT_SETTINGS.groupZh),
+    groupEs: contactInputValue('contactGroupEs', DEFAULT_CONTACT_SETTINGS.groupEs),
+    responseZh: contactInputValue('contactResponseZh', DEFAULT_CONTACT_SETTINGS.responseZh),
+    responseEs: contactInputValue('contactResponseEs', DEFAULT_CONTACT_SETTINGS.responseEs)
+  };
+}
+
+async function loadContactSettings() {
+  if (!canManageSection('payment')) return;
+  try {
+    const result = await adminApi('/api/admin-site-settings', { action: 'get' });
+    fillContactSettings(result.value);
+  } catch (error) {
+    fillContactSettings(DEFAULT_CONTACT_SETTINGS);
+    showToast('联系方式设置读取失败，已显示默认值：' + error.message, 'error');
+  }
+}
+
+async function saveContactSettings() {
+  if (!canManageSection('payment')) {
+    showToast('没有系统设置管理权限', 'error');
+    return;
+  }
+  const value = collectContactSettings();
+  const result = await adminApi('/api/admin-site-settings', { action: 'update', value });
+  fillContactSettings(result.value);
+}
+
+async function saveSettings() {
   const url = document.getElementById('sbUrl').value;
   if(url) localStorage.setItem('sb_url', url);
-  showToast('💾 设置已保存', 'success');
+  try {
+    await saveContactSettings();
+    showToast('💾 设置已保存，前台联系方式已更新', 'success');
+  } catch (error) {
+    showToast('保存失败：' + error.message, 'error');
+  }
 }
 
 function authPasswordFromAdminInput(value) {
@@ -3202,6 +3326,7 @@ function initDashboard() {
   if (canManageSection('review')) loadRealReview();
   if (canManageSection('reports')) loadRealReports();
   if (canManageSection('users')) loadRealUsers();
+  if (canManageSection('payment')) loadContactSettings();
 }
 
 requireAdmin().then(ok => { if (ok) initDashboard(); });
