@@ -378,6 +378,110 @@
     font-weight: 800;
   }
 
+  .hero-referral-card {
+    display: none;
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    border: 2px solid rgba(245,166,35,0.8);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+  }
+
+  .hero-referral-card.active {
+    display: block;
+  }
+
+  .hero-referral-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .hero-referral-title {
+    font-weight: 950;
+    color: #8f1d1d;
+    font-size: 15px;
+  }
+
+  .hero-referral-count {
+    font-weight: 950;
+    color: #16a34a;
+    white-space: nowrap;
+  }
+
+  .hero-referral-code {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fff7ed;
+    border: 1px dashed #f59e0b;
+    font-size: 13px;
+    color: #7c2d12;
+  }
+
+  .hero-referral-code strong {
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: #9f1239;
+  }
+
+  .hero-referral-link {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 12px;
+    color: #14532d;
+    background: #f0fdf4;
+    margin-bottom: 10px;
+  }
+
+  .hero-referral-progress {
+    height: 8px;
+    background: #dcfce7;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 8px 0 10px;
+  }
+
+  .hero-referral-progress span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg,#16a34a,#22c55e);
+    border-radius: 999px;
+  }
+
+  .hero-referral-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .hero-referral-actions button {
+    border: 0;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-weight: 900;
+    cursor: pointer;
+    background: #16a34a;
+    color: white;
+  }
+
+  .hero-referral-actions button.secondary {
+    background: #fff;
+    color: #047857;
+    border: 1.5px solid #16a34a;
+  }
+
   .hero-inner {
     max-width: 1180px;
     margin: 0 auto;
@@ -1625,6 +1729,21 @@
       padding: 6px 8px;
       font-size: 11.5px;
     }
+    .hero-referral-card {
+      padding: 11px;
+    }
+    .hero-referral-top {
+      align-items: flex-start;
+    }
+    .hero-referral-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .hero-referral-actions button {
+      min-width: 0;
+      padding: 10px 6px;
+      font-size: 13px;
+    }
     .hero-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -2054,8 +2173,10 @@
         </div>
         <div class="hero-actions">
           <button class="hero-action primary" onclick="openModal('register')">立即注册</button>
+          <button class="hero-action" onclick="openReferralCenter()">我的转发码</button>
           <a class="hero-action" href="#listingsGrid">最新信息</a>
         </div>
+        <div id="heroReferralCard" class="hero-referral-card" aria-live="polite"></div>
       </div>
     </details>
   </div>
@@ -2396,7 +2517,43 @@
 // ===== SUPABASE =====
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+function createOfflineSupabaseClient() {
+  const offlineError = { message: 'Supabase SDK 未加载，请检查网络后重试' };
+  const query = {
+    select() { return this; },
+    eq() { return this; },
+    in() { return this; },
+    not() { return this; },
+    ilike() { return this; },
+    order() { return this; },
+    limit() { return this; },
+    update() { return this; },
+    delete() { return this; },
+    single() { return Promise.resolve({ data: null, error: offlineError }); },
+    then(resolve) { return Promise.resolve({ data: [], error: null }).then(resolve); }
+  };
+  return {
+    auth: {
+      getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+      signInWithPassword: () => Promise.resolve({ data: null, error: offlineError }),
+      signUp: () => Promise.resolve({ data: null, error: offlineError }),
+      signOut: () => Promise.resolve({ error: null }),
+      resetPasswordForEmail: () => Promise.resolve({ error: offlineError })
+    },
+    from: () => query,
+    storage: {
+      from: () => ({
+        upload: () => Promise.resolve({ data: null, error: offlineError }),
+        getPublicUrl: () => ({ data: { publicUrl: '' } })
+      })
+    },
+    channel: () => ({ on() { return this; }, subscribe() { return this; } })
+  };
+}
+const sb = window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : createOfflineSupabaseClient();
 
 // 当前登录用户
 let currentUser = null;
@@ -3009,6 +3166,8 @@ async function trackReferralVisit() {
 }
 
 function renderReferralPanel(status) {
+  window._referralStatus = status || window._referralStatus || null;
+  renderHeroReferralCard(status);
   const vipBar = document.getElementById('vipStatusBar');
   if (!vipBar || !status) return;
   let panel = document.getElementById('referralPromoPanel');
@@ -3022,6 +3181,7 @@ function renderReferralPanel(status) {
   const remaining = Math.max(0, Number(status.remaining ?? (target - count)));
   const percent = Math.min(100, Math.round(count / target * 100));
   const inviteUrl = status.inviteUrl || '';
+  const referralCode = status.referralCode || '';
   panel.style.cssText = 'background:#fff;border:1.5px solid #bbf7d0;border-left:5px solid #16a34a;border-radius:12px;padding:12px 14px;margin:-4px 0 16px;box-shadow:0 8px 18px rgba(22,163,74,.08);';
   panel.innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
@@ -3031,6 +3191,10 @@ function renderReferralPanel(status) {
         <div style="font-size:12px;color:#047857;line-height:1.5">${remaining === 0 ? '已达到活动条件，系统会自动开通或刷新会员状态。' : `已累计 ${count}/${target} 位，还差 ${remaining} 位好友打开你的链接。`}</div>
       </div>
       <div style="font-size:18px;font-weight:900;color:#16a34a">${count}/${target}</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff7ed;border:1px dashed #f59e0b;border-radius:8px;padding:9px 10px;margin-bottom:10px;color:#7c2d12">
+      <span style="font-size:12px;font-weight:800">我的转发码：<strong style="font-size:17px;color:#9f1239;letter-spacing:1px">${escapeHTML(referralCode)}</strong></span>
+      <button onclick="copyReferralCode()" style="border:none;border-radius:7px;background:#f59e0b;color:white;font-weight:900;padding:6px 9px;cursor:pointer;white-space:nowrap">复制码</button>
     </div>
     <div style="height:8px;background:#dcfce7;border-radius:99px;overflow:hidden;margin-bottom:10px">
       <div style="height:100%;width:${percent}%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:99px"></div>
@@ -3043,10 +3207,67 @@ function renderReferralPanel(status) {
   `;
 }
 
+function renderHeroReferralGuest() {
+  const card = document.getElementById('heroReferralCard');
+  if (!card) return;
+  card.classList.add('active');
+  card.innerHTML = `
+    <div class="hero-referral-top">
+      <div>
+        <div class="hero-referral-title">注册后自动生成专属转发码</div>
+        <div style="font-size:12px;color:#7c2d12;margin-top:3px;line-height:1.5">登录后这里会显示你的转发码、专属链接和邀请进度。</div>
+      </div>
+      <div class="hero-referral-count">0/10</div>
+    </div>
+    <div class="hero-referral-code"><span>示例：</span><strong>u1234567890</strong></div>
+    <div class="hero-referral-progress"><span style="width:0%"></span></div>
+    <div class="hero-referral-actions">
+      <button onclick="openModal('register')">立即注册</button>
+      <button class="secondary" onclick="openModal('login')">已有账号登录</button>
+    </div>
+  `;
+}
+
+function renderHeroReferralCard(status) {
+  const card = document.getElementById('heroReferralCard');
+  if (!card) return;
+  if (!status) {
+    renderHeroReferralGuest();
+    return;
+  }
+  const count = Math.max(0, Number(status.count || 0));
+  const target = Math.max(1, Number(status.target || 10));
+  const remaining = Math.max(0, Number(status.remaining ?? (target - count)));
+  const percent = Math.min(100, Math.round(count / target * 100));
+  const referralCode = status.referralCode || '';
+  const inviteUrl = status.inviteUrl || '';
+  card.classList.add('active');
+  card.innerHTML = `
+    <div class="hero-referral-top">
+      <div>
+        <div class="hero-referral-title">我的专属转发码</div>
+        <div style="font-size:12px;color:#047857;margin-top:3px;line-height:1.5">${remaining === 0 ? '已达标，系统会自动开通或刷新VIP。' : `已累计 ${count}/${target} 位，还差 ${remaining} 位好友打开。`}</div>
+      </div>
+      <div class="hero-referral-count">${count}/${target}</div>
+    </div>
+    <div class="hero-referral-code"><span>转发码：</span><strong>${escapeHTML(referralCode)}</strong></div>
+    <input class="hero-referral-link" readonly value="${escapeHTML(inviteUrl)}" onclick="this.select()">
+    <div class="hero-referral-progress"><span style="width:${percent}%"></span></div>
+    <div class="hero-referral-actions">
+      <button onclick="copyReferralInvite()">复制链接</button>
+      <button class="secondary" onclick="shareReferralInvite()">微信分享</button>
+      <button class="secondary" onclick="copyReferralCode()">复制转发码</button>
+    </div>
+  `;
+}
+
 async function loadReferralStatus() {
   try {
     const headers = await getAuthHeader();
-    if (!headers.Authorization) return;
+    if (!headers.Authorization) {
+      renderHeroReferralGuest();
+      return;
+    }
     const response = await fetch('/api/referral', { headers });
     const data = await response.json().catch(() => ({}));
     if (response.ok) {
@@ -3058,20 +3279,36 @@ async function loadReferralStatus() {
   }
 }
 
+function getReferralInviteUrl() {
+  return window._referralStatus?.inviteUrl || document.getElementById('referralInviteUrl')?.value || '';
+}
+
 async function copyReferralInvite() {
-  const input = document.getElementById('referralInviteUrl');
-  if (!input?.value) return;
-  await copyText(input.value);
+  const inviteUrl = getReferralInviteUrl();
+  if (!inviteUrl) return;
+  await copyText(inviteUrl);
   showToast('✅ 专属邀请链接已复制，发给微信好友即可');
 }
 
+async function copyReferralCode() {
+  const code = window._referralStatus?.referralCode || '';
+  if (!code) {
+    showToast('请先登录，系统会自动生成你的转发码', true);
+    openModal('login');
+    return;
+  }
+  await copyText(code);
+  showToast('✅ 转发码已复制');
+}
+
 async function shareReferralInvite() {
-  const input = document.getElementById('referralInviteUrl');
-  if (!input?.value) return;
-  const text = `我在用西班牙生活通，招工、租房、生意转让、二手和生活服务都能看。打开这个链接支持我领取VIP：${input.value}`;
+  const inviteUrl = getReferralInviteUrl();
+  if (!inviteUrl) return;
+  const code = window._referralStatus?.referralCode || '';
+  const text = `我在用西班牙生活通，招工、租房、生意转让、二手和生活服务都能看。我的转发码：${code}。打开这个链接支持我领取VIP：${inviteUrl}`;
   if (navigator.share && !isWeChatBrowser()) {
     try {
-      await navigator.share({ title: '西班牙生活通', text, url: input.value });
+      await navigator.share({ title: '西班牙生活通', text, url: inviteUrl });
       return;
     } catch(e) {
       if (e && e.name === 'AbortError') return;
@@ -3079,6 +3316,17 @@ async function shareReferralInvite() {
   }
   await copyText(text);
   showToast(isWeChatBrowser() ? '已复制分享文案，去微信聊天粘贴发送' : '已复制邀请文案和链接');
+}
+
+async function openReferralCenter() {
+  const headers = await getAuthHeader().catch(() => ({}));
+  if (!headers.Authorization) {
+    showToast('请先注册或登录，才能生成你的专属转发码');
+    openModal('register');
+    return;
+  }
+  openModal('profile');
+  setTimeout(() => loadReferralStatus(), 80);
 }
 
 function publishEntryCardHtml(extraClass = '') {
@@ -3208,7 +3456,9 @@ window.shareListing = shareListing;
 window.copyText = copyText;
 window.getListingShareUrl = getListingShareUrl;
 window.copyReferralInvite = copyReferralInvite;
+window.copyReferralCode = copyReferralCode;
 window.shareReferralInvite = shareReferralInvite;
+window.openReferralCenter = openReferralCenter;
 
 function renderListings() {
   const grid = document.getElementById('listingsGrid');
@@ -3452,6 +3702,7 @@ function openModal(name) {
     updatePostForm();
   }
 }
+window.openModal = openModal;
 
 if (location.pathname === '/publish') {
   window.addEventListener('DOMContentLoaded', () => setTimeout(() => openModal('post'), 80));
@@ -3475,6 +3726,7 @@ document.addEventListener('DOMContentLoaded', function() {
   syncModalScrollLock();
   applyWeChatBrowserHints();
   trackReferralVisit();
+  loadReferralStatus();
 });
 window.addEventListener('pageshow', syncModalScrollLock);
 
