@@ -1171,6 +1171,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
             <button class="btn btn-green" onclick="batchListingAction('online')">批量上架</button>
             <button class="btn btn-red" onclick="batchListingAction('offline')">批量下架</button>
             <button class="btn btn-blue" onclick="batchListingAction('approve')">批量审批</button>
+            <button class="btn btn-gold" onclick="batchListingPin(true, 7)">批量置顶7天</button>
+            <button class="btn" onclick="batchListingPin(false)">批量取消置顶</button>
             <button class="btn btn-red" onclick="batchListingAction('delete')">批量删除</button>
             <input class="search-input" id="listingSearch" placeholder="🔍 搜索商家名/电话/城市/地址/关键词…" oninput="filterListings()">
             <select class="select-input" id="catFilter" onchange="filterListings()">
@@ -1188,6 +1190,12 @@ tr:hover td { background: rgba(255,255,255,0.02); }
               <option value="已上线">已上线</option>
               <option value="待审核">待审核</option>
               <option value="已下架">已下架</option>
+            </select>
+            <select class="select-input" id="pinFilter" onchange="filterListings()">
+              <option value="">全部置顶</option>
+              <option value="active">置顶中</option>
+              <option value="none">未置顶</option>
+              <option value="expired">已过期</option>
             </select>
           </div>
         </div>
@@ -1291,6 +1299,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         <div class="card-header">
           <div class="card-title">📌 置顶/推广管理</div>
           <div class="card-actions">
+            <input class="search-input" id="pinnedSearch" placeholder="🔍 搜索标题/客人/电话/城市/到期时间…" oninput="filterPinned()">
             <button class="btn btn-gold" onclick="openPinModal()">+ 添加置顶</button>
           </div>
         </div>
@@ -1736,24 +1745,35 @@ function esc(value) {
 }
 
 // ═══════════ LOAD REAL DATA ═══════════
+let listingsLoadedFromDatabase = false;
 async function loadRealListings() {
   const { data } = await sb.from('listings')
-    .select('id, title, category, city, price, address, description, contact, images, status, created_at, user_id, profiles(nickname, phone)')
+    .select('id, title, category, city, price, address, description, contact, images, status, created_at, user_id, is_pinned, pin_until, profiles(nickname, phone)')
     .order('created_at', { ascending: false })
     .limit(1000);
-  if(data && data.length > 0) {
+  if(data) {
+    listingsLoadedFromDatabase = true;
     allListings.length = 0;
     data.forEach(r => {
       const isMerchant = r.user_id === null && String(r.description || '').includes('平台代登记商家信息');
+      const publisherPhone = r.profiles?.phone || '';
+      const contact = r.contact || publisherPhone || '—';
+      const pinUntil = r.pin_until || '';
+      const pinActive = Boolean(r.is_pinned && (!pinUntil || new Date(pinUntil) > new Date()));
       allListings.push({
       id: 'L'+r.id, _id: r.id,
       title: r.title, cat: isMerchant ? '商家' : r.category, rawCat: r.category, isMerchant,
+      userId: r.user_id || '',
       city: r.city, user: r.profiles?.nickname || (r.user_id ? '未知用户' : '游客发布'),
+      publisherPhone,
       price: r.price || '',
       address: r.address || '',
       images: Array.isArray(r.images) ? r.images : [],
-      contact: r.contact || r.profiles?.phone || '—',
+      contact,
       desc: r.description || '',
+      isPinned: pinActive,
+      pinUntil,
+      pinStatus: pinActive ? '置顶中' : (pinUntil ? '置顶已过期' : '未置顶'),
       rawStatus: r.status,
       status: { pending:'待审核', approved:'已上线', rejected:'已下架', offline:'已下架' }[r.status] || r.status,
       time: new Date(r.created_at).toLocaleString('zh-CN')
@@ -1761,6 +1781,7 @@ async function loadRealListings() {
     });
   }
   filterListings();
+  if (canManageSection('pinned')) renderPinned();
 }
 
 async function loadRealReview() {
@@ -1960,7 +1981,12 @@ function renderListings(data) {
     <tr>
       <td data-label="选择"><input type="checkbox" class="listing-row-check" data-id="${l._id || String(l.id).replace(/\D/g,'')}"></td>
       <td data-label="ID"><span style="font-family:JetBrains Mono;font-size:11px;color:var(--text-muted)">${l.id}</span></td>
-      <td data-label="标题" style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.title)}</td>
+      <td data-label="标题" style="max-width:240px">
+        <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.title)}</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px">
+          ${listingPinActive(l) ? `<span class="badge badge-pinned">📌 置顶至 ${esc(formatDateOnly(l.pinUntil))}</span>` : `<span class="badge badge-active">未置顶</span>`}
+        </div>
+      </td>
       <td data-label="分类"><span class="badge badge-active">${esc(l.cat)}</span></td>
       <td data-label="城市">📍 ${esc(l.city)}</td>
       <td data-label="联系方式" style="max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px">${esc(l.contact || '—')}</td>
@@ -1970,6 +1996,7 @@ function renderListings(data) {
       <td data-label="操作">
         <div class="action-btns">
           ${l.status==='已上线' ? `<button class="btn btn-red" onclick="takeDown('${l.id}')">下架</button>` : `<button class="btn btn-green" onclick="bringUp('${l.id}')">上线</button>`}
+          ${listingPinActive(l) ? `<button class="btn" onclick="setListingPin(${l._id || String(l.id).replace(/\D/g,'')}, false)">取消置顶</button>` : `<button class="btn btn-gold" onclick="setListingPin(${l._id || String(l.id).replace(/\D/g,'')}, true, 7)">置顶7天</button>`}
           <button class="btn btn-blue" onclick="openListingModal('${l.id}')">详情</button>
           <button class="btn btn-gold" onclick="openListingEdit('${l.id}')">编辑</button>
           <button class="btn btn-red" onclick="deleteAdminItem('listing','${l._id || l.id}')">删除</button>
@@ -1991,6 +2018,20 @@ function normalizeSearchText(value) {
 
 function compactDigits(value) {
   return String(value || '').replace(/\D/g, '');
+}
+
+function formatDateOnly(value) {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleDateString('zh-CN');
+}
+
+function listingPinActive(listing) {
+  if (!listing?.isPinned) return false;
+  if (!listing.pinUntil) return true;
+  const end = new Date(listing.pinUntil);
+  return Number.isNaN(end.getTime()) || end > new Date();
 }
 
 function listingMatchesCategory(listing, cat) {
@@ -2025,21 +2066,27 @@ function listingMatchesQuery(listing, query) {
   const text = normalizeSearchText([
     listing.id,
     listing._id,
+    listing.userId,
     listing.title,
     listing.cat,
     listing.city,
     listing.user,
+    listing.publisherPhone,
     listing.price,
     listing.address,
     listing.contact,
     listing.desc,
+    listing.pinStatus,
+    listing.pinUntil,
     listing.status,
     listing.time
   ].join(' '));
   const digits = compactDigits([
     listing.id,
     listing._id,
+    listing.userId,
     listing.contact,
+    listing.publisherPhone,
     listing.city,
     listing.title,
     listing.address
@@ -2049,14 +2096,25 @@ function listingMatchesQuery(listing, query) {
     (queryDigits.length >= 3 && digits.includes(queryDigits));
 }
 
+function listingMatchesPin(listing, pin) {
+  if (!pin) return true;
+  const active = listingPinActive(listing);
+  if (pin === 'active') return active;
+  if (pin === 'none') return !active && !listing.pinUntil;
+  if (pin === 'expired') return !active && Boolean(listing.pinUntil);
+  return true;
+}
+
 function filterListings() {
   const q = document.getElementById('listingSearch')?.value || '';
   const cat = document.getElementById('catFilter').value;
   const status = document.getElementById('statusFilter').value;
+  const pin = document.getElementById('pinFilter')?.value || '';
   let data = allListings.filter(l =>
     listingMatchesQuery(l, q) &&
     listingMatchesCategory(l, cat) &&
-    (!status || l.status === status)
+    (!status || l.status === status) &&
+    listingMatchesPin(l, pin)
   );
   renderListings(data);
 }
@@ -2105,6 +2163,50 @@ async function batchListingAction(action, ids = selectedListingIds()) {
   } catch (error) {
     showToast(`批量${label}失败：${error.message}`, 'error');
   }
+}
+
+async function setListingPin(id, pinned, days = 7) {
+  const numId = Number(id);
+  if (!Number.isInteger(numId)) {
+    showToast('未找到要置顶的信息', 'error');
+    return;
+  }
+  const payload = pinned
+    ? { is_pinned: true, pin_until: new Date(Date.now() + days * 86400000).toISOString() }
+    : { is_pinned: false, pin_until: null };
+  const { error } = await sb.from('listings').update(payload).eq('id', numId);
+  if (error) {
+    showToast('置顶操作失败：' + error.message, 'error');
+    return;
+  }
+  await sbLog(pinned ? 'pin_listing' : 'unpin_listing', 'listing', numId);
+  showToast(pinned ? `已置顶 ${days} 天` : '已取消置顶', pinned ? 'success' : 'info');
+  await loadRealListings();
+  renderPinned();
+}
+
+async function batchListingPin(pinned, days = 7, ids = selectedListingIds()) {
+  const selected = [...new Set(ids.map(Number).filter(Number.isInteger))];
+  if (!selected.length) {
+    showToast('请先勾选要置顶管理的信息', 'error');
+    return;
+  }
+  const label = pinned ? `置顶 ${days} 天` : '取消置顶';
+  if (!confirm(`确定对 ${selected.length} 条信息执行“${label}”吗？`)) return;
+  const payload = pinned
+    ? { is_pinned: true, pin_until: new Date(Date.now() + days * 86400000).toISOString() }
+    : { is_pinned: false, pin_until: null };
+  const { error } = await sb.from('listings').update(payload).in('id', selected);
+  if (error) {
+    showToast('批量置顶操作失败：' + error.message, 'error');
+    return;
+  }
+  await sbLog(pinned ? 'batch_pin_listing' : 'batch_unpin_listing', 'listing', selected.join(','));
+  const listingCheckAll = document.getElementById('listingCheckAll');
+  if (listingCheckAll) listingCheckAll.checked = false;
+  showToast(`已${label} ${selected.length} 条信息`, pinned ? 'success' : 'info');
+  await loadRealListings();
+  renderPinned();
 }
 
 function parseCsvLine(line) {
@@ -2222,24 +2324,58 @@ function renderReports() {
   `).join('');
 }
 
-function renderPinned() {
-  document.getElementById('pinnedTbody').innerHTML = pinnedItems.map(p => `
+function pinnedListings() {
+  const realPinned = allListings.filter(l => listingPinActive(l) || l.pinUntil);
+  if (realPinned.length) return realPinned;
+  if (listingsLoadedFromDatabase) return [];
+  return pinnedItems.map((p, index) => ({
+    id: `P${index + 1}`,
+    _id: null,
+    title: p.title,
+    cat: p.cat,
+    city: p.city,
+    user: '示例客户',
+    contact: '—',
+    time: p.start,
+    pinUntil: p.end,
+    isPinned: p.status === '进行中',
+    pinStatus: p.status
+  }));
+}
+
+function renderPinned(data = pinnedListings()) {
+  const tbody = document.getElementById('pinnedTbody');
+  if (!tbody) return;
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px">暂无置顶信息，可在“信息管理”里勾选后批量置顶</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(p => `
     <tr>
-      <td data-label="信息标题">${esc(p.title)}</td>
+      <td data-label="信息标题">
+        <div style="font-weight:700;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${esc(p.user || '游客发布')} · ${esc(p.contact || '—')}</div>
+      </td>
       <td data-label="分类"><span class="badge badge-active">${esc(p.cat)}</span></td>
       <td data-label="城市">📍 ${esc(p.city)}</td>
-      <td data-label="置顶类型">${p.type}</td>
-      <td data-label="开始时间" style="font-size:12px">${p.start}</td>
-      <td data-label="到期时间" style="font-size:12px">${p.end}</td>
-      <td data-label="状态"><span class="badge ${p.status==='进行中'?'badge-pinned':'badge-rejected'}">${p.status}</span></td>
+      <td data-label="置顶类型">首页/列表置顶</td>
+      <td data-label="开始时间" style="font-size:12px">${esc(formatDateOnly(p.time))}</td>
+      <td data-label="到期时间" style="font-size:12px">${esc(formatDateOnly(p.pinUntil))}</td>
+      <td data-label="状态"><span class="badge ${listingPinActive(p)?'badge-pinned':'badge-rejected'}">${listingPinActive(p) ? '置顶中' : '已到期'}</span></td>
       <td data-label="操作">
         <div class="action-btns">
-          <button class="btn btn-red" onclick="showToast('已取消置顶','success')">取消置顶</button>
-          ${p.status==='已到期'?`<button class="btn btn-gold" onclick="showToast('已续期7天','success')">续期</button>`:''}
+          ${p._id ? `<button class="btn btn-red" onclick="setListingPin(${p._id}, false)">取消置顶</button>
+          <button class="btn btn-gold" onclick="setListingPin(${p._id}, true, 7)">续期7天</button>
+          <button class="btn btn-blue" onclick="openListingModal('${p.id}')">详情</button>` : `<button class="btn btn-gold" onclick="showToast('请先加载真实信息后操作','info')">示例</button>`}
         </div>
       </td>
     </tr>
   `).join('');
+}
+
+function filterPinned() {
+  const q = document.getElementById('pinnedSearch')?.value || '';
+  renderPinned(pinnedListings().filter(item => listingMatchesQuery(item, q)));
 }
 
 function adminRoleLabel(user) {
