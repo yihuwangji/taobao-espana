@@ -1160,6 +1160,25 @@
     font-family: 'Noto Sans SC', sans-serif;
   }
 
+  .detail-action.whatsapp,
+  .whatsapp-contact-link {
+    border-color: #22c55e;
+    background: #ecfdf3;
+    color: #128c4a;
+  }
+
+  .whatsapp-contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    border: 1.5px solid #22c55e;
+    border-radius: 10px;
+    padding: 8px 10px;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
   .detail-action.primary {
     border-color: #07c160;
     background: #ecfff4;
@@ -2839,7 +2858,7 @@ const I18N = {
     'detail.loading': '加载中…', 'detail.failed': '信息加载失败', 'detail.error': '加载出错：',
     'detail.description': '📝 详细描述', 'detail.price': '💰 价格', 'detail.area': '📍 省份/地区',
     'detail.contact': '📞 联系方式', 'detail.contactHint': '可通过微信 / 手机 / WhatsApp 联系',
-    'detail.share': '微信分享这条信息', 'detail.map': '打开地图导航', 'detail.copy': '复制联系方式', 'detail.copied': '联系方式已复制', 'detail.views': '次浏览',
+    'detail.share': '微信分享这条信息', 'detail.map': '打开地图导航', 'detail.copy': '复制联系方式', 'detail.copied': '联系方式已复制', 'detail.whatsapp': 'WhatsApp联系', 'detail.views': '次浏览',
     'common.negotiable': '面议', 'common.notFilled': '未填写',
     'search.noResults': '未找到', 'search.resultSuffix': '相关信息', 'search.toastFound': '找到', 'search.toastItems': '条结果', 'search.failed': '搜索失败，请重试',
     'post.title': '📢 发布信息', 'post.memberMode': '🔑 已登录发布', 'post.guestMode': '👤 游客快速发布',
@@ -2903,7 +2922,7 @@ const I18N = {
     'detail.loading': 'Cargando…', 'detail.failed': 'No se pudo cargar el anuncio', 'detail.error': 'Error al cargar: ',
     'detail.description': '📝 Descripción', 'detail.price': '💰 Precio', 'detail.area': '📍 Provincia/zona',
     'detail.contact': '📞 Contacto', 'detail.contactHint': 'Puedes contactar por WeChat / móvil / WhatsApp',
-    'detail.share': 'Compartir este anuncio', 'detail.map': 'Abrir mapa', 'detail.copy': 'Copiar contacto', 'detail.copied': 'Contacto copiado', 'detail.views': 'vistas',
+    'detail.share': 'Compartir este anuncio', 'detail.map': 'Abrir mapa', 'detail.copy': 'Copiar contacto', 'detail.copied': 'Contacto copiado', 'detail.whatsapp': 'Contactar por WhatsApp', 'detail.views': 'vistas',
     'common.negotiable': 'A negociar', 'common.notFilled': 'Sin indicar',
     'search.noResults': 'No se encontraron anuncios para', 'search.resultSuffix': '', 'search.toastFound': 'encontrados', 'search.toastItems': 'resultados', 'search.failed': 'Error al buscar, inténtalo de nuevo',
     'post.title': '📢 Publicar anuncio', 'post.memberMode': '🔑 Publicar con cuenta', 'post.guestMode': '👤 Publicar como visitante',
@@ -3252,6 +3271,36 @@ function escapeHTML(value) {
     '"': '&quot;',
     "'": '&#39;'
   }[ch]));
+}
+
+function extractWhatsAppNumber(value) {
+  const raw = String(value || '');
+  const match = raw.match(/(?:\+|00)?\d[\d\s().-]{7,}\d/);
+  if (!match) return '';
+  let digits = match[0].replace(/\D/g, '');
+  if (digits.startsWith('00')) digits = digits.slice(2);
+  if (digits.length === 9) digits = `34${digits}`;
+  if (digits.length < 8 || digits.length > 15) return '';
+  return digits;
+}
+
+function whatsappSourceMessage(title = '') {
+  const cleanTitle = String(title || '').replace(/\s+/g, ' ').trim();
+  if (currentLang === 'es') {
+    return cleanTitle
+      ? `Hola, te escribo desde España Life / espanalife.app por el anuncio: ${cleanTitle}`
+      : 'Hola, te escribo desde España Life / espanalife.app.';
+  }
+  return cleanTitle
+    ? `你好，我是从西班牙生活通 espanalife.app 看到这条信息，想咨询：${cleanTitle}`
+    : '你好，我是从西班牙生活通 espanalife.app 来的，想咨询一下。';
+}
+
+function whatsappUrlFor(value, message = '') {
+  const number = extractWhatsAppNumber(value);
+  if (!number) return '';
+  const text = message ? `?text=${encodeURIComponent(message)}` : '';
+  return `https://wa.me/${number}${text}`;
 }
 
 function normalizeListingImages(images) {
@@ -3931,6 +3980,10 @@ async function viewListing(id) {
     const safePrice = escapeHTML(data.price || tr('common.negotiable'));
     const safeCity = escapeHTML(normalizeProvinceName(data.city));
     const safeContact = escapeHTML(data.contact || tr('common.notFilled'));
+    const whatsappUrl = whatsappUrlFor(data.contact, whatsappSourceMessage(data.title));
+    const contactHtml = whatsappUrl
+      ? `<a class="whatsapp-contact-link" href="${escapeHTML(whatsappUrl)}" target="_blank" rel="noopener">📱 ${safeContact}</a>`
+      : `<div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">${safeContact}</div>`;
     currentClaimListing = data;
     updateDocumentShareMeta(data);
 
@@ -3962,11 +4015,12 @@ async function viewListing(id) {
         </div>
         <div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px">
           <div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">${tr('detail.contact')}</div>
-          <div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">${safeContact}</div>
+          ${contactHtml}
           <div style="font-size:11px;color:#999;margin-top:6px">${tr('detail.contactHint')}</div>
         </div>
         <div class="detail-actions">
           <button class="detail-action primary" onclick="shareListing(${data.id}, event)">${tr('detail.share')}</button>
+          ${whatsappUrl ? `<a class="detail-action whatsapp" href="${escapeHTML(whatsappUrl)}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">📱 ${tr('detail.whatsapp')}</a>` : ''}
           ${data.address ? `<a class="detail-action" href="${escapeHTML(getMapUrl(data.address, data.city))}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">${tr('detail.map')}</a>` : ''}
           <button class="detail-action" onclick="copyText('${escapeHTML(data.contact || '')}').then(()=>showToast(tr('detail.copied')))">${tr('detail.copy')}</button>
         </div>
@@ -4258,13 +4312,17 @@ function normalizeContactInfo(value = {}) {
   };
 }
 
-function contactCard(icon, title, text) {
+function contactCard(icon, title, text, href = '') {
+  const safeText = escapeHTML(text);
+  const body = href
+    ? `<a href="${escapeHTML(href)}" target="_blank" rel="noopener" style="color:#128c4a;font-size:13px;font-weight:700;text-decoration:none;overflow-wrap:anywhere">${safeText}</a>`
+    : `<div style="color:#666;font-size:13px">${safeText}</div>`;
   return `
     <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
       <span style="font-size:28px">${icon}</span>
       <div>
         <div style="font-weight:700;margin-bottom:2px">${escapeHTML(title)}</div>
-        <div style="color:#666;font-size:13px">${escapeHTML(text)}</div>
+        ${body}
       </div>
     </div>
   `;
@@ -4275,13 +4333,13 @@ function facebookDisplay(info) {
 }
 
 function whatsappHref(value) {
-  const digits = String(value || '').replace(/\D/g, '');
-  return digits.length >= 8 ? `https://wa.me/${digits}` : '';
+  return whatsappUrlFor(value, whatsappSourceMessage());
 }
 
 function buildContactContent(lang) {
   const info = normalizeContactInfo(siteContactInfo);
   if (lang === 'es') {
+    const siteWhatsappUrl = whatsappHref(info.whatsapp);
     return {
       title: '📞 Contacto',
       body: `
@@ -4289,7 +4347,7 @@ function buildContactContent(lang) {
         <div style="display:flex;flex-direction:column;gap:12px">
           ${contactCard('💬', 'Cuenta oficial de WeChat', `Busca “${info.officialAccount}” y síguenos en WeChat`)}
           ${contactCard('📢', 'Grupo de WeChat', `${info.wechatGroup} · ${info.groupEs}`)}
-          ${contactCard('📱', 'WhatsApp', info.whatsapp)}
+          ${contactCard('📱', 'WhatsApp', info.whatsapp, siteWhatsappUrl)}
           ${contactCard('📘', 'Facebook', facebookDisplay(info))}
           ${contactCard('💚', 'Atención por WeChat', `Añade: ${info.wechatId}. Horario: ${info.supportHours} (hora de España)`)}
           ${contactCard('📧', 'Correo electrónico', info.email)}
@@ -4298,6 +4356,7 @@ function buildContactContent(lang) {
       `
     };
   }
+  const siteWhatsappUrl = whatsappHref(info.whatsapp);
   return {
     title: '📞 联系我们',
     body: `
@@ -4305,7 +4364,7 @@ function buildContactContent(lang) {
       <div style="display:flex;flex-direction:column;gap:12px">
         ${contactCard('💬', '微信公众号', `搜索“${info.officialAccount}”关注我们的公众号`)}
         ${contactCard('📢', '微信群', `${info.wechatGroup} · ${info.groupZh}`)}
-        ${contactCard('📱', 'WhatsApp', info.whatsapp)}
+        ${contactCard('📱', 'WhatsApp', info.whatsapp, siteWhatsappUrl)}
         ${contactCard('📘', 'Facebook', facebookDisplay(info))}
         ${contactCard('💚', '微信客服', `添加客服微信：${info.wechatId}，工作时间 ${info.supportHours}（西班牙时间）`)}
         ${contactCard('📧', '电子邮件', info.email)}
