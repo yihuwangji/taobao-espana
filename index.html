@@ -2964,6 +2964,7 @@ function applyLanguage(lang = currentLang) {
   renderListings();
   if (document.getElementById('userAgreementModal')?.classList.contains('open')) renderLegalModal('userAgreement');
   if (document.getElementById('privacyPolicyModal')?.classList.contains('open')) renderLegalModal('privacyPolicy');
+  if (document.getElementById('contactUsModal')?.classList.contains('open')) renderContactModal();
   if (window.refreshLocalizedPlanButton) window.refreshLocalizedPlanButton();
 }
 
@@ -4141,6 +4142,83 @@ const LEGAL_CONTENT = {
   }
 };
 
+const CONTACT_CONTENT = {
+  zh: {
+    title: '📞 联系我们',
+    body: `
+      <p style="margin-bottom:16px">感谢您使用西班牙生活通！如有任何问题或建议，请通过以下方式联系我们：</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">💬</span>
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">微信公众号</div>
+            <div style="color:#666;font-size:13px">搜索“西班牙生活通”关注我们的公众号</div>
+          </div>
+        </div>
+        <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">📱</span>
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">微信客服</div>
+            <div style="color:#666;font-size:13px">添加客服微信：espana_life，工作时间 9:00-22:00（西班牙时间）</div>
+          </div>
+        </div>
+        <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">📧</span>
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">电子邮件</div>
+            <div style="color:#666;font-size:13px">aladaya@gmail.com</div>
+          </div>
+        </div>
+        <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">📢</span>
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">微信交流群</div>
+            <div style="color:#666;font-size:13px">加入西班牙华人生活交流群，与更多华人朋友互动</div>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:16px;font-size:12px;color:#999;text-align:center">我们通常在24小时内回复您的咨询</p>
+    `
+  },
+  es: {
+    title: '📞 Contacto',
+    body: `
+      <p style="margin-bottom:16px">Gracias por usar España Life. Si tienes alguna pregunta o sugerencia, puedes contactar con nosotros por estos medios:</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">💬</span>
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">Cuenta oficial de WeChat</div>
+            <div style="color:#666;font-size:13px">Busca “西班牙生活通” y síguenos en WeChat</div>
+          </div>
+        </div>
+        <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">📱</span>
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">Atención por WeChat</div>
+            <div style="color:#666;font-size:13px">Añade: espana_life. Horario: 9:00-22:00 (hora de España)</div>
+          </div>
+        </div>
+        <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">📧</span>
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">Correo electrónico</div>
+            <div style="color:#666;font-size:13px">aladaya@gmail.com</div>
+          </div>
+        </div>
+        <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">📢</span>
+          <div>
+            <div style="font-weight:700;margin-bottom:2px">Grupo de WeChat</div>
+            <div style="color:#666;font-size:13px">Únete a la comunidad china en España para compartir información útil</div>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:16px;font-size:12px;color:#999;text-align:center">Normalmente respondemos en un plazo de 24 horas</p>
+    `
+  }
+};
+
 function renderLegalModal(name) {
   const lang = currentLang === 'es' ? 'es' : 'zh';
   const content = LEGAL_CONTENT[lang];
@@ -4158,10 +4236,20 @@ function renderLegalModal(name) {
   }
 }
 
+function renderContactModal() {
+  const lang = currentLang === 'es' ? 'es' : 'zh';
+  const content = CONTACT_CONTENT[lang];
+  const title = document.getElementById('contactUsTitle');
+  const body = document.getElementById('contactUsBody');
+  if (title) title.innerHTML = content.title;
+  if (body) body.innerHTML = content.body;
+}
+
 function openModal(name) {
   const modal = document.getElementById(name+'Modal');
   if (!modal) return;
   if (name === 'userAgreement' || name === 'privacyPolicy') renderLegalModal(name);
+  if (name === 'contactUs') renderContactModal();
   ensureModalRoot(modal);
   modal.classList.add('open');
   syncModalScrollLock();
@@ -4762,8 +4850,8 @@ loadListings().then(handleInitialDeepLink);
 <div class="modal-overlay" id="contactUsModal">
   <div class="modal relative" style="max-width:480px">
     <button class="modal-close" onclick="closeModal('contactUs')">✕</button>
-    <h3 style="font-size:20px;font-weight:700;color:var(--red);margin-bottom:16px">📞 联系我们</h3>
-    <div style="line-height:1.8;color:#333;font-size:14px">
+    <h3 id="contactUsTitle" style="font-size:20px;font-weight:700;color:var(--red);margin-bottom:16px">📞 联系我们</h3>
+    <div id="contactUsBody" style="line-height:1.8;color:#333;font-size:14px">
       <p style="margin-bottom:16px">感谢您使用西班牙生活通！如有任何问题或建议，请通过以下方式联系我们：</p>
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
