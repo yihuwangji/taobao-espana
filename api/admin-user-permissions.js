@@ -1,7 +1,6 @@
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
+const { ALL_ADMIN_SECTIONS, requireAdminByMetadata } = require('./_admin-auth');
 
-const ALL_SECTIONS = ['dashboard', 'listings', 'review', 'reports', 'pinned', 'users', 'payment'];
 const MANAGEABLE_SECTIONS = ['listings', 'review', 'reports', 'pinned', 'users', 'payment'];
 
 function json(res, status, body) {
@@ -32,29 +31,7 @@ async function serviceFetch(path, options = {}) {
 }
 
 async function requireAdmin(req, options = {}) {
-  const authHeader = req.headers.authorization || req.headers.Authorization || '';
-  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-  if (!token) return { error: 'missing_token', status: 401 };
-
-  const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-    headers: {
-      apikey: SUPABASE_PUBLISHABLE_KEY,
-      Authorization: `Bearer ${token}`
-    }
-  });
-  if (!userResponse.ok) return { error: 'invalid_token', status: 401 };
-  const user = await userResponse.json();
-
-  const profileResponse = await serviceFetch(`/rest/v1/profiles?select=is_admin&id=eq.${encodeURIComponent(user.id)}&limit=1`);
-  if (!profileResponse.ok) return { error: 'admin_check_failed', status: 403 };
-  const profiles = await profileResponse.json();
-  const isSuper = Boolean(profiles[0]?.is_admin || user.app_metadata?.admin_role === 'super_admin');
-  const sections = Array.isArray(user.app_metadata?.admin_sections) ? user.app_metadata.admin_sections : [];
-  if (options.super && !isSuper) return { error: 'not_super_admin', status: 403 };
-  if (!isSuper && options.section && !sections.includes(options.section)) {
-    return { error: 'not_admin', status: 403 };
-  }
-  return { user, isSuper, sections };
+  return requireAdminByMetadata(req, options);
 }
 
 function normalizeSections(value) {
@@ -62,11 +39,15 @@ function normalizeSections(value) {
   return [...new Set(input.filter(section => MANAGEABLE_SECTIONS.includes(section)))];
 }
 
+function normalizeRole(value) {
+  return value === 'super_admin' || value === 'section_admin' ? value : 'none';
+}
+
 function publicUser(authUser, profile) {
   const app = authUser?.app_metadata || {};
-  const role = profile?.is_admin ? 'super_admin' : (app.admin_role || 'none');
+  const role = normalizeRole(app.admin_role);
   const sections = role === 'super_admin'
-    ? ALL_SECTIONS
+    ? ALL_ADMIN_SECTIONS
     : normalizeSections(app.admin_sections);
   return {
     id: profile?.id || authUser?.id,
@@ -85,7 +66,7 @@ function publicUser(authUser, profile) {
 
 async function listUsers() {
   const [profileResponse, authResponse] = await Promise.all([
-    serviceFetch('/rest/v1/profiles?select=id,nickname,city,phone,is_banned,post_count,created_at,is_admin&order=created_at.desc&limit=1000'),
+    serviceFetch('/rest/v1/profiles?select=id,nickname,city,phone,is_banned,post_count,created_at&order=created_at.desc&limit=1000'),
     serviceFetch('/auth/v1/admin/users?page=1&per_page=1000')
   ]);
   if (!profileResponse.ok) throw new Error(await profileResponse.text());
@@ -93,8 +74,12 @@ async function listUsers() {
   const profiles = await profileResponse.json();
   const authPayload = await authResponse.json();
   const authUsers = Array.isArray(authPayload?.users) ? authPayload.users : [];
+  const profilesById = new Map(profiles.map(profile => [profile.id, profile]));
   const authById = new Map(authUsers.map(user => [user.id, user]));
-  return profiles.map(profile => publicUser(authById.get(profile.id), profile));
+  const ids = new Set([...profilesById.keys(), ...authById.keys()]);
+  return [...ids]
+    .map(id => publicUser(authById.get(id), profilesById.get(id)))
+    .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
 }
 
 function passwordFromInput(value) {
@@ -106,8 +91,8 @@ function passwordFromInput(value) {
 async function setPermissions(body, adminId) {
   const userId = String(body.userId || '').trim();
   if (!/^[0-9a-f-]{36}$/i.test(userId)) throw new Error('用户ID无效');
-  const role = ['none', 'section_admin', 'super_admin'].includes(body.role) ? body.role : 'none';
-  const sections = role === 'super_admin' ? ALL_SECTIONS : normalizeSections(body.sections);
+  const role = normalizeRole(body.role);
+  const sections = role === 'super_admin' ? ALL_ADMIN_SECTIONS : normalizeSections(body.sections);
 
   if (userId === adminId && role !== 'super_admin') {
     throw new Error('不能取消当前登录超级管理员自己的权限');
@@ -133,14 +118,58 @@ async function setPermissions(body, adminId) {
   const profileResponse = await serviceFetch(`/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}`, {
     method: 'PATCH',
     headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify({
-      is_admin: role === 'super_admin',
-      updated_at: new Date().toISOString()
-    })
+    body: JSON.stringify({ updated_at: new Date().toISOString() })
   });
   if (!profileResponse.ok) throw new Error(await profileResponse.text());
 
   return { userId, role, sections };
+}
+
+async function createAdminUser(body) {
+  const email = String(body.email || '').trim().toLowerCase();
+  const nickname = String(body.nickname || '后台管理员').trim().slice(0, 80);
+  const password = String(body.password || '').trim();
+  const role = normalizeRole(body.role || 'section_admin');
+  const sections = role === 'super_admin' ? ALL_ADMIN_SECTIONS : normalizeSections(body.sections);
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('管理员邮箱格式不正确');
+  if (role === 'none') throw new Error('新建后台账号必须分配后台权限');
+  if (role === 'section_admin' && !sections.length) throw new Error('请至少选择一个可管理版面');
+  if (password.length < 8) throw new Error('后台管理员密码至少8位');
+
+  const response = await serviceFetch('/auth/v1/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        nickname,
+        account_type: 'admin'
+      },
+      app_metadata: {
+        admin_role: role,
+        admin_sections: sections
+      }
+    })
+  });
+  const text = await response.text();
+  const user = text ? JSON.parse(text) : null;
+  if (!response.ok) throw new Error(user?.message || user?.msg || text || '创建后台账号失败');
+
+  await serviceFetch('/rest/v1/profiles?on_conflict=id', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify({
+      id: user.id,
+      nickname,
+      city: '后台',
+      phone: '',
+      updated_at: new Date().toISOString()
+    })
+  }).catch(() => null);
+
+  return { user: publicUser(user, { id: user.id, nickname, city: '后台', phone: '', created_at: user.created_at }) };
 }
 
 async function resetPassword(body, adminId) {
@@ -170,13 +199,14 @@ module.exports = async function handler(req, res) {
   }
 
   const body = parseBody(req);
-  const needsSuper = body.action === 'set_permissions' || body.action === 'reset_password';
+  const needsSuper = body.action === 'set_permissions' || body.action === 'reset_password' || body.action === 'create_admin';
   const admin = await requireAdmin(req, { super: needsSuper, section: body.action === 'list' ? 'users' : '' });
   if (admin.error) return json(res, admin.status, { error: admin.error, message: needsSuper ? '需要超级管理员权限' : '没有用户管理权限' });
 
   try {
     let result;
     if (body.action === 'list') result = { users: await listUsers() };
+    else if (body.action === 'create_admin') result = await createAdminUser(body);
     else if (body.action === 'set_permissions') result = await setPermissions(body, admin.user.id);
     else if (body.action === 'reset_password') result = await resetPassword(body, admin.user.id);
     else return json(res, 400, { error: 'invalid_action', message: '操作类型无效' });

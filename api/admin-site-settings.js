@@ -1,5 +1,6 @@
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
+const { requireAdminByMetadata } = require('./_admin-auth');
 
 const DEFAULT_CONTACT_INFO = {
   officialAccount: '西班牙生活通',
@@ -74,26 +75,7 @@ async function serviceFetch(path, options = {}) {
 }
 
 async function requireAdmin(req, requiredSection = 'payment') {
-  const authHeader = req.headers.authorization || req.headers.Authorization || '';
-  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-  if (!token) return { error: 'missing_token', status: 401 };
-
-  const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-    headers: {
-      apikey: SUPABASE_PUBLISHABLE_KEY,
-      Authorization: `Bearer ${token}`
-    }
-  });
-  if (!userResponse.ok) return { error: 'invalid_token', status: 401 };
-  const user = await userResponse.json();
-
-  const profileResponse = await serviceFetch(`/rest/v1/profiles?select=is_admin&id=eq.${encodeURIComponent(user.id)}&limit=1`);
-  if (!profileResponse.ok) return { error: 'admin_check_failed', status: 403 };
-  const profiles = await profileResponse.json();
-  const isSuper = Boolean(profiles[0]?.is_admin || user.app_metadata?.admin_role === 'super_admin');
-  const sections = Array.isArray(user.app_metadata?.admin_sections) ? user.app_metadata.admin_sections : [];
-  if (!isSuper && (!requiredSection || !sections.includes(requiredSection))) return { error: 'not_admin', status: 403 };
-  return { user };
+  return requireAdminByMetadata(req, { section: requiredSection });
 }
 
 async function getContactInfo() {

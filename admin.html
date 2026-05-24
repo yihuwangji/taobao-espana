@@ -1359,6 +1359,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           </div>
           <div class="admin-tools-actions">
             <button class="btn btn-blue" onclick="showAdminUsersOnly()">只看管理员</button>
+            <button class="btn btn-green" onclick="openCreateAdminModal()">新建后台管理员</button>
             <button class="btn" onclick="showAllUsers()">查看全部用户</button>
             <button class="btn btn-gold" onclick="openMyPasswordReset()">修改我的后台密码</button>
           </div>
@@ -1631,6 +1632,51 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   </div>
 </div>
 
+<!-- ── MODAL: CREATE ADMIN ── -->
+<div class="modal-overlay" id="createAdminModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('createAdmin')">✕</button>
+    <h3>➕ 新建后台管理员</h3>
+    <div class="form-group">
+      <label>管理员名称</label>
+      <input type="text" id="createAdminName" placeholder="例如：客服小王">
+    </div>
+    <div class="form-group">
+      <label>登录邮箱</label>
+      <input type="email" id="createAdminEmail" placeholder="admin@example.com">
+    </div>
+    <div class="form-group">
+      <label>初始密码</label>
+      <input type="text" id="createAdminPassword" placeholder="至少8位，创建后发给管理员">
+    </div>
+    <div class="form-group">
+      <label>管理身份</label>
+      <select id="createAdminRole">
+        <option value="section_admin">版面管理员</option>
+        <option value="super_admin">超级管理员</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>可管理版面</label>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;font-size:13px;color:var(--text-dim)">
+        <label><input type="checkbox" class="create-admin-section" value="listings" checked> 信息管理</label>
+        <label><input type="checkbox" class="create-admin-section" value="review" checked> 待审核</label>
+        <label><input type="checkbox" class="create-admin-section" value="reports"> 举报处理</label>
+        <label><input type="checkbox" class="create-admin-section" value="pinned"> 置顶管理</label>
+        <label><input type="checkbox" class="create-admin-section" value="users"> 用户管理</label>
+        <label><input type="checkbox" class="create-admin-section" value="payment"> 系统设置</label>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:8px">
+      这里创建的是后台登录账号，和前台普通用户注册分开。普通用户不会获得后台权限。
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('createAdmin')">取消</button>
+      <button class="btn btn-green" onclick="submitCreateAdmin()">创建管理员</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MODAL: RESET PASSWORD ── -->
 <div class="modal-overlay" id="resetPasswordModal">
   <div class="modal">
@@ -1759,13 +1805,18 @@ async function requireAdmin() {
     return false;
   }
   const { data: profile, error } = await sb.from('profiles')
-    .select('nickname, is_admin')
+    .select('nickname')
     .eq('id', session.user.id)
-    .single();
+    .maybeSingle();
   const app = session.user.app_metadata || {};
-  const role = profile?.is_admin ? 'super_admin' : (app.admin_role || 'none');
+  if (error) console.warn('admin profile load failed', error);
+  const role = app.admin_role === 'super_admin'
+    ? 'super_admin'
+    : app.admin_role === 'section_admin'
+      ? 'section_admin'
+      : 'none';
   const sections = role === 'super_admin' ? ADMIN_ALL_SECTIONS : normalizeAdminSections(app.admin_sections);
-  if (error || (role !== 'super_admin' && !sections.length)) {
+  if (role !== 'super_admin' && !sections.length) {
     await sb.auth.signOut();
     currentAdmin = null;
     currentAdminProfile = null;
@@ -2716,6 +2767,61 @@ async function saveUserPermissions() {
     await loadRealUsers();
   } catch (error) {
     showToast('保存权限失败：' + error.message, 'error');
+  }
+}
+
+function randomAdminPassword() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  let password = '';
+  for (let i = 0; i < 10; i++) password += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return password;
+}
+
+function openCreateAdminModal() {
+  if (!isSuperAdmin()) {
+    showToast('只有超级管理员可以创建后台账号', 'error');
+    return;
+  }
+  document.getElementById('createAdminName').value = '';
+  document.getElementById('createAdminEmail').value = '';
+  document.getElementById('createAdminPassword').value = randomAdminPassword();
+  document.getElementById('createAdminRole').value = 'section_admin';
+  document.querySelectorAll('.create-admin-section').forEach(input => {
+    input.checked = ['listings', 'review'].includes(input.value);
+  });
+  openModal('createAdmin');
+}
+
+async function submitCreateAdmin() {
+  if (!isSuperAdmin()) {
+    showToast('只有超级管理员可以创建后台账号', 'error');
+    return;
+  }
+  const role = document.getElementById('createAdminRole').value;
+  const sections = [...document.querySelectorAll('.create-admin-section:checked')].map(input => input.value);
+  const payload = {
+    action: 'create_admin',
+    nickname: document.getElementById('createAdminName').value.trim() || '后台管理员',
+    email: document.getElementById('createAdminEmail').value.trim(),
+    password: document.getElementById('createAdminPassword').value.trim(),
+    role,
+    sections
+  };
+  if (!payload.email || !payload.password) {
+    showToast('请填写邮箱和初始密码', 'error');
+    return;
+  }
+  if (role === 'section_admin' && !sections.length) {
+    showToast('请至少选择一个可管理版面', 'error');
+    return;
+  }
+  try {
+    await adminApi('/api/admin-user-permissions', payload);
+    closeModal('createAdmin');
+    showToast('后台管理员已创建，请把邮箱和初始密码发给对方', 'success');
+    await loadRealUsers();
+  } catch (error) {
+    showToast('创建管理员失败：' + error.message, 'error');
   }
 }
 

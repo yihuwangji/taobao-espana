@@ -1,5 +1,6 @@
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
+const { requireAdminByMetadata } = require('./_admin-auth');
 const PLACEHOLDER = '\u8bf7\u5546\u5bb6\u8ba4\u9886\u540e\u8865\u5145\u8054\u7cfb\u65b9\u5f0f';
 
 function json(res, status, body) {
@@ -34,24 +35,7 @@ async function serviceFetch(path, options = {}) {
 }
 
 async function requireAdmin(req) {
-  const authHeader = req.headers.authorization || req.headers.Authorization || '';
-  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-  if (!token) return { error: 'missing_token', status: 401 };
-
-  const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-    headers: {
-      apikey: SUPABASE_PUBLISHABLE_KEY,
-      Authorization: `Bearer ${token}`
-    }
-  });
-  if (!userResponse.ok) return { error: 'invalid_token', status: 401 };
-  const user = await userResponse.json();
-
-  const profileResponse = await serviceFetch(`/rest/v1/profiles?select=is_admin&id=eq.${encodeURIComponent(user.id)}&limit=1`);
-  if (!profileResponse.ok) return { error: 'admin_check_failed', status: 403 };
-  const profiles = await profileResponse.json();
-  if (!profiles[0]?.is_admin) return { error: 'not_admin', status: 403 };
-  return { user };
+  return requireAdminByMetadata(req, { section: 'listings' });
 }
 
 function normalizeUpdate(row) {
