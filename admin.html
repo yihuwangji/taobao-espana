@@ -986,11 +986,13 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   <div class="auth-card">
     <h1>西班牙生活通后台</h1>
     <p>请使用管理员账号登录。后台仅对授权账号开放。</p>
-    <label>邮箱</label>
-    <input type="email" id="adminEmail" autocomplete="username" placeholder="admin@example.com">
-    <label>密码</label>
-    <input type="password" id="adminPassword" autocomplete="current-password" placeholder="请输入密码">
-    <button class="btn btn-gold" id="adminLoginBtn" style="width:100%;margin-top:18px;padding:12px" onclick="submitAdminLogin()">登录后台</button>
+    <form id="adminLoginForm" autocomplete="on">
+      <label>邮箱</label>
+      <input type="email" id="adminEmail" autocomplete="username" inputmode="email" enterkeyhint="next" placeholder="admin@example.com">
+      <label>密码</label>
+      <input type="password" id="adminPassword" autocomplete="current-password" enterkeyhint="done" placeholder="请输入密码">
+      <button class="btn btn-gold" id="adminLoginBtn" type="submit" style="width:100%;margin-top:18px;padding:12px">登录后台</button>
+    </form>
     <div class="auth-error" id="adminAuthError"></div>
   </div>
 </div>
@@ -1743,6 +1745,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentAdmin = null;
 let currentAdminProfile = null;
 let currentAdminPermissions = { role: 'none', sections: [] };
+let adminLoginInProgress = false;
 
 const ADMIN_ALL_SECTIONS = ['dashboard', 'listings', 'review', 'reports', 'pinned', 'users', 'payment'];
 const ADMIN_SECTION_LABELS = {
@@ -1840,18 +1843,42 @@ async function requireAdmin() {
 }
 
 async function submitAdminLogin() {
-  const email = document.getElementById('adminEmail').value.trim();
+  if (adminLoginInProgress) return;
+  const email = document.getElementById('adminEmail').value.trim().toLowerCase();
   const password = document.getElementById('adminPassword').value;
   if (!email || !password) { setAuthError('请输入邮箱和密码'); return; }
   const btn = document.getElementById('adminLoginBtn');
-  btn.disabled = true;
-  btn.textContent = '登录中…';
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  btn.disabled = false;
-  btn.textContent = '登录后台';
-  if (error) { setAuthError('登录失败：' + error.message); return; }
+  adminLoginInProgress = true;
   setAuthError('');
-  if (await requireAdmin()) initDashboard();
+  btn.disabled = true;
+  btn.textContent = '登录中...';
+  try {
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { setAuthError('登录失败：' + error.message); return; }
+    if (await requireAdmin()) initDashboard();
+  } catch (error) {
+    setAuthError('登录失败：网络或浏览器权限异常，请重试');
+  } finally {
+    adminLoginInProgress = false;
+    btn.disabled = false;
+    btn.textContent = '登录后台';
+  }
+}
+
+function bindAdminLoginForm() {
+  const form = document.getElementById('adminLoginForm');
+  if (!form || form.dataset.bound === '1') return;
+  form.dataset.bound = '1';
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    submitAdminLogin();
+  });
+  document.getElementById('adminPassword')?.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      submitAdminLogin();
+    }
+  });
 }
 
 async function sbLog(action, type, id, note='') {
@@ -3654,8 +3681,13 @@ function initDashboard() {
   startAdminNotificationMonitor();
 }
 
+window.submitAdminLogin = submitAdminLogin;
+bindAdminLoginForm();
 requireAdmin().then(ok => { if (ok) initDashboard(); });
-document.addEventListener('DOMContentLoaded', updateAdminNotifyButton);
+document.addEventListener('DOMContentLoaded', () => {
+  bindAdminLoginForm();
+  updateAdminNotifyButton();
+});
 </script>
 </body>
 </html>
