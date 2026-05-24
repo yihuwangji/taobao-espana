@@ -1126,40 +1126,12 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           <div class="card-header">
             <div class="card-title">🔔 近期操作记录</div>
           </div>
-          <div class="activity-list">
+          <div class="activity-list" id="activityList">
             <div class="activity-item">
-              <div class="activity-dot" style="background:var(--green-glow)">✅</div>
+              <div class="activity-dot" style="background:var(--blue-glow)">⏳</div>
               <div>
-                <div class="activity-text">审核通过「巴塞罗那中餐馆招厨师」</div>
-                <div class="activity-time">2分钟前 · 管理员</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-dot" style="background:var(--red-glow)">🚫</div>
-              <div>
-                <div class="activity-text">封禁用户 user_2847（发布违规内容）</div>
-                <div class="activity-time">15分钟前 · 管理员</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-dot" style="background:rgba(139,92,246,0.15)">📌</div>
-              <div>
-                <div class="activity-text">置顶「马德里生意转让·中餐外卖」7天</div>
-                <div class="activity-time">1小时前 · 管理员</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-dot" style="background:var(--gold-glow)">⚠️</div>
-              <div>
-                <div class="activity-text">处理举报：「瓦伦西亚二手车」疑似欺诈</div>
-                <div class="activity-time">2小时前 · 管理员</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-dot" style="background:var(--blue-glow)">👤</div>
-              <div>
-                <div class="activity-text">今日新用户注册 <span id="activityNewUsers">0</span> 人</div>
-                <div class="activity-time" id="activityNewUsersTime">统计截至现在</div>
+                <div class="activity-text">正在读取真实操作记录...</div>
+                <div class="activity-time">请稍候</div>
               </div>
             </div>
           </div>
@@ -1796,6 +1768,97 @@ function updateNewUserNotice(count) {
   if (statNewUsers) statNewUsers.textContent = `+${text}`;
 }
 
+function relativeTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '刚刚';
+  const diff = Math.max(0, Date.now() - date.getTime());
+  const minute = 60 * 1000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+  if (diff < minute) return '刚刚';
+  if (diff < hour) return `${Math.floor(diff / minute)}分钟前`;
+  if (diff < day) return `${Math.floor(diff / hour)}小时前`;
+  return date.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function activityStyle(icon, bg) {
+  return { icon, bg };
+}
+
+function adminLogActivity(log) {
+  const target = log.target_title || log.target_id || '';
+  const quoted = target ? `「${target}」` : '';
+  const map = {
+    approve: ['✅', 'var(--green-glow)', `审核通过${quoted}`],
+    batch_approve: ['✅', 'var(--green-glow)', `批量审核通过 ${log.target_id || ''}`],
+    reject: ['🚫', 'var(--red-glow)', `拒绝发布${quoted}`],
+    batch_reject: ['🚫', 'var(--red-glow)', `批量拒绝 ${log.target_id || ''}`],
+    takedown: ['⬇️', 'var(--red-glow)', `下架${quoted}`],
+    batch_offline: ['⬇️', 'var(--red-glow)', `批量下架 ${log.target_id || ''}`],
+    batch_online: ['⬆️', 'var(--green-glow)', `批量上架 ${log.target_id || ''}`],
+    pin_listing: ['📌', 'rgba(139,92,246,0.15)', `置顶${quoted}`],
+    unpin_listing: ['📌', 'rgba(139,92,246,0.15)', `取消置顶${quoted}`],
+    batch_pin_listing: ['📌', 'rgba(139,92,246,0.15)', `批量置顶 ${log.target_id || ''}`],
+    batch_unpin_listing: ['📌', 'rgba(139,92,246,0.15)', `批量取消置顶 ${log.target_id || ''}`],
+    resolve: ['⚠️', 'var(--gold-glow)', `处理举报 ${quoted}`],
+    dismiss: ['⚠️', 'var(--gold-glow)', `驳回举报 ${quoted}`],
+    delete: ['🗑️', 'var(--red-glow)', `删除${log.target_type === 'user' ? '用户' : log.target_type === 'report' ? '举报' : '信息'} ${quoted || log.target_id}`],
+    update_listing: ['✏️', 'var(--blue-glow)', `管理员修改${quoted}`],
+    import_merchants: ['🏪', 'var(--green-glow)', `导入商家信息 ${log.note ? `(${log.note})` : ''}`],
+    update_merchant_contacts: ['☎️', 'var(--blue-glow)', `更新商家联系方式 ${log.target_id || ''} 条`],
+    update_merchant_images: ['🖼️', 'var(--blue-glow)', `更新商家图片 ${log.target_id || ''} 条`],
+    update_site_contact: ['⚙️', 'var(--blue-glow)', '更新前台联系方式'],
+    user_set_permissions: ['👑', 'rgba(139,92,246,0.15)', `调整后台权限 ${quoted}`],
+    user_reset_password: ['🔐', 'var(--gold-glow)', `重置密码 ${quoted}`],
+    user_create_admin: ['👑', 'rgba(139,92,246,0.15)', '创建后台管理员']
+  };
+  const [icon, bg, text] = map[log.action] || ['🔔', 'var(--blue-glow)', `${log.action} ${quoted}`.trim()];
+  return {
+    icon,
+    bg,
+    text,
+    time: `${relativeTime(log.created_at)} · ${log.admin_name || '管理员'}`
+  };
+}
+
+function renderRecentActivity(data = {}) {
+  const list = document.getElementById('activityList');
+  if (!list) return;
+  const stats = data.stats || {};
+  const items = [];
+  items.push({
+    icon: '👤',
+    bg: 'var(--blue-glow)',
+    text: `今日新用户注册 ${Number(stats.newUserCount || 0)} 人`,
+    time: `统计截至 ${new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`
+  });
+  items.push({
+    icon: '📝',
+    bg: 'var(--green-glow)',
+    text: `今日新发布 ${Number(stats.todayListingCount || 0)} 条，其中游客发布 ${Number(stats.todayGuestListingCount || 0)} 条`,
+    time: '来自真实数据库'
+  });
+  (data.todayGuestListings || []).slice(0, 3).forEach(item => {
+    items.push({
+      icon: '🧾',
+      bg: 'var(--gold-glow)',
+      text: `游客发布「${item.title || `信息 #${item.id}`}」`,
+      time: `${relativeTime(item.created_at)} · ${item.status || '未标记'}`
+    });
+  });
+  (data.recentLogs || []).slice(0, 6).forEach(log => items.push(adminLogActivity(log)));
+
+  list.innerHTML = items.slice(0, 8).map(item => `
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${item.bg}">${item.icon}</div>
+      <div>
+        <div class="activity-text">${esc(item.text)}</div>
+        <div class="activity-time">${esc(item.time)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
 function setAuthError(message) {
   const box = document.getElementById('adminAuthError');
   if (box) box.textContent = message || '';
@@ -2024,16 +2087,31 @@ async function loadRealUsers() {
 async function loadRealStats() {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
-  const [{ count: userCount }, { count: listingCount }, { count: pendingCount }, { count: newUserCount }] = await Promise.all([
-    sb.from('profiles').select('*', { count:'exact', head:true }),
-    sb.from('listings').select('*', { count:'exact', head:true }).eq('status','approved'),
-    sb.from('listings').select('*', { count:'exact', head:true }).eq('status','pending'),
-    sb.from('profiles').select('*', { count:'exact', head:true }).gte('created_at', todayStart.toISOString()),
-  ]);
-  document.querySelector('[data-stat=users]')  && (document.querySelector('[data-stat=users]').textContent  = (userCount||0).toLocaleString());
-  document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = (listingCount||0).toLocaleString());
-  updatePendingBadges(pendingCount || 0);
-  updateNewUserNotice(newUserCount || 0);
+  try {
+    const result = await adminApi('/api/admin-activity', { todayStart: todayStart.toISOString() });
+    const stats = result.stats || {};
+    document.querySelector('[data-stat=users]')  && (document.querySelector('[data-stat=users]').textContent  = Number(stats.userCount || 0).toLocaleString());
+    document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = Number(stats.listingCount || 0).toLocaleString());
+    updatePendingBadges(stats.pendingCount || 0);
+    updateNewUserNotice(stats.newUserCount || 0);
+    renderRecentActivity(result);
+  } catch (error) {
+    const [{ count: userCount }, { count: listingCount }, { count: pendingCount }, { count: newUserCount }] = await Promise.all([
+      sb.from('profiles').select('*', { count:'exact', head:true }),
+      sb.from('listings').select('*', { count:'exact', head:true }).eq('status','approved'),
+      sb.from('listings').select('*', { count:'exact', head:true }).eq('status','pending'),
+      sb.from('profiles').select('*', { count:'exact', head:true }).gte('created_at', todayStart.toISOString()),
+    ]);
+    document.querySelector('[data-stat=users]')  && (document.querySelector('[data-stat=users]').textContent  = (userCount||0).toLocaleString());
+    document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = (listingCount||0).toLocaleString());
+    updatePendingBadges(pendingCount || 0);
+    updateNewUserNotice(newUserCount || 0);
+    renderRecentActivity({
+      stats: { userCount, listingCount, pendingCount, newUserCount, todayListingCount: 0, todayGuestListingCount: 0 },
+      recentLogs: [],
+      todayGuestListings: []
+    });
+  }
 }
 
 const ADMIN_NOTIFY_INTERVAL_MS = 45000;
