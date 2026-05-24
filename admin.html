@@ -1988,7 +1988,7 @@ async function loadRealListings() {
     listingsLoadedFromDatabase = true;
     allListings.length = 0;
     data.forEach(r => {
-      const isMerchant = r.user_id === null && String(r.description || '').includes('平台代登记商家信息');
+      const isMerchant = isMerchantListingRow(r);
       const publisherPhone = r.profiles?.phone || '';
       const contact = r.contact || publisherPhone || '—';
       const pinUntil = r.pin_until || '';
@@ -2085,6 +2085,21 @@ async function loadRealUsers() {
     showToast('加载用户权限失败：' + error.message, 'error');
     renderUsers(allUsers);
   }
+}
+
+function isBusinessTransferRow(row) {
+  const text = `${row?.title || ''} ${row?.description || row?.desc || ''}`.toLowerCase();
+  return /转让|出兑|顶手|盘让|让店|店铺出售|店面出售|生意出售|traspaso|se traspasa/.test(text);
+}
+
+function isMerchantListingRow(row) {
+  const category = String(row?.category || row?.rawCat || row?.cat || '').trim();
+  return row
+    && row.user_id === null
+    && (
+      String(row.description || row.desc || '').includes('平台代登记商家信息')
+      || (category === '生意' && !isBusinessTransferRow(row))
+    );
 }
 
 let currentCategoryPeriod = 'month';

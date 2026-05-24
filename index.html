@@ -2995,9 +2995,20 @@ function setLanguage(lang) {
 window.setLanguage = setLanguage;
 
 function isImportedMerchantListing(listing) {
+  const category = String(listing?.category || listing?.cat || '').trim();
+  const text = `${listing?.title || ''} ${listing?.description || listing?.desc || ''}`.toLowerCase();
+  const isTransfer = /转让|出兑|顶手|盘让|让店|店铺出售|店面出售|生意出售|traspaso|se traspasa/.test(text);
   return listing
     && listing.user_id === null
-    && String(listing.description || listing.desc || '').includes(IMPORTED_MERCHANT_MARK);
+    && (
+      String(listing.description || listing.desc || '').includes(IMPORTED_MERCHANT_MARK)
+      || (category === '生意' && !isTransfer)
+    );
+}
+
+function isBusinessTransferListing(listing) {
+  const text = `${listing?.title || ''} ${listing?.description || listing?.desc || ''}`.toLowerCase();
+  return /转让|出兑|顶手|盘让|让店|店铺出售|店面出售|生意出售|traspaso|se traspasa/.test(text);
 }
 
 function getListingDisplayCategory(listing) {
@@ -3221,7 +3232,8 @@ async function loadListings() {
     if (error) throw error;
 
     if (data && data.length > 0) {
-      const uniqueRows = dedupeListingRows(data);
+      const uniqueRows = dedupeListingRows(data)
+        .filter(r => currentCat !== 'business' || isBusinessTransferListing(r));
       allListings = uniqueRows.map(r => {
         const importedMerchant = isImportedMerchantListing(r);
         const displayCategory = getListingDisplayCategory(r);

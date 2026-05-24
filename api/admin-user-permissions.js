@@ -257,22 +257,27 @@ const CATEGORY_META = {
   service: { label: '商家服务', color: '#0891B2' }
 };
 
-function categoryGroup(category) {
-  const value = String(category || '').trim();
+function isTransferListing(row) {
+  const text = `${row?.title || ''} ${row?.description || ''}`.toLowerCase();
+  return /转让|出兑|顶手|盘让|让店|店铺出售|店面出售|生意出售|traspaso|se traspasa/.test(text);
+}
+
+function categoryGroup(row) {
+  const value = String(row?.category || '').trim();
   if (/招工|求职|worker|job/i.test(value)) return 'jobs';
   if (/租房|房源|买房|house|housing/i.test(value)) return 'housing';
   if (/二手|车|物品|goods|car/i.test(value)) return 'goods';
-  if (/生意|转让|business/i.test(value)) return 'business';
+  if (/生意|转让|business/i.test(value)) return isTransferListing(row) ? 'business' : 'service';
   return 'service';
 }
 
 async function loadCategoryStats(periodStart) {
   const dateFilter = periodStart ? `&created_at=gte.${encodeURIComponent(periodStart)}` : '';
-  const response = await serviceFetch(`/rest/v1/listings?select=category&status=eq.approved${dateFilter}&limit=10000`);
+  const response = await serviceFetch(`/rest/v1/listings?select=category,title,description&status=eq.approved${dateFilter}&limit=10000`);
   if (!response.ok) throw new Error(await response.text());
   const rows = await response.json();
   const counts = rows.reduce((acc, row) => {
-    const group = categoryGroup(row.category);
+    const group = categoryGroup(row);
     acc[group] = (acc[group] || 0) + 1;
     return acc;
   }, {});
