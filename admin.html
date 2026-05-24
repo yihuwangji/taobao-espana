@@ -1116,9 +1116,9 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           <div class="card-header">
             <div class="card-title">📊 各分类发布量统计</div>
             <select class="select-input" onchange="updateChart(this.value)">
-              <option>本周</option>
-              <option>本月</option>
-              <option>全部</option>
+              <option value="week">本周</option>
+              <option value="month" selected>本月</option>
+              <option value="all">全部</option>
             </select>
           </div>
           <div class="chart-container" id="catChart"></div>
@@ -2087,6 +2087,21 @@ async function loadRealUsers() {
   }
 }
 
+let currentCategoryPeriod = 'month';
+
+function categoryPeriodStart(period) {
+  if (period === 'all') return '';
+  const d = new Date();
+  if (period === 'week') {
+    const day = d.getDay() || 7;
+    d.setDate(d.getDate() - day + 1);
+  } else {
+    d.setDate(1);
+  }
+  d.setHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
 function updateViewStats(todayViews, yesterdayViews) {
   const viewEl = document.querySelector('[data-stat=views]');
   const changeEl = document.getElementById('viewsChange');
@@ -2110,12 +2125,17 @@ async function loadRealStats() {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
   try {
-    const result = await adminApi('/api/admin-user-permissions', { action: 'list_activity', todayStart: todayStart.toISOString() });
+    const result = await adminApi('/api/admin-user-permissions', {
+      action: 'list_activity',
+      todayStart: todayStart.toISOString(),
+      categoryStart: categoryPeriodStart(currentCategoryPeriod)
+    });
     const stats = result.stats || {};
     document.querySelector('[data-stat=users]')  && (document.querySelector('[data-stat=users]').textContent  = Number(stats.userCount || 0).toLocaleString());
     document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = Number(stats.listingCount || 0).toLocaleString());
     document.querySelector('[data-stat=today-listings]') && (document.querySelector('[data-stat=today-listings]').textContent = Number(stats.todayListingCount || 0).toLocaleString());
     updateViewStats(stats.todayViewCount, stats.yesterdayViewCount);
+    renderCatChart(stats.categoryStats || []);
     updatePendingBadges(stats.pendingCount || 0);
     updateNewUserNotice(stats.newUserCount || 0);
     renderRecentActivity(result);
@@ -2130,6 +2150,7 @@ async function loadRealStats() {
     document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = (listingCount||0).toLocaleString());
     document.querySelector('[data-stat=today-listings]') && (document.querySelector('[data-stat=today-listings]').textContent = '0');
     updateViewStats(0, 0);
+    renderCatChart([]);
     updatePendingBadges(pendingCount || 0);
     updateNewUserNotice(newUserCount || 0);
     renderRecentActivity({
@@ -3005,20 +3026,16 @@ async function submitPasswordReset() {
 }
 
 // ═══════════ CHART ═══════════
-const catData = [
-  {label:'二手物品', val:3210, color:'#F5A623'},
-  {label:'租房买房', val:2567, color:'#3B82F6'},
-  {label:'招工求职', val:1234, color:'#E53935'},
-  {label:'生活服务', val:945, color:'#0891B2'},
-  {label:'二手车', val:856, color:'#8B5CF6'},
-  {label:'交友相亲', val:678, color:'#EC4899'},
-  {label:'教育培训', val:421, color:'#059669'},
-  {label:'生意转让', val:389, color:'#16A34A'},
-];
-
-function renderCatChart() {
-  const max = catData[0].val;
-  document.getElementById('catChart').innerHTML = catData.map(d => `
+function renderCatChart(data = []) {
+  const chart = document.getElementById('catChart');
+  if (!chart) return;
+  const rows = Array.isArray(data) ? data.filter(d => Number(d.val || 0) > 0) : [];
+  if (!rows.length) {
+    chart.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px">当前时间范围暂无真实分类数据</div>';
+    return;
+  }
+  const max = Math.max(...rows.map(d => Number(d.val || 0)), 1);
+  chart.innerHTML = rows.map(d => `
     <div class="chart-bar-row">
       <div class="chart-bar-label">${d.label}</div>
       <div class="chart-bar-track">
@@ -3054,7 +3071,10 @@ function renderCityChart() {
 }
 
 function updateChart(period) {
-  showToast(`已切换到${period}数据`, 'info');
+  currentCategoryPeriod = period || 'month';
+  loadRealStats();
+  const labels = { week: '本周', month: '本月', all: '全部' };
+  showToast(`已切换到${labels[currentCategoryPeriod] || '本月'}真实数据`, 'info');
 }
 
 // ═══════════ ACTIONS ═══════════

@@ -249,10 +249,45 @@ async function loadTodayGuestListings(todayStart) {
   return response.json();
 }
 
+const CATEGORY_META = {
+  jobs: { label: '招工求职', color: '#E53935' },
+  housing: { label: '租房买房', color: '#3B82F6' },
+  goods: { label: '二手买卖', color: '#F5A623' },
+  business: { label: '生意转让', color: '#16A34A' },
+  service: { label: '商家服务', color: '#0891B2' }
+};
+
+function categoryGroup(category) {
+  const value = String(category || '').trim();
+  if (/招工|求职|worker|job/i.test(value)) return 'jobs';
+  if (/租房|房源|买房|house|housing/i.test(value)) return 'housing';
+  if (/二手|车|物品|goods|car/i.test(value)) return 'goods';
+  if (/生意|转让|business/i.test(value)) return 'business';
+  return 'service';
+}
+
+async function loadCategoryStats(periodStart) {
+  const dateFilter = periodStart ? `&created_at=gte.${encodeURIComponent(periodStart)}` : '';
+  const response = await serviceFetch(`/rest/v1/listings?select=category&status=eq.approved${dateFilter}&limit=10000`);
+  if (!response.ok) throw new Error(await response.text());
+  const rows = await response.json();
+  const counts = rows.reduce((acc, row) => {
+    const group = categoryGroup(row.category);
+    acc[group] = (acc[group] || 0) + 1;
+    return acc;
+  }, {});
+  return Object.entries(CATEGORY_META)
+    .map(([key, meta]) => ({ ...meta, val: counts[key] || 0 }))
+    .filter(row => row.val > 0)
+    .sort((a, b) => b.val - a.val);
+}
+
 async function loadActivity(body) {
   const todayStart = String(body.todayStart || '').trim();
   const validTodayStart = /^\d{4}-\d{2}-\d{2}T/.test(todayStart) ? todayStart : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const yesterdayStart = new Date(new Date(validTodayStart).getTime() - 24 * 60 * 60 * 1000).toISOString();
+  const categoryStart = String(body.categoryStart || '').trim();
+  const validCategoryStart = /^\d{4}-\d{2}-\d{2}T/.test(categoryStart) ? categoryStart : '';
   const [
     userCount,
     listingCount,
@@ -263,7 +298,8 @@ async function loadActivity(body) {
     todayViewCount,
     yesterdayViewCount,
     recentLogs,
-    todayGuestListings
+    todayGuestListings,
+    categoryStats
   ] = await Promise.all([
     countRows('/rest/v1/profiles?select=id'),
     countRows('/rest/v1/listings?select=id&status=eq.approved'),
@@ -274,11 +310,12 @@ async function loadActivity(body) {
     countRows(`/rest/v1/page_views?select=id&created_at=gte.${encodeURIComponent(validTodayStart)}`),
     countRows(`/rest/v1/page_views?select=id&created_at=gte.${encodeURIComponent(yesterdayStart)}&created_at=lt.${encodeURIComponent(validTodayStart)}`),
     loadRecentLogs(),
-    loadTodayGuestListings(validTodayStart)
+    loadTodayGuestListings(validTodayStart),
+    loadCategoryStats(validCategoryStart)
   ]);
 
   return {
-    stats: { userCount, listingCount, pendingCount, newUserCount, todayGuestListingCount, todayListingCount, todayViewCount, yesterdayViewCount },
+    stats: { userCount, listingCount, pendingCount, newUserCount, todayGuestListingCount, todayListingCount, todayViewCount, yesterdayViewCount, categoryStats },
     recentLogs,
     todayGuestListings
   };
