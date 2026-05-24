@@ -4,6 +4,61 @@ const DEFAULT_SITE_URL = 'https://espanalife.app';
 const SITE_NAME = '西班牙生活通';
 const IMPORTED_MERCHANT_MARK = '平台代登记商家信息';
 
+function json(res, status, body) {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-store');
+  res.status(status).send(JSON.stringify(body));
+}
+
+function parseBody(req) {
+  if (!req.body) return {};
+  if (typeof req.body === 'string') {
+    try { return JSON.parse(req.body); } catch { return {}; }
+  }
+  return req.body;
+}
+
+async function serviceFetch(path, options = {}) {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return fetch(`${SUPABASE_URL}${path}`, {
+    ...options,
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    }
+  });
+}
+
+async function recordPageView(req, res) {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return json(res, 500, { ok: false, error: 'missing_service_role' });
+  }
+  const body = parseBody(req);
+  if (body.action !== 'record_page_view') {
+    return json(res, 400, { ok: false, error: 'invalid_action' });
+  }
+  const listingId = String(body.listingId || '').trim();
+  if (!/^\d+$/.test(listingId)) {
+    return json(res, 400, { ok: false, error: 'invalid_listing_id' });
+  }
+  const viewerIp = String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '')
+    .split(',')[0]
+    .trim()
+    .slice(0, 80);
+
+  const response = await serviceFetch('/rest/v1/page_views', {
+    method: 'POST',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ listing_id: Number(listingId), viewer_ip: viewerIp || null })
+  });
+  if (!response.ok) {
+    return json(res, 400, { ok: false, error: 'record_failed', message: await response.text() });
+  }
+  return json(res, 200, { ok: true });
+}
+
 function getRequestSiteUrl(req) {
   const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
   if (!host) return DEFAULT_SITE_URL;
@@ -47,6 +102,10 @@ function listingDescription(listing) {
 }
 
 module.exports = async function handler(req, res) {
+  if (req.method === 'POST') {
+    return recordPageView(req, res);
+  }
+
   const siteUrl = getRequestSiteUrl(req);
   const siteLogoUrl = `${siteUrl}/assets/icons/wechat-share-logo-20260521.jpg`;
   const id = compact(req.query.id);
