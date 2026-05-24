@@ -1053,6 +1053,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
       <button class="topbar-btn" id="newUsersBtn" onclick="showPage('users',document.querySelector('[data-section=users]'))">
         🔔 新注册 <span id="newUsersCount" style="color:var(--gold);font-weight:700">0</span>
       </button>
+      <button class="topbar-btn" id="adminNotifyBtn" onclick="enableAdminNotifications()">🔕 开启通知</button>
       <button class="topbar-btn" onclick="showToast('系统运行正常 ✓','success')">🟢 系统正常</button>
       <button class="topbar-btn danger" onclick="confirmLogout()">退出登录</button>
     </div>
@@ -1929,6 +1930,128 @@ async function loadRealStats() {
   document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = (listingCount||0).toLocaleString());
   updatePendingBadges(pendingCount || 0);
   updateNewUserNotice(newUserCount || 0);
+}
+
+const ADMIN_NOTIFY_INTERVAL_MS = 45000;
+let adminNotifyTimer = null;
+let adminNotifyBaselined = false;
+
+function adminNotifyEnabled() {
+  return localStorage.getItem('admin_notify_enabled') === '1';
+}
+
+function updateAdminNotifyButton() {
+  const btn = document.getElementById('adminNotifyBtn');
+  if (!btn) return;
+  const supported = 'Notification' in window;
+  if (!supported) {
+    btn.textContent = '🔕 不支持通知';
+    btn.disabled = true;
+    return;
+  }
+  const enabled = adminNotifyEnabled() && Notification.permission === 'granted';
+  btn.textContent = enabled ? '🔔 通知已开' : '🔕 开启通知';
+}
+
+async function enableAdminNotifications() {
+  if (!('Notification' in window)) {
+    showToast('当前浏览器不支持系统通知', 'error');
+    return;
+  }
+  const permission = Notification.permission === 'granted'
+    ? 'granted'
+    : await Notification.requestPermission();
+  if (permission !== 'granted') {
+    localStorage.setItem('admin_notify_enabled', '0');
+    updateAdminNotifyButton();
+    showToast('请在安卓系统/浏览器里允许通知权限', 'error');
+    return;
+  }
+  localStorage.setItem('admin_notify_enabled', '1');
+  updateAdminNotifyButton();
+  await baselineAdminNotifications();
+  startAdminNotificationMonitor();
+  showAdminNotification('西班牙生活通后台', '通知已开启：有新注册或新信息会提醒你');
+  showToast('后台通知已开启', 'success');
+}
+
+function showAdminNotification(title, body, url = '/admin') {
+  if (!adminNotifyEnabled() || !('Notification' in window) || Notification.permission !== 'granted') {
+    showToast(body || title, 'info');
+    return;
+  }
+  const notification = new Notification(title, {
+    body,
+    icon: '/assets/icons/icon-192.png?v=20260521',
+    badge: '/assets/icons/icon-192.png?v=20260521',
+    tag: `admin-${Date.now()}`,
+    renotify: true
+  });
+  notification.onclick = () => {
+    window.focus();
+    if (url) location.href = url;
+    notification.close();
+  };
+}
+
+async function latestAdminRows() {
+  const [profileResult, listingResult] = await Promise.all([
+    sb.from('profiles').select('id,nickname,phone,created_at').order('created_at', { ascending:false }).limit(1),
+    sb.from('listings').select('id,title,category,status,created_at').order('created_at', { ascending:false }).limit(1)
+  ]);
+  return {
+    profile: profileResult.data?.[0] || null,
+    listing: listingResult.data?.[0] || null
+  };
+}
+
+async function baselineAdminNotifications() {
+  try {
+    const latest = await latestAdminRows();
+    if (latest.profile) localStorage.setItem('admin_notify_last_profile_at', latest.profile.created_at || '');
+    if (latest.listing) localStorage.setItem('admin_notify_last_listing_at', latest.listing.created_at || '');
+    adminNotifyBaselined = true;
+  } catch (error) {
+    console.warn('admin notification baseline failed', error);
+  }
+}
+
+async function checkAdminNotifications() {
+  if (!currentAdmin || !adminNotifyEnabled()) return;
+  try {
+    if (!adminNotifyBaselined) await baselineAdminNotifications();
+    const latest = await latestAdminRows();
+    const lastProfileAt = localStorage.getItem('admin_notify_last_profile_at') || '';
+    const lastListingAt = localStorage.getItem('admin_notify_last_listing_at') || '';
+
+    if (latest.profile?.created_at && latest.profile.created_at > lastProfileAt) {
+      localStorage.setItem('admin_notify_last_profile_at', latest.profile.created_at);
+      const name = latest.profile.nickname || latest.profile.phone || '新用户';
+      showAdminNotification('有新用户注册', `${name} 刚刚注册了账号`, '/admin');
+      loadRealStats();
+      if (canManageSection('users')) loadRealUsers();
+    }
+
+    if (latest.listing?.created_at && latest.listing.created_at > lastListingAt) {
+      localStorage.setItem('admin_notify_last_listing_at', latest.listing.created_at);
+      const status = latest.listing.status === 'pending' ? '待审核' : latest.listing.status;
+      showAdminNotification('有新发布信息', `${latest.listing.title || '新信息'} · ${status}`, '/admin');
+      loadRealStats();
+      if (canManageSection('review')) loadRealReview();
+      if (canManageSection('listings')) loadRealListings();
+    }
+  } catch (error) {
+    console.warn('admin notification check failed', error);
+  }
+}
+
+function startAdminNotificationMonitor() {
+  updateAdminNotifyButton();
+  if (!adminNotifyEnabled()) return;
+  if (!adminNotifyTimer) {
+    adminNotifyTimer = setInterval(checkAdminNotifications, ADMIN_NOTIFY_INTERVAL_MS);
+  }
+  checkAdminNotifications();
 }
 
 // ═══════════ REAL APPROVE / REJECT ═══════════
@@ -3355,9 +3478,11 @@ function initDashboard() {
   if (canManageSection('reports')) loadRealReports();
   if (canManageSection('users')) loadRealUsers();
   if (canManageSection('payment')) loadContactSettings();
+  startAdminNotificationMonitor();
 }
 
 requireAdmin().then(ok => { if (ok) initDashboard(); });
+document.addEventListener('DOMContentLoaded', updateAdminNotifyButton);
 </script>
 </body>
 </html>

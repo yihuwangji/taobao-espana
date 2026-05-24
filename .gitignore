@@ -6,6 +6,7 @@ android-release/
 *.apk
 !downloads/
 !downloads/*.apk
+downloads/*admin-private*.apk
 
 # Android/Gradle build output
 .gradle/

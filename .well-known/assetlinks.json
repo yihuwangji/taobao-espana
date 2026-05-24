@@ -8,5 +8,15 @@
         "0D:0C:5F:75:86:76:02:4F:C4:8F:30:D1:3E:6E:18:41:8E:E1:CB:CB:B7:BE:E4:69:ED:D3:45:74:DF:C1:09:BE"
       ]
     }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.xibanyalife.admin",
+      "sha256_cert_fingerprints": [
+        "0D:0C:5F:75:86:76:02:4F:C4:8F:30:D1:3E:6E:18:41:8E:E1:CB:CB:B7:BE:E4:69:ED:D3:45:74:DF:C1:09:BE"
+      ]
+    }
   }
 ]

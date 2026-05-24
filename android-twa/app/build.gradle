@@ -20,12 +20,15 @@ plugins {
     id 'com.android.application'
 }
 
+def isAdminApk = project.hasProperty('adminApk') && project.property('adminApk').toString().toBoolean()
+def javaPackage = 'com.xibanyalife.app'
+
 def twaManifest = [
-    applicationId: 'com.xibanyalife.app',
+    applicationId: isAdminApk ? 'com.xibanyalife.admin' : 'com.xibanyalife.app',
     hostName: 'espanalife.app', // The domain being opened in the TWA.
-    launchUrl: '/?source=twa', // The start path for the TWA. Must be relative to the domain.
-    name: '西班牙生活通', // The application name.
-    launcherName: '生活通', // The name shown on the Android Launcher.
+    launchUrl: isAdminApk ? '/admin?source=admin-apk' : '/?source=twa', // The start path for the TWA. Must be relative to the domain.
+    name: isAdminApk ? '西班牙生活通后台' : '西班牙生活通', // The application name.
+    launcherName: isAdminApk ? '生活通后台' : '生活通', // The name shown on the Android Launcher.
     themeColor: '#D42B2B', // The color used for the status bar.
     themeColorDark: '#9E1C1C', // The color used for the dark status bar.
     navigationColor: '#000000', // The color used for the navigation bar.
@@ -39,7 +42,9 @@ def twaManifest = [
     // - short_name: Shorter string used if |name| is too long.
     // - url: Absolute path of the URL to launch the app with (e.g '/create').
     // - icon: Name of the resource in the drawable folder to use as an icon.
-    shortcuts: [[name:'发布信息', short_name:'发布', url:'/?action=post', icon:'shortcut_0'],[name:'最新信息', short_name:'最新', url:'/#listingsGrid', icon:'shortcut_1']],
+    shortcuts: isAdminApk
+        ? [[name:'后台首页', short_name:'后台', url:'/admin', icon:'shortcut_0'],[name:'待审核', short_name:'审核', url:'/admin', icon:'shortcut_1']]
+        : [[name:'发布信息', short_name:'发布', url:'/?action=post', icon:'shortcut_0'],[name:'最新信息', short_name:'最新', url:'/#listingsGrid', icon:'shortcut_1']],
     // The duration of fade out animation in milliseconds to be played when removing splash screen.
     splashScreenFadeOutDuration: 300,
     generatorApp: 'bubblewrap-cli', // Application that generated the Android Project
@@ -52,13 +57,13 @@ def twaManifest = [
 
 android {
     compileSdkVersion 36
-    namespace "com.xibanyalife.app"
+    namespace javaPackage
     defaultConfig {
-        applicationId "com.xibanyalife.app"
+        applicationId twaManifest.applicationId
         minSdkVersion 23
         targetSdkVersion 35
-        versionCode 5
-        versionName "1.0.4"
+        versionCode isAdminApk ? 1 : 5
+        versionName isAdminApk ? "1.0.0-admin" : "1.0.4"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
@@ -190,7 +195,7 @@ task generateShorcutsFile {
                     'intent'(
                             'android:action': 'android.intent.action.MAIN',
                             'android:targetPackage': twaManifest.applicationId,
-                            'android:targetClass': twaManifest.applicationId + '.LauncherActivity',
+                            'android:targetClass': javaPackage + '.LauncherActivity',
                             'android:data': s.url)
                     'categories'('android:name': 'android.intent.category.LAUNCHER')
                 }
