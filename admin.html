@@ -2418,7 +2418,7 @@ function renderListings(data) {
       </td>
       <td data-label="分类"><span class="badge badge-active">${esc(l.cat)}</span></td>
       <td data-label="城市">📍 ${esc(l.city)}</td>
-      <td data-label="联系方式" style="max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px">${esc(l.contact || '—')}</td>
+      <td data-label="联系方式" style="max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px">${adminWhatsAppContactHtml(l.contact || l.publisherPhone, l.title)}</td>
       <td data-label="发布者">${esc(l.user)}</td>
       <td data-label="状态"><span class="badge ${statusMap[l.status]||'badge-active'}">${l.status}</span></td>
       <td data-label="发布时间" style="font-size:11px;color:var(--text-dim);white-space:nowrap">${l.time}</td>
@@ -2485,6 +2485,28 @@ function adminWhatsAppUrlForListing(listing) {
   const number = extractAdminWhatsAppNumber(listing?.contact || listing?.publisherPhone || '');
   if (!number) return '';
   return `https://wa.me/${number}?text=${encodeURIComponent(buildPublishedWhatsAppMessage(listing))}`;
+}
+
+function buildAdminContactWhatsAppMessage(context = '') {
+  const cleanContext = String(context || '').replace(/\s+/g, ' ').trim();
+  return [
+    `你好，我是西班牙生活通客服。${cleanContext ? `关于《${cleanContext}》，` : ''}想和您确认一下信息。`,
+    '',
+    `Hola, soy atención al cliente de España Life. ${cleanContext ? `Le contacto por "${cleanContext}".` : 'Quería confirmar unos datos con usted.'}`
+  ].join('\n');
+}
+
+function adminWhatsAppUrlForContact(value, context = '') {
+  const number = extractAdminWhatsAppNumber(value);
+  if (!number) return '';
+  return `https://wa.me/${number}?text=${encodeURIComponent(buildAdminContactWhatsAppMessage(context))}`;
+}
+
+function adminWhatsAppContactHtml(value, context = '') {
+  const safeValue = esc(value || '—');
+  const url = adminWhatsAppUrlForContact(value, context);
+  if (!url) return `<span style="font-family:JetBrains Mono">${safeValue}</span>`;
+  return `<a href="${esc(url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="用 WhatsApp 联系" style="font-family:JetBrains Mono;color:#16a34a;font-weight:800;text-decoration:none">📱 ${safeValue}</a>`;
 }
 
 function notifyListingPublished(listingId) {
@@ -2788,7 +2810,7 @@ function renderReview() {
       <td data-label="分类"><span class="badge badge-active">${esc(r.cat)}</span></td>
       <td data-label="城市">📍 ${esc(r.city)}</td>
       <td data-label="发布者">${esc(r.user)}</td>
-      <td data-label="联系方式" style="font-size:12px">${esc(r.contact)}</td>
+      <td data-label="联系方式" style="font-size:12px">${adminWhatsAppContactHtml(r.contact, r.title)}</td>
       <td data-label="提交时间" style="font-size:11px;color:var(--text-dim)">${r.time}</td>
       <td data-label="操作">
         <div class="action-btns">
@@ -2852,7 +2874,7 @@ function renderPinned(data = pinnedListings()) {
     <tr>
       <td data-label="信息标题">
         <div style="font-weight:700;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${esc(p.user || '游客发布')} · ${esc(p.contact || '—')}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${esc(p.user || '游客发布')} · ${adminWhatsAppContactHtml(p.contact, p.title)}</div>
       </td>
       <td data-label="分类"><span class="badge badge-active">${esc(p.cat)}</span></td>
       <td data-label="城市">📍 ${esc(p.city)}</td>
@@ -2902,7 +2924,7 @@ function renderUsers(data) {
         </div>
       </td>
       <td data-label="城市">📍 ${esc(u.city)}</td>
-      <td data-label="手机号" style="font-family:JetBrains Mono;font-size:12px">${esc(u.phone)}</td>
+      <td data-label="手机号" style="font-size:12px">${adminWhatsAppContactHtml(u.phone, u.name)}</td>
       <td data-label="后台权限">
         <div><span class="badge ${u.role==='none'?'badge-active':(u.role==='super_admin'?'badge-pinned':'badge-approved')}">${esc(adminRoleLabel(u))}</span></div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:4px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(adminSectionsLabel(u))}</div>
@@ -3237,7 +3259,7 @@ function renderListingMap(address, city) {
 function renderListingDetail(r) {
   const whatsappUrl = adminWhatsAppUrlForListing(r);
   const contactHtml = `
-    <span style="font-family:JetBrains Mono">${esc(r.contact || '—')}</span>
+    ${adminWhatsAppContactHtml(r.contact || r.publisherPhone, r.title)}
     ${whatsappUrl ? `<div style="margin-top:10px"><button class="btn btn-green" onclick="notifyListingPublished('${esc(r._id || String(r.id || '').replace(/\D/g,''))}')">📱 WhatsApp通知发布成功</button></div>` : `<div style="margin-top:8px;font-size:12px;color:var(--text-muted)">未识别到手机号，无法生成 WhatsApp 通知</div>`}
   `;
   return `
