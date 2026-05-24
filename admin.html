@@ -1091,13 +1091,13 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           <span class="stat-card-icon">📋</span>
           <div class="stat-card-val" data-stat="listings">12,456</div>
           <div class="stat-card-label">有效信息总数</div>
-          <div class="stat-card-change change-up">▲ 今日发布 +87</div>
+          <div class="stat-card-change change-up">▲ 今日发布 <span data-stat="today-listings">0</span></div>
         </div>
         <div class="stat-card" style="--card-accent:var(--gold)">
           <span class="stat-card-icon">👀</span>
-          <div class="stat-card-val">98,234</div>
+          <div class="stat-card-val" data-stat="views">0</div>
           <div class="stat-card-label">今日页面访问量</div>
-          <div class="stat-card-change change-up">▲ 较昨日 +12.4%</div>
+          <div class="stat-card-change" id="viewsChange">真实统计：今日 0</div>
         </div>
         <div class="stat-card" style="--card-accent:var(--red)">
           <span class="stat-card-icon">⏳</span>
@@ -2084,6 +2084,25 @@ async function loadRealUsers() {
   }
 }
 
+function updateViewStats(todayViews, yesterdayViews) {
+  const viewEl = document.querySelector('[data-stat=views]');
+  const changeEl = document.getElementById('viewsChange');
+  const today = Number(todayViews || 0);
+  const yesterday = Number(yesterdayViews || 0);
+  if (viewEl) viewEl.textContent = today.toLocaleString();
+  if (!changeEl) return;
+
+  changeEl.classList.remove('change-up', 'change-down');
+  if (yesterday > 0) {
+    const delta = ((today - yesterday) / yesterday) * 100;
+    changeEl.textContent = `${delta >= 0 ? '▲' : '▼'} 较昨日 ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%`;
+    changeEl.classList.add(delta >= 0 ? 'change-up' : 'change-down');
+    return;
+  }
+  changeEl.textContent = today > 0 ? `今日新增 ${today.toLocaleString()} 次，昨日 0` : '真实统计：今日 0';
+  if (today > 0) changeEl.classList.add('change-up');
+}
+
 async function loadRealStats() {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
@@ -2092,6 +2111,8 @@ async function loadRealStats() {
     const stats = result.stats || {};
     document.querySelector('[data-stat=users]')  && (document.querySelector('[data-stat=users]').textContent  = Number(stats.userCount || 0).toLocaleString());
     document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = Number(stats.listingCount || 0).toLocaleString());
+    document.querySelector('[data-stat=today-listings]') && (document.querySelector('[data-stat=today-listings]').textContent = Number(stats.todayListingCount || 0).toLocaleString());
+    updateViewStats(stats.todayViewCount, stats.yesterdayViewCount);
     updatePendingBadges(stats.pendingCount || 0);
     updateNewUserNotice(stats.newUserCount || 0);
     renderRecentActivity(result);
@@ -2104,10 +2125,12 @@ async function loadRealStats() {
     ]);
     document.querySelector('[data-stat=users]')  && (document.querySelector('[data-stat=users]').textContent  = (userCount||0).toLocaleString());
     document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = (listingCount||0).toLocaleString());
+    document.querySelector('[data-stat=today-listings]') && (document.querySelector('[data-stat=today-listings]').textContent = '0');
+    updateViewStats(0, 0);
     updatePendingBadges(pendingCount || 0);
     updateNewUserNotice(newUserCount || 0);
     renderRecentActivity({
-      stats: { userCount, listingCount, pendingCount, newUserCount, todayListingCount: 0, todayGuestListingCount: 0 },
+      stats: { userCount, listingCount, pendingCount, newUserCount, todayListingCount: 0, todayGuestListingCount: 0, todayViewCount: 0, yesterdayViewCount: 0 },
       recentLogs: [],
       todayGuestListings: []
     });

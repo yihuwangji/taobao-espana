@@ -4032,6 +4032,7 @@ async function viewListing(id) {
 
     // 更新浏览量
     sb.from('listings').update({ view_count: (data.view_count || 0) + 1 }).eq('id', id).then(() => {});
+    sb.from('page_views').insert({ listing_id: id }).then(() => {});
 
   } catch(e) {
     document.getElementById('detailContent').innerHTML =

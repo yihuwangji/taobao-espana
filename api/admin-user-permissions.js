@@ -252,6 +252,7 @@ async function loadTodayGuestListings(todayStart) {
 async function loadActivity(body) {
   const todayStart = String(body.todayStart || '').trim();
   const validTodayStart = /^\d{4}-\d{2}-\d{2}T/.test(todayStart) ? todayStart : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const yesterdayStart = new Date(new Date(validTodayStart).getTime() - 24 * 60 * 60 * 1000).toISOString();
   const [
     userCount,
     listingCount,
@@ -259,6 +260,8 @@ async function loadActivity(body) {
     newUserCount,
     todayGuestListingCount,
     todayListingCount,
+    todayViewCount,
+    yesterdayViewCount,
     recentLogs,
     todayGuestListings
   ] = await Promise.all([
@@ -268,12 +271,14 @@ async function loadActivity(body) {
     countRows(`/rest/v1/profiles?select=id&created_at=gte.${encodeURIComponent(validTodayStart)}`),
     countRows(`/rest/v1/listings?select=id&user_id=is.null&created_at=gte.${encodeURIComponent(validTodayStart)}`),
     countRows(`/rest/v1/listings?select=id&created_at=gte.${encodeURIComponent(validTodayStart)}`),
+    countRows(`/rest/v1/page_views?select=id&created_at=gte.${encodeURIComponent(validTodayStart)}`),
+    countRows(`/rest/v1/page_views?select=id&created_at=gte.${encodeURIComponent(yesterdayStart)}&created_at=lt.${encodeURIComponent(validTodayStart)}`),
     loadRecentLogs(),
     loadTodayGuestListings(validTodayStart)
   ]);
 
   return {
-    stats: { userCount, listingCount, pendingCount, newUserCount, todayGuestListingCount, todayListingCount },
+    stats: { userCount, listingCount, pendingCount, newUserCount, todayGuestListingCount, todayListingCount, todayViewCount, yesterdayViewCount },
     recentLogs,
     todayGuestListings
   };
