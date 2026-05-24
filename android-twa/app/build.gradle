@@ -26,7 +26,7 @@ def javaPackage = 'com.xibanyalife.app'
 def twaManifest = [
     applicationId: isAdminApk ? 'com.xibanyalife.admin' : 'com.xibanyalife.app',
     hostName: 'espanalife.app', // The domain being opened in the TWA.
-    launchUrl: isAdminApk ? '/admin?source=admin-apk' : '/?source=twa', // The start path for the TWA. Must be relative to the domain.
+    launchUrl: isAdminApk ? '/admin?source=admin-apk&v=admin-login-078f156' : '/?source=twa', // The start path for the TWA. Must be relative to the domain.
     name: isAdminApk ? '西班牙生活通后台' : '西班牙生活通', // The application name.
     launcherName: isAdminApk ? '生活通后台' : '生活通', // The name shown on the Android Launcher.
     themeColor: '#D42B2B', // The color used for the status bar.
@@ -43,7 +43,7 @@ def twaManifest = [
     // - url: Absolute path of the URL to launch the app with (e.g '/create').
     // - icon: Name of the resource in the drawable folder to use as an icon.
     shortcuts: isAdminApk
-        ? [[name:'后台首页', short_name:'后台', url:'/admin', icon:'shortcut_0'],[name:'待审核', short_name:'审核', url:'/admin', icon:'shortcut_1']]
+        ? [[name:'后台首页', short_name:'后台', url:'/admin?source=admin-apk&v=admin-login-078f156', icon:'shortcut_0'],[name:'待审核', short_name:'审核', url:'/admin?source=admin-apk&v=admin-login-078f156', icon:'shortcut_1']]
         : [[name:'发布信息', short_name:'发布', url:'/?action=post', icon:'shortcut_0'],[name:'最新信息', short_name:'最新', url:'/#listingsGrid', icon:'shortcut_1']],
     // The duration of fade out animation in milliseconds to be played when removing splash screen.
     splashScreenFadeOutDuration: 300,
@@ -62,8 +62,8 @@ android {
         applicationId twaManifest.applicationId
         minSdkVersion 23
         targetSdkVersion 35
-        versionCode isAdminApk ? 1 : 5
-        versionName isAdminApk ? "1.0.0-admin" : "1.0.4"
+        versionCode isAdminApk ? 2 : 5
+        versionName isAdminApk ? "1.0.1-admin" : "1.0.4"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name

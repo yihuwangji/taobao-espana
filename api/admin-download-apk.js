@@ -5,7 +5,7 @@ const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
 const { requireAdminByMetadata } = require('./_admin-auth');
 const ADMIN_APK_BUCKET = 'admin-private';
-const APK_FILE_NAME = 'xibanyalife-admin-private-1.0.0.apk';
+const APK_FILE_NAME = 'xibanyalife-admin-private-1.0.1.apk';
 
 function json(res, status, body) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
