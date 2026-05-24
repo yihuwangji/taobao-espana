@@ -1069,7 +1069,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           ⏳ 待审核 <span id="topPendingCount" style="color:var(--red);font-weight:700">8</span>
         </button>
       </div>
-      <button class="topbar-btn" id="newUsersBtn" onclick="showPage('users',document.querySelector('[data-section=users]'))">
+      <button class="topbar-btn" id="newUsersBtn" onclick="openNewUsersPage()">
         🔔 新注册 <span id="newUsersCount" style="color:var(--gold);font-weight:700">0</span>
       </button>
       <button class="topbar-btn" id="adminNotifyBtn" onclick="enableAdminNotifications()">🔕 开启通知</button>
@@ -1336,6 +1336,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           </div>
           <div class="admin-tools-actions">
             <button class="btn btn-blue" onclick="showAdminUsersOnly()">只看管理员</button>
+            <button class="btn btn-green" onclick="showTodayUsers()">今日新注册</button>
             <button class="btn btn-green" onclick="openCreateAdminModal()">新建后台管理员</button>
             <button class="btn" onclick="showAllUsers()">查看全部用户</button>
             <button class="btn btn-gold" onclick="openMyPasswordReset()">修改我的后台密码</button>
@@ -1721,6 +1722,7 @@ let currentAdmin = null;
 let currentAdminProfile = null;
 let currentAdminPermissions = { role: 'none', sections: [] };
 let adminLoginInProgress = false;
+let userQuickFilter = '';
 
 const ADMIN_ALL_SECTIONS = ['dashboard', 'listings', 'review', 'reports', 'pinned', 'users', 'payment'];
 const ADMIN_SECTION_LABELS = {
@@ -2075,6 +2077,7 @@ async function loadRealUsers() {
       city: u.city || '—',
       phone: u.phone || '—',
       reg: u.created_at ? new Date(u.created_at).toLocaleDateString('zh-CN') : '—',
+      createdAt: u.created_at || '',
       posts: u.post_count || 0,
       status: u.is_banned ? '封禁' : '正常',
       role: u.role || 'none',
@@ -2912,13 +2915,24 @@ function adminSectionsLabel(user) {
 
 function renderUsers(data) {
   const colors = ['#E53935','#3B82F6','#00C896','#F5A623','#8B5CF6'];
+  if (!data.length) {
+    document.getElementById('usersTbody').innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;color:var(--text-muted);padding:26px">
+          暂无符合条件的用户。可以点“查看全部用户”清空筛选。
+        </td>
+      </tr>
+    `;
+    document.getElementById('usersInfo').textContent = '共 0 位用户';
+    return;
+  }
   document.getElementById('usersTbody').innerHTML = data.map((u,i) => `
-    <tr>
+    <tr style="${isTodayUser(u) ? 'outline:2px solid rgba(245,166,35,.35);background:rgba(245,166,35,.06)' : ''}">
       <td data-label="用户">
         <div class="user-cell">
           <div class="user-avatar" style="background:${colors[i%5]}22;color:${colors[i%5]}">${esc(u.name[0] || '?')}</div>
           <div>
-            <div style="font-weight:600">${esc(u.name)}</div>
+            <div style="font-weight:600">${esc(u.name)}${isTodayUser(u) ? ' <span class="badge badge-pinned" style="margin-left:6px">今日新注册</span>' : ''}</div>
             ${u.email ? `<div style="font-size:11px;color:var(--text-muted)">${esc(u.email)}</div>` : ''}
           </div>
         </div>
@@ -2947,28 +2961,57 @@ function renderUsers(data) {
   document.getElementById('usersInfo').textContent = `共 ${data.length} 位用户`;
 }
 
+function isTodayUser(user) {
+  if (!user?.createdAt) return false;
+  const created = new Date(user.createdAt);
+  if (Number.isNaN(created.getTime())) return false;
+  return created.toDateString() === new Date().toDateString();
+}
+
 function filterUsers() {
   const q = normalizeSearchText(document.getElementById('userSearch')?.value || '');
   const status = document.getElementById('userStatusFilter').value;
   let data = allUsers.filter(u =>
     (!q || normalizeSearchText([u.name, u.email, u.phone, u.city, adminRoleLabel(u), adminSectionsLabel(u)].join(' ')).includes(q) || compactDigits(u.phone).includes(compactDigits(q))) &&
-    (!status || u.status === status)
+    (!status || u.status === status) &&
+    (userQuickFilter !== 'today' || isTodayUser(u))
   );
   renderUsers(data);
 }
 
 function showAdminUsersOnly() {
+  userQuickFilter = '';
   const input = document.getElementById('userSearch');
   if (input) input.value = '管理员';
   filterUsers();
 }
 
-function showAllUsers() {
+function showTodayUsers() {
+  userQuickFilter = 'today';
   const input = document.getElementById('userSearch');
   const status = document.getElementById('userStatusFilter');
   if (input) input.value = '';
   if (status) status.value = '';
   filterUsers();
+}
+
+function showAllUsers() {
+  userQuickFilter = '';
+  const input = document.getElementById('userSearch');
+  const status = document.getElementById('userStatusFilter');
+  if (input) input.value = '';
+  if (status) status.value = '';
+  filterUsers();
+}
+
+async function openNewUsersPage() {
+  showPage('users', document.querySelector('[data-section=users]'));
+  const input = document.getElementById('userSearch');
+  const status = document.getElementById('userStatusFilter');
+  if (input) input.value = '';
+  if (status) status.value = '';
+  userQuickFilter = 'today';
+  await loadRealUsers();
 }
 
 function openMyPasswordReset() {
