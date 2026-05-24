@@ -2088,7 +2088,7 @@ async function loadRealStats() {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
   try {
-    const result = await adminApi('/api/admin-activity', { todayStart: todayStart.toISOString() });
+    const result = await adminApi('/api/admin-user-permissions', { action: 'list_activity', todayStart: todayStart.toISOString() });
     const stats = result.stats || {};
     document.querySelector('[data-stat=users]')  && (document.querySelector('[data-stat=users]').textContent  = Number(stats.userCount || 0).toLocaleString());
     document.querySelector('[data-stat=listings]') && (document.querySelector('[data-stat=listings]').textContent = Number(stats.listingCount || 0).toLocaleString());

@@ -10,7 +10,6 @@
     { "src": "/api/admin-delete", "dest": "/api/admin-delete.js" },
     { "src": "/api/admin-listing-batch", "dest": "/api/admin-listing-batch.js" },
     { "src": "/api/admin-user-permissions", "dest": "/api/admin-user-permissions.js" },
-    { "src": "/api/admin-activity", "dest": "/api/admin-activity.js" },
     { "src": "/api/admin-site-settings", "dest": "/api/admin-site-settings.js" },
     { "src": "/api/admin-download-apk", "dest": "/api/admin-download-apk.js" },
     { "src": "/api/admin-import-merchants", "dest": "/api/admin-import-merchants.js" },
