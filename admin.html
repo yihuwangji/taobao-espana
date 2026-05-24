@@ -2428,6 +2428,7 @@ function renderListings(data) {
           ${listingPinActive(l) ? `<button class="btn" onclick="setListingPin(${l._id || String(l.id).replace(/\D/g,'')}, false)">取消置顶</button>` : `<button class="btn btn-gold" onclick="setListingPin(${l._id || String(l.id).replace(/\D/g,'')}, true, 7)">置顶7天</button>`}
           <button class="btn btn-blue" onclick="openListingModal('${l.id}')">详情</button>
           <button class="btn btn-gold" onclick="openListingEdit('${l.id}')">编辑</button>
+          <button class="btn btn-green" onclick="notifyListingPublished('${l._id || String(l.id).replace(/\D/g,'')}')">WhatsApp通知</button>
           <button class="btn btn-red" onclick="deleteAdminItem('listing','${l._id || l.id}')">删除</button>
         </div>
       </td>
@@ -2447,6 +2448,71 @@ function normalizeSearchText(value) {
 
 function compactDigits(value) {
   return String(value || '').replace(/\D/g, '');
+}
+
+function extractAdminWhatsAppNumber(value) {
+  const raw = String(value || '');
+  const match = raw.match(/(?:\+|00)?\d[\d\s().-]{7,}\d/);
+  if (!match) return '';
+  let digits = match[0].replace(/\D/g, '');
+  if (digits.startsWith('00')) digits = digits.slice(2);
+  if (digits.length === 9) digits = `34${digits}`;
+  if (digits.length < 8 || digits.length > 15) return '';
+  return digits;
+}
+
+function adminListingShareUrl(listing) {
+  const id = listing?._id || String(listing?.id || '').replace(/\D/g, '');
+  if (!id) return 'https://espanalife.app/';
+  return new URL(`/s/${encodeURIComponent(id)}`, window.location.origin).toString();
+}
+
+function buildPublishedWhatsAppMessage(listing) {
+  const title = String(listing?.title || '您的信息').replace(/\s+/g, ' ').trim();
+  const url = adminListingShareUrl(listing);
+  return [
+    `你好，您的信息《${title}》已经在西班牙生活通发布成功 ✅`,
+    `查看详情：${url}`,
+    '',
+    '如果需要修改内容、置顶或增加曝光，可以直接回复客服。',
+    '',
+    `Hola, tu anuncio "${title}" ya está publicado en España Life ✅`,
+    `Ver detalle: ${url}`
+  ].join('\n');
+}
+
+function adminWhatsAppUrlForListing(listing) {
+  const number = extractAdminWhatsAppNumber(listing?.contact || listing?.publisherPhone || '');
+  if (!number) return '';
+  return `https://wa.me/${number}?text=${encodeURIComponent(buildPublishedWhatsAppMessage(listing))}`;
+}
+
+function notifyListingPublished(listingId) {
+  const listing = getAdminListingById(listingId);
+  if (!listing) {
+    showToast('没有找到这条信息', 'error');
+    return;
+  }
+  const url = adminWhatsAppUrlForListing(listing);
+  if (!url) {
+    showToast('这条信息没有可识别的手机号，不能生成 WhatsApp 通知', 'error');
+    return;
+  }
+  window.open(url, '_blank', 'noopener');
+  const id = listing._id || String(listing.id || '').replace(/\D/g, '');
+  if (id) sbLog('whatsapp_notify_listing', 'listing', id, 'published_success').catch(() => {});
+}
+
+function maybePromptWhatsAppAfterPublish(ids) {
+  const selected = [...new Set((ids || []).map(Number).filter(Number.isInteger))];
+  if (selected.length !== 1) return;
+  const listing = getAdminListingById(selected[0]);
+  if (!listing || !adminWhatsAppUrlForListing(listing)) return;
+  setTimeout(() => {
+    if (confirm('这条信息已经发布成功，是否现在用 WhatsApp 通知客人？')) {
+      notifyListingPublished(selected[0]);
+    }
+  }, 150);
 }
 
 function formatDateOnly(value) {
@@ -2589,6 +2655,9 @@ async function batchListingAction(action, ids = selectedListingIds()) {
       canManageSection('review') ? loadRealReview() : Promise.resolve(),
       loadRealStats()
     ]);
+    if (action === 'approve' || action === 'online') {
+      maybePromptWhatsAppAfterPublish(selected);
+    }
   } catch (error) {
     showToast(`批量${label}失败：${error.message}`, 'error');
   }
@@ -3166,6 +3235,11 @@ function renderListingMap(address, city) {
 }
 
 function renderListingDetail(r) {
+  const whatsappUrl = adminWhatsAppUrlForListing(r);
+  const contactHtml = `
+    <span style="font-family:JetBrains Mono">${esc(r.contact || '—')}</span>
+    ${whatsappUrl ? `<div style="margin-top:10px"><button class="btn btn-green" onclick="notifyListingPublished('${esc(r._id || String(r.id || '').replace(/\D/g,''))}')">📱 WhatsApp通知发布成功</button></div>` : `<div style="margin-top:8px;font-size:12px;color:var(--text-muted)">未识别到手机号，无法生成 WhatsApp 通知</div>`}
+  `;
   return `
     <div style="display:grid;gap:10px">
       ${detailBlock('标题', `<strong>${esc(r.title)}</strong>`)}
@@ -3180,7 +3254,7 @@ function renderListingDetail(r) {
         ${detailBlock('价格', r.price ? esc(r.price) : '面议')}
       </div>
       ${detailBlock('详细描述', esc(r.desc || '暂无描述').replace(/\n/g, '<br>'))}
-      ${detailBlock('联系方式', `<span style="font-family:JetBrains Mono">${esc(r.contact || '—')}</span>`)}
+      ${detailBlock('联系方式', contactHtml)}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         ${detailBlock('状态', esc(r.status))}
         ${detailBlock('发布时间', esc(r.time))}
