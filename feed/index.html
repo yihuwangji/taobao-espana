@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>淘商圈 / 货源动态 - 西班牙生活通</title>
+<meta name="description" content="西班牙生活通淘商圈，面向欧洲华商的货源动态、新品到仓、清仓特价、吐槽与生意经验社区。">
+<meta name="theme-color" content="#D42B2B">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/assets/icons/icon-192.png?v=20260521" sizes="192x192">
+<link rel="stylesheet" href="/feed/feed.css?v=20260525-10">
+</head>
+<body>
+<header class="feed-topbar">
+  <a class="feed-back" href="/" aria-label="返回首页">‹</a>
+  <div class="feed-brand">
+    <strong>淘商圈</strong>
+    <span>货源动态 · 生意经验 · 华人吐槽</span>
+  </div>
+  <button class="feed-publish-mini" type="button" data-open-publish>发布</button>
+</header>
+
+<main class="feed-shell">
+  <section class="feed-hero" aria-label="淘商圈">
+    <div>
+      <p class="feed-kicker">EspañaLife Feed</p>
+      <h1>淘商圈</h1>
+      <p>像发朋友圈一样发货源、新品、清仓、吐槽和生意经验。</p>
+    </div>
+    <button class="feed-publish-main" type="button" data-open-publish>发布动态</button>
+  </section>
+
+  <section class="feed-controls" aria-label="筛选动态">
+    <label class="feed-search">
+      <span>搜索</span>
+      <input id="feedSearchInput" type="search" placeholder="搜货源、城市、标签、WhatsApp">
+    </label>
+    <div class="feed-filter-row" id="feedSortTabs" aria-label="推荐流筛选">
+      <button class="active" type="button" data-sort="latest">最新</button>
+      <button type="button" data-sort="hot">热门</button>
+      <button type="button" data-sort="nearby">附近</button>
+      <button type="button" data-sort="new">新品</button>
+      <button type="button" data-sort="today">今日热卖</button>
+    </div>
+  </section>
+
+  <section class="feed-masonry" id="feedGrid" aria-live="polite"></section>
+</main>
+
+<button class="mobile-compose-fab" type="button" data-open-publish>发布动态</button>
+
+<div class="feed-compose" id="feedCompose" aria-hidden="true">
+  <div class="feed-compose-panel" role="dialog" aria-modal="true" aria-labelledby="composeTitle">
+    <div class="compose-head">
+      <div>
+        <h2 id="composeTitle">发布动态</h2>
+        <p>最多9张图片，或1个30秒内视频。</p>
+      </div>
+      <button class="compose-close" type="button" data-close-publish aria-label="关闭">×</button>
+    </div>
+    <form id="feedPostForm" class="compose-form">
+      <div class="form-block">
+        <label>图片 / 视频</label>
+        <input id="feedMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm" multiple>
+        <p class="form-hint" id="mediaHint">图片最多9张；视频最多1个，不能超过30秒。</p>
+        <div class="media-preview" id="mediaPreview"></div>
+      </div>
+      <label>
+        简短描述
+        <textarea id="feedDescription" rows="4" maxlength="500" placeholder="写货源、价格段、适合人群、到货时间，或你的生意经验…"></textarea>
+      </label>
+      <div class="compose-grid">
+        <label>
+          城市
+          <input id="feedCity" type="text" placeholder="Madrid / Barcelona / Valencia">
+        </label>
+        <label>
+          WhatsApp
+          <input id="feedWhatsapp" type="tel" placeholder="+34 6XX XXX XXX">
+        </label>
+      </div>
+      <div class="compose-grid">
+        <label>
+          标签
+          <input id="feedTags" type="text" placeholder="#新品 #批发 #今日热卖">
+        </label>
+        <label>
+          内容分类
+          <select id="feedCategory">
+            <option>货源动态</option>
+            <option>新品到仓</option>
+            <option>清仓特价</option>
+            <option>华人吐槽</option>
+            <option>生意经验</option>
+            <option>招工信息</option>
+            <option>店铺转让</option>
+          </select>
+        </label>
+      </div>
+      <label class="check-row">
+        <input id="feedAnonymous" type="checkbox">
+        <span>匿名发布，前台显示“匿名华商”</span>
+      </label>
+      <div class="rule-note">基础关键词审核已开启：赌博、色情、诈骗、仇恨攻击、假货侵权、恶意刷屏、人身攻击等内容会被拦截。</div>
+      <button class="submit-feed" id="feedSubmitBtn" type="submit">发布动态</button>
+    </form>
+  </div>
+</div>
+
+<template id="feedCardTemplate">
+  <article class="feed-card">
+    <button class="media-button" type="button"></button>
+    <div class="card-body">
+      <p class="card-desc"></p>
+      <div class="tag-list"></div>
+      <div class="card-meta">
+        <span class="author"></span>
+        <span class="city"></span>
+        <span class="time"></span>
+      </div>
+      <div class="card-actions">
+        <button class="social-action like-action" type="button" data-action="like" aria-label="点赞"><span class="action-icon">♡</span><span class="action-count"></span></button>
+        <button class="social-action" type="button" data-action="comment" aria-label="评论"><span class="action-icon">💬</span><span class="action-count"></span></button>
+        <button class="social-action save-action" type="button" data-action="save" aria-label="收藏"><span class="action-icon">☆</span><span class="action-count"></span></button>
+        <button class="social-action share-action" type="button" data-action="share" aria-label="分享"><span class="action-icon">↗</span></button>
+        <button class="social-action report-action" type="button" data-action="report" aria-label="举报"><span class="action-icon">!</span></button>
+      </div>
+      <a class="whatsapp-btn" target="_blank" rel="noreferrer">WhatsApp 联系</a>
+    </div>
+  </article>
+</template>
+
+<div class="comment-drawer" id="commentDrawer" aria-hidden="true">
+  <div class="comment-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="commentDrawerTitle">
+    <div class="drawer-grip" aria-hidden="true"></div>
+    <div class="drawer-head">
+      <h2 id="commentDrawerTitle">评论</h2>
+      <button type="button" id="closeCommentDrawer" aria-label="关闭评论">×</button>
+    </div>
+    <div class="drawer-comments" id="drawerComments"></div>
+    <div class="drawer-form">
+      <input id="drawerCommentInput" type="text" placeholder="说点什么">
+      <label><input id="drawerAnonymousComment" type="checkbox">匿名</label>
+      <button id="drawerCommentSend" type="button">发送</button>
+    </div>
+  </div>
+</div>
+
+<div class="feed-toast" id="feedToast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/feed/feed.js?v=20260525-10"></script>
+</body>
+</html>
