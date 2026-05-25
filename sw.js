@@ -64,6 +64,122 @@ async function transformHomeResponse(response) {
   });
 }
 
+async function transformFeedScriptResponse(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('javascript')) return response;
+
+  let js = await response.text();
+  if (js.includes('taoMerchantMixPatch')) {
+    return new Response(js, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers
+    });
+  }
+
+  js += `
+
+;(() => {
+  const taoMerchantMixPatch = true;
+  const merchantFallbackImage = 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=80';
+
+  function merchantImages(raw) {
+    if (Array.isArray(raw)) return raw.filter(Boolean).map(String);
+    if (!raw) return [];
+    if (typeof raw === 'string') {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed.filter(Boolean).map(String);
+      } catch (error) {
+        return raw.split(/[\\n,]+/).map(item => item.trim()).filter(Boolean);
+      }
+    }
+    return [];
+  }
+
+  function appendTaoMerchants() {
+    const grid = document.getElementById('feedGrid');
+    if (!grid || typeof filteredMerchants !== 'function') return;
+    grid.querySelectorAll('.merchant-card').forEach(card => card.remove());
+    const merchants = filteredMerchants();
+    merchants.forEach(merchant => {
+      const card = document.createElement('article');
+      const photos = merchantImages(merchant.images);
+      const photo = photos[0] || merchantFallbackImage;
+      const phone = typeof extractPhone === 'function' ? extractPhone(merchant.contact) : '';
+      const contactHref = phone ? 'https://wa.me/' + phone.replace(/^\\+/, '') : '/?listing=' + encodeURIComponent(merchant.id);
+      const mapUrl = merchant.address
+        ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((merchant.address || '') + ' ' + (merchant.city || ''))
+        : '';
+      card.className = 'feed-card merchant-card';
+      card.innerHTML = \`
+        <button class="media-button" type="button" aria-label="查看大图">
+          <img src="\${escapeHTML(photo)}" alt="\${escapeHTML(merchant.title || '商家资料')}" loading="lazy">
+          <span class="burst-heart">♥</span>
+        </button>
+        <div class="card-body">
+          <h2 class="merchant-title">\${escapeHTML(merchant.title || '商家资料')}</h2>
+          <p class="card-desc">\${escapeHTML(merchant.description || '西班牙生活通商家资料')}</p>
+          <div class="tag-list">
+            <span>#商家</span>
+            <span>#\${escapeHTML(merchant.category || '黄页')}</span>
+            <span>#\${escapeHTML(merchant.city || '西班牙')}</span>
+          </div>
+          <div class="card-meta">
+            <span class="author">西班牙生活通</span>
+            <span class="city">📍 \${escapeHTML(merchant.city || '西班牙')}</span>
+            <span class="time">\${typeof timeAgo === 'function' ? timeAgo(merchant.created_at) : ''}</span>
+          </div>
+          <div class="merchant-actions">
+            <button class="merchant-action save-merchant" type="button" aria-label="收藏">☆</button>
+            <button class="merchant-action share-merchant" type="button" aria-label="分享">↗</button>
+            \${mapUrl ? \`<a class="merchant-action" href="\${escapeHTML(mapUrl)}" target="_blank" rel="noopener" aria-label="地图">⌖</a>\` : ''}
+          </div>
+          <a class="merchant-contact-btn" href="\${escapeHTML(contactHref)}" target="_blank" rel="noopener">联系</a>
+          <a class="merchant-detail-btn" href="/?listing=\${encodeURIComponent(merchant.id)}" aria-label="详情">详情</a>
+        </div>
+      \`;
+      card.querySelector('.media-button')?.addEventListener('click', () => {
+        if (typeof openImageViewer === 'function') openImageViewer(photo, merchant.title || '商家资料');
+      });
+      card.querySelector('.share-merchant')?.addEventListener('click', async () => {
+        const url = location.origin + '/?listing=' + merchant.id;
+        if (navigator.share) await navigator.share({ title: '西班牙生活通商家资料', text: merchant.title || '商家资料', url }).catch(() => {});
+        else {
+          await navigator.clipboard?.writeText(url).catch(() => {});
+          if (typeof showToast === 'function') showToast('商家链接已复制');
+        }
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  const originalRenderPosts = typeof renderPosts === 'function' ? renderPosts : null;
+  if (originalRenderPosts) {
+    renderPosts = function patchedRenderPosts() {
+      originalRenderPosts();
+      appendTaoMerchants();
+    };
+  }
+
+  const originalLoadMerchants = typeof loadMerchants === 'function' ? loadMerchants : null;
+  if (originalLoadMerchants) {
+    loadMerchants = async function patchedLoadMerchants() {
+      const result = await originalLoadMerchants();
+      if (activeMode !== 'merchants') appendTaoMerchants();
+      return result;
+    };
+  }
+})();
+`;
+
+  return new Response(js, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+}
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
@@ -73,6 +189,15 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/api/')) return;
   if (url.pathname.startsWith('/s/')) return;
   if (url.hostname.includes('supabase.co')) return;
+
+  if (url.pathname === '/feed/feed.js') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => transformFeedScriptResponse(response.clone()))
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
 
   if (request.mode === 'navigate') {
     event.respondWith(
