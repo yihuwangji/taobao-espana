@@ -996,12 +996,14 @@
     padding-bottom: 12px;
   }
 
-  .merchant-filter-section.collapsed .merchant-filter-grid {
-    display: none;
-  }
-
   .merchant-filter-section.collapsed .section-title {
     margin-bottom: 0;
+  }
+
+  .merchant-toggle-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .merchant-toggle {
@@ -1023,10 +1025,30 @@
     border-color: #f5b660;
   }
 
+  .merchant-toggle-close {
+    display: none;
+  }
+
   .merchant-filter-grid {
-    display: grid;
+    display: none;
     grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
     gap: 10px;
+  }
+
+  #merchantFilterToggle:checked ~ .merchant-filter-grid {
+    display: grid;
+  }
+
+  #merchantFilterToggle:checked + .section-title .merchant-toggle-open {
+    display: none;
+  }
+
+  #merchantFilterToggle:checked + .section-title .merchant-toggle-close {
+    display: inline;
+  }
+
+  #merchantFilterToggle:checked + .section-title {
+    margin-bottom: 14px;
   }
 
   .merchant-filter-card {
@@ -2351,10 +2373,14 @@
 <!-- ===== MAIN CONTENT ===== -->
 <main class="content-shell">
 
-<div class="section merchant-filter-section collapsed" id="merchantFilterSection">
+<div class="section merchant-filter-section" id="merchantFilterSection">
+  <input class="merchant-toggle-input" id="merchantFilterToggle" type="checkbox" aria-hidden="true">
   <div class="section-title">
     <h3 data-i18n="merchant.title">商家服务筛选</h3>
-    <button class="merchant-toggle" id="merchantToggleBtn" type="button" data-i18n="merchant.expand">展开商家目录</button>
+    <label class="merchant-toggle" id="merchantToggleBtn" for="merchantFilterToggle" role="button">
+      <span class="merchant-toggle-open" data-i18n="merchant.expand">展开商家目录</span>
+      <span class="merchant-toggle-close" data-i18n="merchant.collapse">收起商家目录</span>
+    </label>
     <a href="#" class="see-all" onclick="filterMerchant('all');return false;" data-i18n="merchant.allLink">商家黄页 →</a>
   </div>
   <div class="merchant-filter-grid" id="merchantFilterGrid"></div>
@@ -3174,25 +3200,29 @@ function updateMerchantFilterUI() {
 
 function updateMerchantToggleText() {
   const section = document.getElementById('merchantFilterSection');
+  const toggle = document.getElementById('merchantFilterToggle');
   const button = document.getElementById('merchantToggleBtn');
-  if (!section || !button) return;
-  const collapsed = section.classList.contains('collapsed');
-  button.textContent = collapsed ? tr('merchant.expand') : tr('merchant.collapse');
+  if (!section) return;
+  const open = Boolean(toggle?.checked);
+  section.classList.toggle('collapsed', !open);
+  if (button) button.setAttribute('aria-expanded', String(open));
 }
 
 function toggleMerchantFilters(forceOpen = null) {
   const section = document.getElementById('merchantFilterSection');
   if (!section) return;
-  const open = forceOpen === null ? section.classList.contains('collapsed') : Boolean(forceOpen);
+  const toggle = document.getElementById('merchantFilterToggle');
+  const open = forceOpen === null ? !Boolean(toggle?.checked) : Boolean(forceOpen);
+  if (toggle) toggle.checked = open;
   section.classList.toggle('collapsed', !open);
   updateMerchantToggleText();
 }
 
 function initMerchantFilterInteractions() {
-  const button = document.getElementById('merchantToggleBtn');
-  if (button && button.dataset.bound !== 'true') {
-    button.addEventListener('click', () => toggleMerchantFilters());
-    button.dataset.bound = 'true';
+  const toggle = document.getElementById('merchantFilterToggle');
+  if (toggle && toggle.dataset.bound !== 'true') {
+    toggle.addEventListener('change', updateMerchantToggleText);
+    toggle.dataset.bound = 'true';
   }
 
   const grid = document.getElementById('merchantFilterGrid');
