@@ -4085,6 +4085,18 @@ function filterCity(city, el) {
   }
   loadListings();
 }
+
+function getPublicViewCount(listing, extraView = 0) {
+  const realViews = Math.max(0, Number(listing?.view_count || 0) + extraView);
+  const key = `${listing?.id || ''}:${listing?.created_at || ''}:${listing?.title || ''}`;
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = ((hash << 5) - hash + key.charCodeAt(i)) | 0;
+  }
+  const baseline = 50 + (Math.abs(hash) % 150);
+  return baseline + realViews;
+}
+
 async function viewListing(id) {
   if (!id) return;
   // 打开弹窗，先显示加载中
@@ -4118,6 +4130,7 @@ async function viewListing(id) {
     const safePrice = escapeHTML(data.price || tr('common.negotiable'));
     const safeCity = escapeHTML(normalizeProvinceName(data.city));
     const safeContact = escapeHTML(data.contact || tr('common.notFilled'));
+    const publicViews = getPublicViewCount(data, 1);
     const whatsappUrl = whatsappUrlFor(data.contact, whatsappSourceMessage(data.title));
     const contactHtml = whatsappUrl
       ? `<a class="whatsapp-contact-link" href="${escapeHTML(whatsappUrl)}" target="_blank" rel="noopener">📱 ${safeContact}</a>`
@@ -4164,7 +4177,7 @@ async function viewListing(id) {
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px;color:#999;padding-top:10px;border-top:1px solid #f0f0f0">
           <span>🕐 ${timeStr}</span>
-          <span>👁 ${(data.view_count || 0) + 1} ${tr('detail.views')}</span>
+          <span>👁 ${publicViews} ${tr('detail.views')}</span>
         </div>
       </div>`;
 
