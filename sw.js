@@ -33,6 +33,7 @@ async function transformHomeResponse(response) {
   const note = `
   <div class="customer-info-note">
     <strong>所有客户信息集中在首页：</strong>商家资料、招工求职、租房买房、二手物品、生意转让和生活服务都在这里查看。淘商圈只作为朋友圈式浏览和发布动态入口。
+    <a class="tao-circle-link" href="/feed/">进入淘商圈</a>
   </div>`;
   const noteStyle = `
   .customer-info-note {
@@ -46,6 +47,20 @@ async function transformHomeResponse(response) {
     line-height: 1.65;
   }
   .customer-info-note strong { color: var(--red-dark); }
+  .tao-circle-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--red);
+    color: #fff;
+    font-weight: 900;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(193,39,45,0.22);
+  }
 `;
 
   html = html
