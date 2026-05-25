@@ -156,6 +156,14 @@
   }
 
   .logo-text { color: white; }
+  .logo-title-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
   .logo-text h1 {
     font-family: 'Noto Serif SC', serif;
     font-size: 25px;
@@ -173,7 +181,7 @@
     display: inline-flex;
     align-items: center;
     width: fit-content;
-    margin-top: 5px;
+    margin-top: 0;
     padding: 4px 10px;
     border-radius: 999px;
     background: linear-gradient(135deg, #ffd36a, #ffb31a);
@@ -1786,13 +1794,17 @@
       font-size: 22px;
     }
     .logo-text h1 {
-      font-size: 21px;
+      font-size: 20px;
       letter-spacing: 0;
+    }
+    .logo-title-row {
+      gap: 6px;
+      max-width: 230px;
     }
     .logo-text span { font-size: 10px; }
     .logo-text .brand-domain {
-      font-size: 14px;
-      padding: 4px 9px;
+      font-size: 12px;
+      padding: 3px 7px;
       max-width: 176px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -2303,9 +2315,11 @@
     <a href="#" class="logo">
       <div class="logo-icon"><img src="/assets/icons/icon-192.png?v=20260521" alt="西班牙生活通"></div>
       <div class="logo-text">
-        <h1>西班牙生活通</h1>
+        <div class="logo-title-row">
+          <h1>西班牙生活通</h1>
+          <span class="brand-domain">espanalife.app</span>
+        </div>
         <span data-i18n="brand.sub">全西班牙华人分类信息平台</span>
-        <span class="brand-domain">espanalife.app</span>
       </div>
     </a>
     <div class="search-bar">
@@ -2335,10 +2349,6 @@
 <!-- ===== HERO ===== -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-brandmark" aria-label="espanalife.app">
-      <strong>espanalife.app</strong>
-      <span>西班牙生活通</span>
-    </div>
     <details class="hero-activity">
       <summary>
         <div class="hero-index">
