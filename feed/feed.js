@@ -15,6 +15,8 @@ const sb = window.supabase
 let currentUser = null;
 let selectedMedia = [];
 let allPosts = [];
+let merchantCards = [];
+let activeMode = 'posts';
 let activeSort = 'latest';
 let searchTerm = '';
 let likedIds = new Set(JSON.parse(localStorage.getItem('feedLikedIds') || '[]'));
@@ -74,6 +76,20 @@ const fallbackPosts = [
   }
 ];
 
+const fallbackMerchants = [
+  {
+    id: 'merchant-demo-1',
+    title: '马德里华人超市',
+    category: '商家黄页',
+    city: 'Madrid',
+    contact: '+34 600 000 009',
+    address: 'Madrid, Spain',
+    description: '日用百货、亚洲食品、餐馆耗材，支持到店咨询。',
+    images: ['https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=80'],
+    created_at: new Date(Date.now() - 1000 * 60 * 160).toISOString()
+  }
+];
+
 function escapeHTML(value) {
   return String(value || '').replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -95,6 +111,26 @@ function normalizeTags(raw) {
     .map(tag => tag.trim().replace(/^#/, ''))
     .filter(Boolean)
     .slice(0, 8);
+}
+
+function normalizeListingImages(raw) {
+  if (Array.isArray(raw)) return raw.filter(Boolean).map(String);
+  if (!raw) return [];
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed.filter(Boolean).map(String);
+    } catch (error) {
+      return raw.split(/[\n,]+/).map(item => item.trim()).filter(Boolean);
+    }
+  }
+  return [];
+}
+
+function extractPhone(value) {
+  const text = String(value || '');
+  const match = text.match(/(\+?\d[\d\s().-]{7,}\d)/);
+  return match ? match[1].replace(/[^\d+]/g, '') : '';
 }
 
 function hasBlockedContent(...values) {
@@ -157,6 +193,27 @@ async function loadPosts() {
     allPosts = data?.length ? data : fallbackPosts;
   }
   renderPosts();
+}
+
+async function loadMerchants() {
+  if (!sb) {
+    merchantCards = fallbackMerchants;
+    if (activeMode === 'merchants') renderMerchants();
+    return;
+  }
+  const query = sb
+    .from('listings')
+    .select('id,title,category,city,contact,address,description,images,created_at')
+    .eq('status', 'approved')
+    .or('category.eq.商家黄页,description.ilike.%平台代登记商家信息%')
+    .order('created_at', { ascending: false })
+    .limit(80);
+  const timeout = new Promise(resolve => {
+    setTimeout(() => resolve({ data: null, error: { message: 'merchant timeout' } }), 2500);
+  });
+  const { data, error } = await Promise.race([query, timeout]);
+  merchantCards = error || !data?.length ? fallbackMerchants : data;
+  if (activeMode === 'merchants') renderMerchants();
 }
 
 function filteredPosts() {
@@ -277,6 +334,124 @@ function renderPosts() {
     grid.appendChild(card);
   });
 }
+
+function filteredMerchants() {
+  const keyword = searchTerm.trim().toLowerCase();
+  let merchants = merchantCards.filter(merchant => {
+    const text = [
+      merchant.title, merchant.category, merchant.city, merchant.contact,
+      merchant.address, merchant.description
+    ].join(' ').toLowerCase();
+    return !keyword || text.includes(keyword);
+  });
+  if (activeSort === 'nearby') {
+    const city = localStorage.getItem('feedCityHint') || document.getElementById('feedCity')?.value || '';
+    if (city.trim()) {
+      merchants = merchants.filter(merchant => String(merchant.city || '').toLowerCase().includes(city.trim().toLowerCase()));
+    }
+  }
+  if (activeSort === 'new' || activeSort === 'today') {
+    merchants = [...merchants].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+  return merchants;
+}
+
+function renderMerchants() {
+  const grid = document.getElementById('feedGrid');
+  const merchants = filteredMerchants();
+  grid.innerHTML = '';
+  if (!merchants.length) {
+    grid.innerHTML = '<div class="empty-state">暂时没有符合条件的商家，换个关键词看看。</div>';
+    return;
+  }
+
+  merchants.forEach(merchant => {
+    const card = document.createElement('article');
+    const merchantId = `merchant-${merchant.id}`;
+    const photos = normalizeListingImages(merchant.images);
+    const photo = photos[0] || 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=80';
+    const phone = extractPhone(merchant.contact);
+    const contactHref = phone ? `https://wa.me/${phone.replace(/^\+/, '')}` : `/?listing=${encodeURIComponent(merchant.id)}`;
+    const mapUrl = merchant.address
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${merchant.address} ${merchant.city || ''}`)}`
+      : '';
+    card.className = 'feed-card merchant-card';
+    card.id = `merchant-${escapeHTML(merchant.id)}`;
+    card.innerHTML = `
+      <a class="media-button" href="/?listing=${encodeURIComponent(merchant.id)}" aria-label="查看商家">
+        <img src="${escapeHTML(photo)}" alt="${escapeHTML(merchant.title || '商家资料')}" loading="lazy">
+        <span class="burst-heart">♥</span>
+      </a>
+      <div class="card-body">
+        <h2 class="merchant-title">${escapeHTML(merchant.title || '商家资料')}</h2>
+        <p class="card-desc">${escapeHTML(merchant.description || '西班牙生活通商家资料')}</p>
+        <div class="tag-list">
+          <span>#商家</span>
+          <span>#${escapeHTML(merchant.category || '黄页')}</span>
+          <span>#${escapeHTML(merchant.city || '西班牙')}</span>
+        </div>
+        <div class="card-meta">
+          <span class="author">西班牙生活通</span>
+          <span class="city">📍 ${escapeHTML(merchant.city || '西班牙')}</span>
+          <span class="time">${timeAgo(merchant.created_at)}</span>
+        </div>
+        <div class="merchant-actions">
+          <button class="merchant-action save-merchant" type="button" aria-label="收藏">☆</button>
+          <button class="merchant-action share-merchant" type="button" aria-label="分享">↗</button>
+          ${mapUrl ? `<a class="merchant-action" href="${escapeHTML(mapUrl)}" target="_blank" rel="noopener" aria-label="地图">⌖</a>` : ''}
+        </div>
+        <a class="merchant-contact-btn" href="${escapeHTML(contactHref)}" target="_blank" rel="noopener">联系</a>
+      </div>
+    `;
+    const saveButton = card.querySelector('.save-merchant');
+    saveButton.classList.toggle('active', savedIds.has(merchantId));
+    saveButton.textContent = savedIds.has(merchantId) ? '★' : '☆';
+    saveButton.addEventListener('click', () => {
+      if (savedIds.has(merchantId)) {
+        savedIds.delete(merchantId);
+        saveButton.textContent = '☆';
+        saveButton.classList.remove('active');
+      } else {
+        savedIds.add(merchantId);
+        saveButton.textContent = '★';
+        saveButton.classList.add('active');
+      }
+      saveLocalSets();
+    });
+    card.querySelector('.share-merchant').addEventListener('click', () => shareMerchant(merchant));
+    grid.appendChild(card);
+  });
+}
+
+async function shareMerchant(merchant) {
+  const url = `${location.origin}/?listing=${merchant.id}`;
+  const text = `商家资料：${merchant.title || '西班牙生活通商家'}`;
+  if (navigator.share) {
+    await navigator.share({ title: '西班牙生活通商家资料', text, url }).catch(() => {});
+  } else {
+    await navigator.clipboard.writeText(url).catch(() => {});
+    showToast('商家链接已复制');
+  }
+}
+
+function renderActiveMode() {
+  if (activeMode === 'merchants') renderMerchants();
+  else renderPosts();
+}
+
+function switchFeedMode(mode, clickedButton) {
+  activeMode = mode === 'merchants' ? 'merchants' : 'posts';
+  document.querySelectorAll('#feedModeTabs button').forEach(item => {
+    item.classList.toggle('active', item === clickedButton || item.dataset.mode === activeMode);
+  });
+  document.getElementById('feedSearchInput').placeholder = activeMode === 'merchants'
+    ? '搜商家、城市、地址、电话'
+    : '搜货源、城市、标签、WhatsApp';
+  renderActiveMode();
+  if (activeMode === 'merchants' && !merchantCards.length) loadMerchants();
+}
+
+window.switchFeedMode = switchFeedMode;
 
 async function toggleReaction(post, type, button) {
   const postId = String(post.id);
@@ -453,7 +628,12 @@ function reportPost(post) {
 function bindFilters() {
   document.getElementById('feedSearchInput').addEventListener('input', event => {
     searchTerm = event.target.value;
-    renderPosts();
+    renderActiveMode();
+  });
+  document.getElementById('feedModeTabs').addEventListener('click', event => {
+    const button = event.target.closest('button[data-mode]');
+    if (!button) return;
+    switchFeedMode(button.dataset.mode, button);
   });
   document.getElementById('feedSortTabs').addEventListener('click', event => {
     const button = event.target.closest('button[data-sort]');
@@ -464,7 +644,7 @@ function bindFilters() {
       const city = document.getElementById('feedCity')?.value || localStorage.getItem('feedCityHint') || '';
       if (!city) showToast('附近会按你发布表单中的城市筛选，可先填写城市');
     }
-    renderPosts();
+    renderActiveMode();
   });
 }
 
@@ -657,7 +837,7 @@ async function submitPost(event) {
     selectedMedia = [];
     renderMediaPreview();
     closeCompose();
-    renderPosts();
+    renderActiveMode();
     showToast('发布成功');
   } catch (error) {
     showToast(`发布失败：${error.message || '请稍后再试'}`);
@@ -686,4 +866,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   bindFilters();
   await initUser();
   await loadPosts();
+  loadMerchants();
 });
