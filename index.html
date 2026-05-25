@@ -992,6 +992,37 @@
     border-bottom: 1px solid #f4eadc;
   }
 
+  .merchant-filter-section.collapsed {
+    padding-bottom: 12px;
+  }
+
+  .merchant-filter-section.collapsed .merchant-filter-grid {
+    display: none;
+  }
+
+  .merchant-filter-section.collapsed .section-title {
+    margin-bottom: 0;
+  }
+
+  .merchant-toggle {
+    border: 1.5px solid #f0d7b6;
+    border-radius: 999px;
+    background: #fff7ed;
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 900;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+    white-space: nowrap;
+    box-shadow: 0 5px 14px rgba(128, 45, 16, .08);
+  }
+
+  .merchant-toggle:hover {
+    background: #fff1dd;
+    border-color: #f5b660;
+  }
+
   .merchant-filter-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
@@ -2320,9 +2351,10 @@
 <!-- ===== MAIN CONTENT ===== -->
 <main class="content-shell">
 
-<div class="section merchant-filter-section">
+<div class="section merchant-filter-section collapsed" id="merchantFilterSection">
   <div class="section-title">
     <h3 data-i18n="merchant.title">商家服务筛选</h3>
+    <button class="merchant-toggle" id="merchantToggleBtn" onclick="toggleMerchantFilters()" type="button" data-i18n="merchant.expand">展开商家目录</button>
     <a href="#" class="see-all" onclick="filterMerchant('all');return false;" data-i18n="merchant.allLink">商家黄页 →</a>
   </div>
   <div class="merchant-filter-grid" id="merchantFilterGrid"></div>
@@ -2836,7 +2868,7 @@ const I18N = {
     'hero.register': '立即注册', 'hero.referral': '我的转发码', 'hero.latest': '最新信息',
     'wechat.title': '微信里下次找不到？先收藏本站',
     'wechat.text': '看右上角绿色箭头，点微信浏览器的 <strong>...</strong>，选择 <strong>添加到收藏</strong>；想放到手机桌面，就选 <strong>添加到桌面</strong>。',
-    'merchant.title': '商家服务筛选', 'merchant.allLink': '商家黄页 →',
+    'merchant.title': '商家服务筛选', 'merchant.allLink': '商家黄页 →', 'merchant.expand': '展开商家目录', 'merchant.collapse': '收起商家目录',
     'listing.more': '查看更多 →',
     'publish.aria': '免费发布信息', 'publish.title': '免费发布信息', 'publish.text': '招工、房源、二手、生意转让都可以发布', 'publish.button': '立即发布',
     'trust.reviewTitle': '先审核后展示', 'trust.reviewText': '减少诈骗与重复广告',
@@ -2900,7 +2932,7 @@ const I18N = {
     'hero.register': 'Registrarme', 'hero.referral': 'Mi código', 'hero.latest': 'Anuncios recientes',
     'wechat.title': '¿Lo abriste desde WeChat? Guarda la web',
     'wechat.text': 'Toca los <strong>...</strong> de arriba a la derecha en WeChat y elige <strong>Guardar en favoritos</strong>. Para acceso rápido, usa <strong>Añadir a pantalla de inicio</strong>.',
-    'merchant.title': 'Servicios y comercios', 'merchant.allLink': 'Directorio →',
+    'merchant.title': 'Servicios y comercios', 'merchant.allLink': 'Directorio →', 'merchant.expand': 'Ver directorio', 'merchant.collapse': 'Ocultar directorio',
     'listing.more': 'Ver más →',
     'publish.aria': 'Publicar anuncio gratis', 'publish.title': 'Publicar anuncio gratis', 'publish.text': 'Empleo, vivienda, segunda mano y traspasos', 'publish.button': 'Publicar ahora',
     'trust.reviewTitle': 'Anuncios revisados', 'trust.reviewText': 'Menos fraude y anuncios repetidos',
@@ -3129,6 +3161,7 @@ function renderMerchantFilters() {
       </span>
     </button>
   `).join('');
+  updateMerchantToggleText();
 }
 
 function updateMerchantFilterUI() {
@@ -3136,6 +3169,22 @@ function updateMerchantFilterUI() {
   if (!currentMerchant) return;
   const active = document.querySelector(`.merchant-filter-card[data-merchant="${currentMerchant}"]`);
   if (active) active.classList.add('active');
+}
+
+function updateMerchantToggleText() {
+  const section = document.getElementById('merchantFilterSection');
+  const button = document.getElementById('merchantToggleBtn');
+  if (!section || !button) return;
+  const collapsed = section.classList.contains('collapsed');
+  button.textContent = collapsed ? tr('merchant.expand') : tr('merchant.collapse');
+}
+
+function toggleMerchantFilters(forceOpen = null) {
+  const section = document.getElementById('merchantFilterSection');
+  if (!section) return;
+  const open = forceOpen === null ? section.classList.contains('collapsed') : Boolean(forceOpen);
+  section.classList.toggle('collapsed', !open);
+  updateMerchantToggleText();
 }
 
 function merchantOrFilter(filter) {
@@ -3936,6 +3985,7 @@ function syncListingTitle() {
 }
 
 function filterMerchant(id) {
+  toggleMerchantFilters(true);
   currentMerchant = id || 'all';
   currentCat = 'all';
   document.querySelectorAll('.nav-cat').forEach(e => e.classList.remove('active'));
