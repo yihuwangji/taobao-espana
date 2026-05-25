@@ -2354,7 +2354,7 @@
 <div class="section merchant-filter-section collapsed" id="merchantFilterSection">
   <div class="section-title">
     <h3 data-i18n="merchant.title">商家服务筛选</h3>
-    <button class="merchant-toggle" id="merchantToggleBtn" onclick="toggleMerchantFilters()" type="button" data-i18n="merchant.expand">展开商家目录</button>
+    <button class="merchant-toggle" id="merchantToggleBtn" type="button" data-i18n="merchant.expand">展开商家目录</button>
     <a href="#" class="see-all" onclick="filterMerchant('all');return false;" data-i18n="merchant.allLink">商家黄页 →</a>
   </div>
   <div class="merchant-filter-grid" id="merchantFilterGrid"></div>
@@ -3153,7 +3153,7 @@ function renderMerchantFilters() {
   const grid = document.getElementById('merchantFilterGrid');
   if (!grid) return;
   grid.innerHTML = merchantFilters.map(item => `
-    <button class="merchant-filter-card${currentMerchant === item.id ? ' active' : ''}" data-merchant="${escapeHTML(item.id)}" onclick="filterMerchant('${escapeHTML(item.id)}')" type="button">
+    <button class="merchant-filter-card${currentMerchant === item.id ? ' active' : ''}" data-merchant="${escapeHTML(item.id)}" type="button">
       <span class="merchant-filter-icon">${escapeHTML(item.icon)}</span>
       <span>
         <span class="merchant-filter-name">${escapeHTML(merchantFilterText(item, 'name'))}</span>
@@ -3161,6 +3161,7 @@ function renderMerchantFilters() {
       </span>
     </button>
   `).join('');
+  initMerchantFilterInteractions();
   updateMerchantToggleText();
 }
 
@@ -3186,6 +3187,30 @@ function toggleMerchantFilters(forceOpen = null) {
   section.classList.toggle('collapsed', !open);
   updateMerchantToggleText();
 }
+
+function initMerchantFilterInteractions() {
+  const button = document.getElementById('merchantToggleBtn');
+  if (button && button.dataset.bound !== 'true') {
+    button.addEventListener('click', () => toggleMerchantFilters());
+    button.dataset.bound = 'true';
+  }
+
+  const grid = document.getElementById('merchantFilterGrid');
+  if (grid && grid.dataset.bound !== 'true') {
+    grid.addEventListener('click', event => {
+      const card = event.target.closest('.merchant-filter-card');
+      if (!card) return;
+      filterMerchant(card.dataset.merchant || 'all');
+    });
+    grid.dataset.bound = 'true';
+  }
+
+  updateMerchantToggleText();
+}
+
+window.updateMerchantToggleText = updateMerchantToggleText;
+window.toggleMerchantFilters = toggleMerchantFilters;
+window.initMerchantFilterInteractions = initMerchantFilterInteractions;
 
 function merchantOrFilter(filter) {
   if (!filter?.keywords?.length) return '';
@@ -3997,6 +4022,8 @@ function filterMerchant(id) {
   loadListings();
   document.getElementById('listingsGrid').scrollIntoView({behavior:'smooth', block:'start'});
 }
+
+window.filterMerchant = filterMerchant;
 
 function filterCity(city, el) {
   currentCity = city === '全部' ? '全部' : normalizeProvinceName(city);
