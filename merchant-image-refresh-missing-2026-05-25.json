@@ -1,0 +1,1093 @@
+{
+  "generated_at": "2026-05-25T06:28:39.911Z",
+  "source": "refresh missing placeholder photos for imported merchants",
+  "note": "Each missing imported merchant receives one varied industry-related placeholder photo. Merchants can replace it after claiming or through admin edit.",
+  "total": 108,
+  "industry_counts": {
+    "wholesale_retail": 73,
+    "fashion_pet_auto": 32,
+    "restaurant_catering": 3
+  },
+  "updates": [
+    {
+      "id": 408,
+      "title": "Navidad Shop – Arboles de Navidad al por Mayor y Particulares",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 409,
+      "title": "MEJORADA S.L.",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 410,
+      "title": "Tres Yan – Mayorista Multiprecio",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 411,
+      "title": "Continente Asiatico & Export S.L.",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 412,
+      "title": "Domoflor Bazar",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 413,
+      "title": "Águila de Oro",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 414,
+      "title": "Valong I&E",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 415,
+      "title": "Master Regalos",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 416,
+      "title": "Anda Import",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 417,
+      "title": "Ms Lencería",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 418,
+      "title": "Lady Glamour Yin Tai",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 419,
+      "title": "Linda Moda",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 420,
+      "title": "Time home",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 421,
+      "title": "SAMPHONE ELECTRONICO",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 422,
+      "title": "Christmas Village",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 423,
+      "title": "Regalo Fusión",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 424,
+      "title": "Mayal Productos Oficiales",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 425,
+      "title": "Ousdy – Juguetes Con Licencia al por mayor",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 426,
+      "title": "Sunshine Baby Puericultura",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 427,
+      "title": "Colibri Electronics",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 428,
+      "title": "Sio Technology",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 429,
+      "title": "Alone In Spain",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 430,
+      "title": "Movicentro",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 431,
+      "title": "Alas del Cielo Electrónica",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 432,
+      "title": "Ebox Prostima",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 433,
+      "title": "SinSun Telefonía",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 434,
+      "title": "baloby Moda al por mayor",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 435,
+      "title": "Chenson Bolsos de Piel",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 436,
+      "title": "Divancci Bolsos al por mayor",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 437,
+      "title": "Fortunela Bolsos de Fiesta y Bisutería",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 438,
+      "title": "LYS París Maletas",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 439,
+      "title": "Misiuss Maletas al por mayor",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 440,
+      "title": "Moroccan Bazar BMM",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 441,
+      "title": "Herbosa",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 442,
+      "title": "Udin complementos de la India",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 443,
+      "title": "Geocomp Bolsos",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 444,
+      "title": "baloby Bisutería al por mayor",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 445,
+      "title": "Moda Me & Te",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 446,
+      "title": "Michelle Bijoux",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 447,
+      "title": "Bisucomples – Bisutería al por mayor",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 448,
+      "title": "New Star Bisutería y complementos",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 449,
+      "title": "Rong Qiang Bisutería",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 450,
+      "title": "Girasol Complementos",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 451,
+      "title": "Sonata Bisuteria",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 452,
+      "title": "Abalorio & Diseño",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 453,
+      "title": "Pretty Bisutería",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 454,
+      "title": "Miss Minna",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 455,
+      "title": "Cristal House",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 456,
+      "title": "Casashi Abalorios",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 457,
+      "title": "Moda Todo Bien",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 458,
+      "title": "Lirio lmp_Exp S. L",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 459,
+      "title": "Huaxin shishang",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 460,
+      "title": "DULCE GATTI S.L",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "restaurant_catering",
+      "images": [
+        "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 461,
+      "title": "YUYU Moda",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 462,
+      "title": "Mirasol",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 463,
+      "title": "MODA CORAZON",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 464,
+      "title": "Sweet secret",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 465,
+      "title": "LADY SUMMER",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 466,
+      "title": "Just be you",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 467,
+      "title": "Moon Face",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 468,
+      "title": "Reyna Shop",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 469,
+      "title": "NUEVO FRAITA",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 470,
+      "title": "Le Chic",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 471,
+      "title": "Lara Chic Moda",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 472,
+      "title": "Celina Selection",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 473,
+      "title": "CHLOE´S Moda",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 474,
+      "title": "Top Top Top Moda",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 475,
+      "title": "Vestido Rojo Cobo Calleja",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 476,
+      "title": "Tres Colores Moda",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 477,
+      "title": "Free Base y Morango – Moda y ropa de deporte al por mayor",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 478,
+      "title": "Superbellota SL",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 479,
+      "title": "Kylie Calzado al por mayor",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 480,
+      "title": "Aolang Trading S.L.",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 481,
+      "title": "Miss Bom Bom Calzado",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 482,
+      "title": "Corina Zapatos",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 483,
+      "title": "Patriot Sport",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 484,
+      "title": "OCPEAK",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 485,
+      "title": "Top Electrónica",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 486,
+      "title": "Equipamiento comercial y perchas Percorin",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 487,
+      "title": "Nave de las Bodas",
+      "category": "服务",
+      "city": "Fuenlabrada",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 489,
+      "title": "Tsangku Badalona mayorista drogueria y perfumeria",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 490,
+      "title": "M7 Company 蒙福贸易 Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 491,
+      "title": "Mercanta Import S.L.U. Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 492,
+      "title": "Bolsos Xinglong S.L. Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 493,
+      "title": "Bolsos Flora Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 494,
+      "title": "Moda Europa Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 495,
+      "title": "Rocker Moda Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 496,
+      "title": "Toys Furlong S.L. Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 497,
+      "title": "Chino Mayorista Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "restaurant_catering",
+      "images": [
+        "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 498,
+      "title": "Comercial Xhi Hai Fong Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "restaurant_catering",
+      "images": [
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 499,
+      "title": "Confecciones Placi S.A. Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 500,
+      "title": "Poligono Chinos Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 501,
+      "title": "Badalona 仓库",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 502,
+      "title": "Angelina Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 503,
+      "title": "KUKA Fashion S.L. Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 504,
+      "title": "Impacto 圣贝勒服装贸易 Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 505,
+      "title": "Linberon S.L.U. Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 506,
+      "title": "Cherry Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 507,
+      "title": "Star Moda Bisuteria Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 508,
+      "title": "Sofia Moda Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 509,
+      "title": "Bolsos Mimi S.L. Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 510,
+      "title": "Trendy Bag S.L.U. Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 511,
+      "title": "Jessy Secret Pasion Comercio S.L. Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "wholesale_retail",
+      "images": [
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 512,
+      "title": "Cristina's Moda Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 513,
+      "title": "Confeccions Fortuna Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 514,
+      "title": "Elena Moda Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 515,
+      "title": "JieJie Fashion Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=82"
+      ]
+    },
+    {
+      "id": 516,
+      "title": "La Paz Moda Badalona",
+      "category": "服务",
+      "city": "Badalona",
+      "industry": "fashion_pet_auto",
+      "images": [
+        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=900&q=82"
+      ]
+    }
+  ]
+}
