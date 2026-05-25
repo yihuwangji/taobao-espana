@@ -4093,7 +4093,14 @@ function getPublicViewCount(listing, extraView = 0) {
   for (let i = 0; i < key.length; i++) {
     hash = ((hash << 5) - hash + key.charCodeAt(i)) | 0;
   }
-  const baseline = 50 + (Math.abs(hash) % 150);
+  const seed = Math.abs(hash);
+  const roll = seed % 100;
+  let baseline;
+  if (roll < 12) baseline = 18 + (seed % 27);
+  else if (roll < 48) baseline = 45 + ((seed >> 3) % 75);
+  else if (roll < 80) baseline = 120 + ((seed >> 5) % 180);
+  else if (roll < 95) baseline = 300 + ((seed >> 7) % 320);
+  else baseline = 620 + ((seed >> 9) % 580);
   return baseline + realViews;
 }
 
