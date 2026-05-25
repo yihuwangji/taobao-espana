@@ -1000,12 +1000,6 @@
     margin-bottom: 0;
   }
 
-  .merchant-toggle-input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
   .merchant-toggle {
     border: 1.5px solid #f0d7b6;
     border-radius: 999px;
@@ -1029,26 +1023,33 @@
     display: none;
   }
 
-  .merchant-filter-grid {
-    display: none;
-    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
-    gap: 10px;
+  .merchant-filter-section > summary {
+    list-style: none;
+    cursor: pointer;
   }
 
-  #merchantFilterToggle:checked ~ .merchant-filter-grid {
-    display: grid;
-  }
-
-  #merchantFilterToggle:checked + .section-title .merchant-toggle-open {
+  .merchant-filter-section > summary::-webkit-details-marker {
     display: none;
   }
 
-  #merchantFilterToggle:checked + .section-title .merchant-toggle-close {
+  .merchant-filter-section[open] .merchant-toggle-open {
+    display: none;
+  }
+
+  .merchant-filter-section[open] .merchant-toggle-close {
     display: inline;
   }
 
-  #merchantFilterToggle:checked + .section-title {
-    margin-bottom: 14px;
+  .merchant-filter-action-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: -4px 2px 10px;
+  }
+
+  .merchant-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+    gap: 10px;
   }
 
   .merchant-filter-card {
@@ -2373,18 +2374,19 @@
 <!-- ===== MAIN CONTENT ===== -->
 <main class="content-shell">
 
-<div class="section merchant-filter-section" id="merchantFilterSection">
-  <input class="merchant-toggle-input" id="merchantFilterToggle" type="checkbox" aria-hidden="true">
-  <div class="section-title">
+<details class="section merchant-filter-section" id="merchantFilterSection">
+  <summary class="section-title">
     <h3 data-i18n="merchant.title">商家服务筛选</h3>
-    <label class="merchant-toggle" id="merchantToggleBtn" for="merchantFilterToggle" role="button">
+    <span class="merchant-toggle" id="merchantToggleBtn" role="button">
       <span class="merchant-toggle-open" data-i18n="merchant.expand">展开商家目录</span>
       <span class="merchant-toggle-close" data-i18n="merchant.collapse">收起商家目录</span>
-    </label>
+    </span>
+  </summary>
+  <div class="merchant-filter-action-row">
     <a href="#" class="see-all" onclick="filterMerchant('all');return false;" data-i18n="merchant.allLink">商家黄页 →</a>
   </div>
   <div class="merchant-filter-grid" id="merchantFilterGrid"></div>
-</div>
+</details>
 
 <!-- Latest listings -->
 <div class="section">
@@ -3200,10 +3202,9 @@ function updateMerchantFilterUI() {
 
 function updateMerchantToggleText() {
   const section = document.getElementById('merchantFilterSection');
-  const toggle = document.getElementById('merchantFilterToggle');
   const button = document.getElementById('merchantToggleBtn');
   if (!section) return;
-  const open = Boolean(toggle?.checked);
+  const open = Boolean(section.open);
   section.classList.toggle('collapsed', !open);
   if (button) button.setAttribute('aria-expanded', String(open));
 }
@@ -3211,18 +3212,17 @@ function updateMerchantToggleText() {
 function toggleMerchantFilters(forceOpen = null) {
   const section = document.getElementById('merchantFilterSection');
   if (!section) return;
-  const toggle = document.getElementById('merchantFilterToggle');
-  const open = forceOpen === null ? !Boolean(toggle?.checked) : Boolean(forceOpen);
-  if (toggle) toggle.checked = open;
+  const open = forceOpen === null ? !Boolean(section.open) : Boolean(forceOpen);
+  section.open = open;
   section.classList.toggle('collapsed', !open);
   updateMerchantToggleText();
 }
 
 function initMerchantFilterInteractions() {
-  const toggle = document.getElementById('merchantFilterToggle');
-  if (toggle && toggle.dataset.bound !== 'true') {
-    toggle.addEventListener('change', updateMerchantToggleText);
-    toggle.dataset.bound = 'true';
+  const section = document.getElementById('merchantFilterSection');
+  if (section && section.dataset.bound !== 'true') {
+    section.addEventListener('toggle', updateMerchantToggleText);
+    section.dataset.bound = 'true';
   }
 
   const grid = document.getElementById('merchantFilterGrid');
