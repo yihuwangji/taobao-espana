@@ -185,6 +185,33 @@ a {
 
 .feed-filter-row::-webkit-scrollbar { display: none; }
 
+.feed-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.feed-mode-tabs button {
+  min-height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.feed-mode-tabs button.active {
+  background: var(--ink);
+  color: var(--white);
+  box-shadow: 0 8px 16px rgba(26, 10, 0, 0.12);
+}
+
 .feed-filter-row button {
   flex: 0 0 auto;
   border: 1px solid var(--line);
@@ -482,6 +509,93 @@ a {
 .whatsapp-btn::before {
   content: "WA";
   font-size: 12px;
+}
+
+.feed-card.merchant-card {
+  background: #201107;
+}
+
+.merchant-card .media-button {
+  aspect-ratio: 9 / 14;
+}
+
+.merchant-card .card-desc {
+  bottom: 104px;
+  -webkit-line-clamp: 4;
+}
+
+.merchant-title {
+  position: absolute;
+  right: 58px;
+  bottom: 168px;
+  left: 12px;
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 950;
+  line-height: 1.25;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.46);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  pointer-events: none;
+}
+
+.merchant-card .tag-list {
+  bottom: 72px;
+}
+
+.merchant-card .card-meta {
+  bottom: 42px;
+}
+
+.merchant-actions {
+  position: absolute;
+  right: 10px;
+  bottom: 72px;
+  z-index: 5;
+  display: grid;
+  gap: 10px;
+}
+
+.merchant-action {
+  display: grid;
+  width: 40px;
+  min-height: 40px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--white);
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 900;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+.merchant-action.active {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--red);
+}
+
+.merchant-contact-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 14px;
+  z-index: 5;
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #0fbf62;
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 950;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 }
 
 .comment-drawer {
