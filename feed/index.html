@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#D42B2B">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/assets/icons/icon-192.png?v=20260521" sizes="192x192">
-<link rel="stylesheet" href="/feed/feed.css?v=20260525-10">
+<link rel="stylesheet" href="/feed/feed.css?v=20260525-11">
 </head>
 <body>
 <header class="feed-topbar">
@@ -31,6 +31,10 @@
   </section>
 
   <section class="feed-controls" aria-label="筛选动态">
+    <div class="feed-mode-tabs" id="feedModeTabs" aria-label="内容模式">
+      <button class="active" type="button" data-mode="posts" onclick="switchFeedMode('posts', this)">动态</button>
+      <button type="button" data-mode="merchants" onclick="switchFeedMode('merchants', this)">商家</button>
+    </div>
     <label class="feed-search">
       <span>搜索</span>
       <input id="feedSearchInput" type="search" placeholder="搜货源、城市、标签、WhatsApp">
@@ -148,6 +152,6 @@
 
 <div class="feed-toast" id="feedToast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/feed/feed.js?v=20260525-10"></script>
+<script src="/feed/feed.js?v=20260525-11"></script>
 </body>
 </html>
