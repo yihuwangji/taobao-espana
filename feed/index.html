@@ -9,6 +9,25 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/assets/icons/icon-192.png?v=20260521" sizes="192x192">
 <link rel="stylesheet" href="/feed/feed.css?v=20260525-11">
+<style>
+.feed-card::after{background:linear-gradient(180deg,rgba(0,0,0,.08),transparent 28%),linear-gradient(0deg,rgba(0,0,0,.58),rgba(0,0,0,.03) 48%,transparent 70%)}
+.media-button{touch-action:pan-y}
+.card-body{pointer-events:none}
+.card-actions,.whatsapp-btn,.merchant-actions,.merchant-action,.merchant-contact-btn{pointer-events:auto;touch-action:manipulation}
+.card-desc{right:58px;bottom:62px;-webkit-line-clamp:2}
+.tag-list{right:58px;bottom:38px}
+.card-meta{right:58px;bottom:14px}
+.merchant-card .card-desc{display:none}
+.merchant-title{right:58px;bottom:70px;font-size:14px}
+.merchant-card .tag-list{bottom:42px}
+.merchant-card .card-meta{bottom:17px}
+.image-viewer{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 12px calc(28px + env(safe-area-inset-bottom));background:rgba(0,0,0,.92)}
+.image-viewer.open{display:flex}
+.image-viewer img{display:block;max-width:100%;max-height:82vh;border-radius:12px;object-fit:contain}
+.image-viewer-close{position:fixed;top:calc(12px + env(safe-area-inset-top));right:14px;z-index:2;width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;cursor:pointer;font-size:28px;line-height:1}
+.image-viewer-title{position:fixed;right:16px;bottom:calc(14px + env(safe-area-inset-bottom));left:16px;overflow:hidden;color:rgba(255,255,255,.86);font-size:14px;font-weight:800;text-align:center;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:640px){.card-desc{right:52px;bottom:56px;font-size:13px}.tag-list{right:52px;bottom:34px;flex-wrap:nowrap;overflow:hidden}.tag-list span:nth-child(n+3){display:none}.card-meta{right:52px;bottom:12px}.merchant-title{right:52px;bottom:62px;font-size:13px;-webkit-line-clamp:2}.merchant-card .tag-list{bottom:36px}.merchant-card .card-meta{bottom:12px}}
+</style>
 </head>
 <body>
 <header class="feed-topbar">
@@ -150,8 +169,48 @@
   </div>
 </div>
 
+<div class="image-viewer" id="imageViewer" aria-hidden="true">
+  <button class="image-viewer-close" type="button" id="imageViewerClose" aria-label="关闭大图">×</button>
+  <img id="imageViewerImg" src="" alt="大图预览">
+  <div class="image-viewer-title" id="imageViewerTitle"></div>
+</div>
+
 <div class="feed-toast" id="feedToast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/feed/feed.js?v=20260525-11"></script>
+<script>
+(() => {
+  const viewer = document.getElementById('imageViewer');
+  const image = document.getElementById('imageViewerImg');
+  const title = document.getElementById('imageViewerTitle');
+  const close = () => {
+    viewer?.classList.remove('open');
+    viewer?.setAttribute('aria-hidden', 'true');
+    if (image) image.src = '';
+  };
+  const open = (src, text) => {
+    if (!viewer || !image || !src) return;
+    image.src = src;
+    image.alt = text || '大图预览';
+    if (title) title.textContent = text || '';
+    viewer.classList.add('open');
+    viewer.setAttribute('aria-hidden', 'false');
+  };
+  document.addEventListener('click', event => {
+    const media = event.target.closest?.('.feed-card .media-button');
+    if (!media || media.querySelector('video')) return;
+    const img = media.querySelector('img');
+    if (!img) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const cardText = media.closest('.feed-card')?.querySelector('.merchant-title,.card-desc')?.textContent?.trim();
+    open(img.currentSrc || img.src, cardText);
+  }, true);
+  document.getElementById('imageViewerClose')?.addEventListener('click', close);
+  viewer?.addEventListener('click', event => {
+    if (event.target === viewer) close();
+  });
+})();
+</script>
 </body>
 </html>
