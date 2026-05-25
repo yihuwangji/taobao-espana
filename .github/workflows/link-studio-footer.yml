@@ -3,6 +3,8 @@ name: Link Studio Footer
 on:
   push:
     branches: [main]
+    paths:
+      - ".github/footer-link-trigger.txt"
   workflow_dispatch:
 
 permissions:
