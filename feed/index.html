@@ -23,6 +23,7 @@
 .merchant-title{right:58px;bottom:70px;font-size:14px}
 .merchant-card .tag-list{bottom:42px}
 .merchant-card .card-meta{bottom:17px}
+.external-link{position:absolute;left:12px;right:58px;bottom:38px;z-index:2;display:inline-flex;width:max-content;max-width:calc(100% - 76px);align-items:center;min-height:28px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.92);color:#d42b2b;font-size:12px;font-weight:900;text-decoration:none;box-shadow:0 6px 18px rgba(0,0,0,.12)}
 .image-viewer{position:fixed;inset:0;z-index:70;display:none;grid-template-rows:minmax(0,1fr) auto;padding:calc(58px + env(safe-area-inset-top)) 0 calc(12px + env(safe-area-inset-bottom));background:rgba(0,0,0,.94)}
 .image-viewer.open{display:grid}
 .image-viewer-track{display:flex;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
@@ -32,6 +33,7 @@
 .image-viewer-title{max-height:28vh;overflow-y:auto;margin:10px 12px 0;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.92);font-size:14px;font-weight:800;line-height:1.55;text-align:left;white-space:pre-wrap;-webkit-overflow-scrolling:touch}
 @media (max-width:640px){.card-desc{right:52px;bottom:56px;font-size:13px}.tag-list{right:52px;bottom:34px;flex-wrap:nowrap;overflow:hidden}.tag-list span:nth-child(n+3){display:none}.card-meta{right:52px;bottom:12px}.merchant-title{right:52px;bottom:62px;font-size:13px;-webkit-line-clamp:2}.merchant-card .tag-list{bottom:36px}.merchant-card .card-meta{bottom:12px}}
 @media (max-width:640px){body{background:#f7f7f7}.feed-topbar{background:#fff;border-bottom:1px solid #eee}.feed-shell{padding:10px 10px calc(88px + env(safe-area-inset-bottom))}.feed-masonry{display:block;column-count:1}.feed-card{display:block;margin:0 0 12px;border:1px solid #eee;border-radius:12px;background:#fff;box-shadow:none;break-inside:auto}.feed-card::after{display:none}.media-button{aspect-ratio:4/5;min-height:0;background:#f2f2f2}.media-button img,.media-button video{min-height:0;max-height:none}.card-body{position:static;padding:10px 12px 12px;color:#1a0a00;pointer-events:auto}.card-desc,.merchant-title{position:static;display:block;margin:0 0 8px;overflow:visible;color:#1a0a00;font-size:15px;font-weight:800;line-height:1.5;text-shadow:none;-webkit-line-clamp:unset}.merchant-card .card-desc{display:block;font-size:13px;font-weight:600;color:#6b5a48}.tag-list{display:none}.card-meta{position:static;display:flex;margin-bottom:10px;color:#7a5c3f;text-shadow:none}.card-actions{position:static;display:flex;justify-content:space-between;gap:4px;margin-top:4px}.social-action{min-width:44px;min-height:34px;color:#6b5a48;text-shadow:none}.action-icon{width:24px;height:24px;color:inherit;font-size:22px}.action-count{color:#6b5a48}.whatsapp-btn,.merchant-contact-btn{position:absolute;right:10px;bottom:10px;width:48px;height:48px}.merchant-actions{position:static;display:flex;gap:12px;margin-top:4px}.merchant-action{width:36px;min-height:36px;background:#f4f4f4;color:#6b5a48}.merchant-detail-btn{position:absolute;right:66px;bottom:10px;width:48px;height:48px;background:#f4f4f4;color:#6b5a48}.mobile-compose-fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom))}}
+@media (max-width:640px){.external-link{position:static;max-width:100%;margin:0 0 10px;background:#fff2f2;color:#d42b2b;box-shadow:none}}
 </style>
 </head>
 <body>
@@ -96,6 +98,10 @@
       <label>
         简短描述
         <textarea id="feedDescription" rows="4" maxlength="500" placeholder="写货源、价格段、适合人群、到货时间，或你的生意经验…"></textarea>
+      </label>
+      <label>
+        外部链接
+        <input id="feedExternalLink" type="url" inputmode="url" placeholder="https://example.com，可不填">
       </label>
       <div class="compose-grid">
         <label>
@@ -184,6 +190,68 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/feed/feed.js?v=20260525-13"></script>
 <script>
+function normalizeExternalLinkPatch(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    const url = new URL(withProtocol);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch (error) {
+    return '';
+  }
+}
+function extractExternalLinkPatch(post) {
+  const text = String(post?.external_url || post?.description || '');
+  const labelMatch = text.match(/(?:链接|外部链接)[:：]\s*(https?:\/\/[^\s，,]+)/i);
+  if (labelMatch) return normalizeExternalLinkPatch(labelMatch[1]);
+  const urlMatch = text.match(/https?:\/\/[^\s，,]+/i);
+  return urlMatch ? normalizeExternalLinkPatch(urlMatch[0]) : '';
+}
+function stripExternalLinkPatch(text) {
+  return String(text || '').replace(/(?:\n|\s)*(?:链接|外部链接)[:：]\s*https?:\/\/[^\s，,]+/ig, '').trim();
+}
+if (typeof submitPost === 'function') {
+  const originalSubmitPost = submitPost;
+  submitPost = async function(event) {
+    const linkInput = document.getElementById('feedExternalLink');
+    const descInput = document.getElementById('feedDescription');
+    const link = normalizeExternalLinkPatch(linkInput?.value || '');
+    if (linkInput?.value.trim() && !link) {
+      event.preventDefault();
+      showToast('外部链接格式不正确');
+      return;
+    }
+    if (link && descInput && !descInput.value.includes(link)) {
+      descInput.value = `${descInput.value.trim()}\n链接：${link}`.trim();
+    }
+    await originalSubmitPost(event);
+  };
+}
+if (typeof renderPosts === 'function') {
+  const originalRenderPosts = renderPosts;
+  renderPosts = function() {
+    originalRenderPosts();
+    if (typeof filteredPosts !== 'function') return;
+    const cards = [...document.querySelectorAll('#feedGrid > .feed-card:not(.merchant-card)')];
+    filteredPosts().forEach((post, index) => {
+      const card = cards[index];
+      if (!card) return;
+      const link = extractExternalLinkPatch(post);
+      const desc = card.querySelector('.card-desc');
+      if (desc) desc.textContent = stripExternalLinkPatch(post.description) || post.title || '淘商圈动态';
+      if (link && !card.querySelector('.external-link')) {
+        const anchor = document.createElement('a');
+        anchor.className = 'external-link';
+        anchor.href = link;
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+        anchor.textContent = '打开链接';
+        card.querySelector('.tag-list')?.insertAdjacentElement('afterend', anchor);
+      }
+    });
+  };
+}
 if (typeof handleMediaInput === 'function') {
   handleMediaInput = async function(event) {
     const files = [...event.target.files];
