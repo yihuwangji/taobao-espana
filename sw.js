@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v11';
+const CACHE_NAME = 'espana-life-v12';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -72,6 +72,87 @@ async function transformHomeResponse(response) {
     .replace("'hero.latest': '最新信息'", "'hero.latest': '客户信息'")
     .replace("'listing.more': '查看更多 →'", "'listing.more': '全部资料 →'")
     .replace("'listing.all': '最新信息'", "'listing.all': '客户信息中心'");
+
+  if (!html.includes('manualLifeListingsPatch')) {
+    html = html.replace('</body>', `
+<script>
+(() => {
+  const manualLifeListingsPatch = true;
+  const manualListing = {
+    id: 900001,
+    cat: 'merchant',
+    city: 'Valencia',
+    icon: '🏪',
+    badge: '商家',
+    badgeType: 'gold',
+    title: '方圆货架',
+    price: '面议',
+    address: 'Avinguda de la Cova, 67D, 46940 Manises, Valencia',
+    description: 'Cuadrada, redonda y triangular S.L.，Manises 店铺设备与货架商家，Google 公开资料显示评分 4.8，主营货架和店铺装备。网站：equipatutienda.es。',
+    isMerchant: true,
+    images: ['https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=900&q=82'],
+    unit: '',
+    tags: ['商家黄页', 'Valencia'],
+    time: '刚刚',
+    contact: '961 54 60 19'
+  };
+  const mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(manualListing.address);
+  function safe(value) {
+    return String(value || '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  }
+  function injectListing() {
+    try {
+      if (typeof allListings !== 'undefined' && Array.isArray(allListings) && !allListings.some(item => String(item.id) === String(manualListing.id) || item.title === manualListing.title)) {
+        allListings.unshift(manualListing);
+      }
+    } catch (error) {}
+  }
+  function openManualDetail(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const detail = document.getElementById('detailContent');
+    if (!detail || typeof openModal !== 'function') {
+      location.href = '/feed/';
+      return;
+    }
+    detail.innerHTML = '<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:36px">🏪</span><div><span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">商家黄页</span><h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">方圆货架</h3></div></div><div class="detail-photo-grid"><img src="' + safe(manualListing.images[0]) + '" alt="方圆货架" loading="lazy"></div><div class="detail-map-card"><a class="detail-map-preview" href="' + safe(mapUrl) + '" target="_blank" rel="noopener"><div class="detail-map-body"><div class="detail-map-pin">📍</div><div><div class="detail-map-title">地图位置 / 导航</div><div class="detail-map-address">' + safe(manualListing.address) + '</div></div></div></a></div><div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">详细描述</div><div style="font-size:14px;line-height:1.7;color:#333">' + safe(manualListing.description) + '</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:#fef3f2;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">价格</div><div style="font-size:16px;font-weight:700;color:#c0392b">面议</div></div><div style="background:#f0fdf4;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">省份/地区</div><div style="font-size:15px;font-weight:600;color:#166534">Valencia</div></div></div><div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px"><div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">联系方式</div><div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">961 54 60 19</div><div style="font-size:11px;color:#999;margin-top:6px">联系时请说明来自西班牙生活通</div></div><div class="detail-actions"><a class="detail-action" href="' + safe(mapUrl) + '" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">地图</a><button class="detail-action" onclick="copyText && copyText(\\'961 54 60 19\\').then(()=>showToast && showToast(\\'已复制\\'))">复制电话</button><a class="detail-action primary" href="http://equipatutienda.es/" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">网站</a></div></div>';
+    openModal('detail');
+  }
+  function patchDetail() {
+    if (typeof viewListing === 'function' && !viewListing.manualLifeListingsPatch) {
+      const originalViewListing = viewListing;
+      viewListing = function patchedViewListing(id) {
+        if (String(id) === String(manualListing.id)) return openManualDetail();
+        return originalViewListing.apply(this, arguments);
+      };
+      viewListing.manualLifeListingsPatch = true;
+      window.viewListing = viewListing;
+    }
+  }
+  function patchRender() {
+    injectListing();
+    patchDetail();
+    if (typeof renderListings === 'function' && !renderListings.manualLifeListingsPatch) {
+      const originalRenderListings = renderListings;
+      renderListings = function patchedRenderListings() {
+        injectListing();
+        return originalRenderListings.apply(this, arguments);
+      };
+      renderListings.manualLifeListingsPatch = true;
+      window.renderListings = renderListings;
+    }
+    if (typeof renderListings === 'function') renderListings();
+  }
+  window.openManualFangyuanListing = openManualDetail;
+  setTimeout(patchRender, 300);
+  setTimeout(patchRender, 1500);
+  setTimeout(patchRender, 3500);
+})();
+</script>
+</body>`);
+  }
 
   return new Response(html, {
     status: response.status,
@@ -167,7 +248,7 @@ async function transformFeedScriptResponse(response) {
   const merchantFallbackImage = 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=80';
   const manualTaoMerchants = [
     {
-      id: 'manual-cuadrada-redonda-triangular-manises',
+      id: '900001',
       title: '方圆货架',
       category: '商家黄页',
       city: 'Manises, Valencia',
