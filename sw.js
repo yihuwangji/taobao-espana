@@ -86,7 +86,11 @@ async function transformFeedPageResponse(response) {
   let html = await response.text();
   html = html
     .replace('最多9张图片，或1个30秒内视频。', '最多9张图片，或1个视频。')
-    .replace('图片最多9张；视频最多1个，不能超过30秒。', '图片最多9张；视频最多1个。');
+    .replace('最多9张图片，或1个视频。', '最多9张图片。')
+    .replace('图片 / 视频', '图片')
+    .replace('accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm"', 'accept="image/jpeg,image/png,image/webp,image/gif"')
+    .replace('图片最多9张；视频最多1个，不能超过30秒。', '图片最多9张。')
+    .replace('图片最多9张；视频最多1个。', '图片最多9张。');
 
   return new Response(html, {
     status: response.status,
@@ -110,7 +114,38 @@ async function transformFeedScriptResponse(response) {
       renderMediaPreview();
       return;
     }
-`, "    const duration = await getVideoDuration(videos[0]).catch(() => 0);\n");
+`, "    showToast('暂不支持视频，请上传图片');\n    event.target.value = '';\n    selectedMedia = [];\n    renderMediaPreview();\n    return;\n")
+    .replace(`  if (videos.length) {
+    const duration = await getVideoDuration(videos[0]).catch(() => 0);
+    selectedMedia = [{ file: videos[0], media_type: 'video', duration_seconds: Math.round(duration) }];
+  } else {
+    selectedMedia = images.slice(0, MAX_IMAGES).map(file => ({ file, media_type: 'image', duration_seconds: null }));
+  }
+`, "  selectedMedia = images.slice(0, MAX_IMAGES).map(file => ({ file, media_type: 'image', duration_seconds: null }));\n")
+    .replace(`  if (videos.length && images.length) {
+    showToast('一次动态请选择图片或视频，不要混传');
+    event.target.value = '';
+    selectedMedia = [];
+    renderMediaPreview();
+    return;
+  }
+`, '')
+    .replace(`  if (videos.length > 1) {
+    showToast('视频最多上传1个');
+    event.target.value = '';
+    selectedMedia = [];
+    renderMediaPreview();
+    return;
+  }
+`, `  if (videos.length) {
+    showToast('暂不支持视频，请上传图片');
+    event.target.value = '';
+    selectedMedia = [];
+    renderMediaPreview();
+    return;
+  }
+`)
+    .replace("  if (!selectedMedia.length) return showToast('请至少上传1张图片或1个视频');", "  if (!selectedMedia.length) return showToast('请至少上传1张图片');");
 
   if (js.includes('taoMerchantMixPatch')) {
     return new Response(js, {
