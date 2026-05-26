@@ -184,6 +184,37 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/feed/feed.js?v=20260525-13"></script>
 <script>
+if (typeof handleMediaInput === 'function') {
+  handleMediaInput = async function(event) {
+    const files = [...event.target.files];
+    const videos = files.filter(file => file.type.startsWith('video/'));
+    const images = files.filter(file => file.type.startsWith('image/'));
+    if (videos.length && images.length) {
+      showToast('一次动态请选择图片或视频，不要混传');
+      event.target.value = '';
+      selectedMedia = [];
+      renderMediaPreview();
+      return;
+    }
+    if (videos.length > 1) {
+      showToast('视频最多上传1个');
+      event.target.value = '';
+      selectedMedia = [];
+      renderMediaPreview();
+      return;
+    }
+    if (images.length > MAX_IMAGES) showToast('图片最多9张，已保留前9张');
+    if (videos.length) {
+      const duration = await getVideoDuration(videos[0]).catch(() => 0);
+      selectedMedia = [{ file: videos[0], media_type: 'video', duration_seconds: Math.round(duration) }];
+    } else {
+      selectedMedia = images.slice(0, MAX_IMAGES).map(file => ({ file, media_type: 'image', duration_seconds: null }));
+    }
+    renderMediaPreview();
+  };
+}
+</script>
+<script>
 (() => {
   const viewer = document.getElementById('imageViewer');
   const track = document.getElementById('imageViewerTrack');
