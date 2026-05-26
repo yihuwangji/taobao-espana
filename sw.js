@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v10';
+const CACHE_NAME = 'espana-life-v11';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -30,10 +30,11 @@ async function transformHomeResponse(response) {
   if (!contentType.includes('text/html')) return response;
 
   let html = await response.text();
+  html = html.replaceAll('淘商圈', '生活圈');
   const note = `
   <div class="customer-info-note">
-    <strong>所有客户信息集中在首页：</strong>商家资料、招工求职、租房买房、二手物品、生意转让和生活服务都在这里查看。淘商圈只作为朋友圈式浏览和发布动态入口。
-    <a class="tao-circle-link" href="/feed/" onclick="event.stopPropagation(); location.href='/feed/'; return false;">进入淘商圈</a>
+    <strong>所有客户信息集中在首页：</strong>商家资料、招工求职、租房买房、二手物品、生意转让和生活服务都在这里查看。生活圈只作为朋友圈式浏览和发布动态入口。
+    <a class="tao-circle-link" href="/feed/" onclick="event.stopPropagation(); location.href='/feed/'; return false;">进入生活圈</a>
   </div>`;
   const noteStyle = `
   .customer-info-note {
@@ -84,6 +85,7 @@ async function transformFeedPageResponse(response) {
   if (!contentType.includes('text/html')) return response;
 
   let html = await response.text();
+  html = html.replaceAll('淘商圈', '生活圈');
   html = html
     .replace('最多9张图片，或1个30秒内视频。', '最多9张图片，或1个视频。')
     .replace('最多9张图片，或1个视频。', '最多9张图片。')
@@ -105,6 +107,7 @@ async function transformFeedScriptResponse(response) {
 
   let js = await response.text();
   js = js
+    .replaceAll('淘商圈', '生活圈')
     .replaceAll("title: 'Cuadrada, redonda y triangular S.L.'", "title: '方圆货架'")
     .replaceAll('Manises 店铺设备与货架商家，Google 公开资料显示评分 4.8，主营货架和店铺装备。网站：equipatutienda.es。', 'Cuadrada, redonda y triangular S.L.，Manises 店铺设备与货架商家，Google 公开资料显示评分 4.8，主营货架和店铺装备。网站：equipatutienda.es。')
     .replace("const MAX_VIDEO_SECONDS = 30;\n", '')
