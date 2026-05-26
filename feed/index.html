@@ -31,7 +31,7 @@
 .image-viewer-close{position:fixed;top:calc(12px + env(safe-area-inset-top));right:14px;z-index:2;width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;cursor:pointer;font-size:28px;line-height:1}
 .image-viewer-title{max-height:28vh;overflow-y:auto;margin:10px 12px 0;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.92);font-size:14px;font-weight:800;line-height:1.55;text-align:left;white-space:pre-wrap;-webkit-overflow-scrolling:touch}
 @media (max-width:640px){.card-desc{right:52px;bottom:56px;font-size:13px}.tag-list{right:52px;bottom:34px;flex-wrap:nowrap;overflow:hidden}.tag-list span:nth-child(n+3){display:none}.card-meta{right:52px;bottom:12px}.merchant-title{right:52px;bottom:62px;font-size:13px;-webkit-line-clamp:2}.merchant-card .tag-list{bottom:36px}.merchant-card .card-meta{bottom:12px}}
-@media (max-width:640px){body{background:#f7f7f7}.feed-topbar{background:#fff;border-bottom:1px solid #eee}.feed-shell{padding:10px 10px calc(88px + env(safe-area-inset-bottom))}.feed-masonry{display:block;column-count:1}.feed-card{display:block;margin:0 0 12px;border:1px solid #eee;border-radius:12px;background:#fff;box-shadow:none;break-inside:auto}.feed-card::after{display:none}.media-button{aspect-ratio:4/5;min-height:0;background:#f2f2f2}.media-button img,.media-button video{min-height:0;max-height:none}.card-body{position:static;padding:10px 12px 12px;color:#1a0a00;pointer-events:auto}.card-desc,.merchant-title{position:static;display:block;margin:0 0 8px;overflow:visible;color:#1a0a00;font-size:15px;font-weight:800;line-height:1.5;text-shadow:none;-webkit-line-clamp:unset}.merchant-card .card-desc{display:block;font-size:13px;font-weight:600;color:#6b5a48}.tag-list{display:none}.card-meta{position:static;display:flex;margin-bottom:10px;color:#7a5c3f;text-shadow:none}.card-actions{position:static;display:flex;justify-content:space-between;gap:4px;margin-top:4px}.social-action{min-width:44px;min-height:34px;color:#6b5a48;text-shadow:none}.action-icon{width:24px;height:24px;color:inherit;font-size:22px}.action-count{color:#6b5a48}.whatsapp-btn,.merchant-contact-btn{position:absolute;right:10px;bottom:10px;width:48px;height:48px}.merchant-actions{position:static;display:flex;gap:12px;margin-top:4px}.merchant-action{width:36px;min-height:36px;background:#f4f4f4;color:#6b5a48;text-shadow:none}.merchant-detail-btn{position:absolute;right:66px;bottom:10px;width:48px;height:48px;background:#f4f4f4;color:#6b5a48}.mobile-compose-fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom))}}
+@media (max-width:640px){body{background:#f7f7f7}.feed-topbar{background:#fff;border-bottom:1px solid #eee}.feed-shell{padding:10px 10px calc(88px + env(safe-area-inset-bottom))}.feed-masonry{display:block;column-count:1}.feed-card{display:block;margin:0 0 12px;border:1px solid #eee;border-radius:12px;background:#fff;box-shadow:none;break-inside:auto}.feed-card::after{display:none}.media-button{aspect-ratio:4/5;min-height:0;background:#f2f2f2}.media-button img,.media-button video{min-height:0;max-height:none}.card-body{position:static;padding:10px 12px 12px;color:#1a0a00;pointer-events:auto}.card-desc,.merchant-title{position:static;display:block;margin:0 0 8px;overflow:visible;color:#1a0a00;font-size:15px;font-weight:800;line-height:1.5;text-shadow:none;-webkit-line-clamp:unset}.merchant-card .card-desc{display:block;font-size:13px;font-weight:600;color:#6b5a48}.tag-list{display:none}.card-meta{position:static;display:flex;margin-bottom:10px;color:#7a5c3f;text-shadow:none}.card-actions{position:static;display:flex;justify-content:space-between;gap:4px;margin-top:4px}.social-action{min-width:44px;min-height:34px;color:#6b5a48;text-shadow:none}.action-icon{width:24px;height:24px;color:inherit;font-size:22px}.action-count{color:#6b5a48}.whatsapp-btn,.merchant-contact-btn{position:absolute;right:10px;bottom:10px;width:48px;height:48px}.merchant-actions{position:static;display:flex;gap:12px;margin-top:4px}.merchant-action{width:36px;min-height:36px;background:#f4f4f4;color:#6b5a48}.merchant-detail-btn{position:absolute;right:66px;bottom:10px;width:48px;height:48px;background:#f4f4f4;color:#6b5a48}.mobile-compose-fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom))}}
 </style>
 </head>
 <body>
@@ -82,7 +82,7 @@
     <div class="compose-head">
       <div>
         <h2 id="composeTitle">发布动态</h2>
-        <p>最多9张图片，或1个30秒内视频。</p>
+        <p>最多9张图片，或1个视频。</p>
       </div>
       <button class="compose-close" type="button" data-close-publish aria-label="关闭">×</button>
     </div>
@@ -90,7 +90,7 @@
       <div class="form-block">
         <label>图片 / 视频</label>
         <input id="feedMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm" multiple>
-        <p class="form-hint" id="mediaHint">图片最多9张；视频最多1个，不能超过30秒。</p>
+        <p class="form-hint" id="mediaHint">图片最多9张；视频最多1个。</p>
         <div class="media-preview" id="mediaPreview"></div>
       </div>
       <label>
@@ -182,7 +182,7 @@
 
 <div class="feed-toast" id="feedToast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/feed/feed.js?v=20260525-11"></script>
+<script src="/feed/feed.js?v=20260525-13"></script>
 <script>
 (() => {
   const viewer = document.getElementById('imageViewer');
