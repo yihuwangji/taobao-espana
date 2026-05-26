@@ -82,15 +82,15 @@
     <div class="compose-head">
       <div>
         <h2 id="composeTitle">发布动态</h2>
-        <p>最多9张图片，或1个视频。</p>
+        <p>最多9张图片。</p>
       </div>
       <button class="compose-close" type="button" data-close-publish aria-label="关闭">×</button>
     </div>
     <form id="feedPostForm" class="compose-form">
       <div class="form-block">
-        <label>图片 / 视频</label>
-        <input id="feedMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm" multiple>
-        <p class="form-hint" id="mediaHint">图片最多9张；视频最多1个。</p>
+        <label>图片</label>
+        <input id="feedMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+        <p class="form-hint" id="mediaHint">图片最多9张。</p>
         <div class="media-preview" id="mediaPreview"></div>
       </div>
       <label>
@@ -187,29 +187,16 @@
 if (typeof handleMediaInput === 'function') {
   handleMediaInput = async function(event) {
     const files = [...event.target.files];
-    const videos = files.filter(file => file.type.startsWith('video/'));
     const images = files.filter(file => file.type.startsWith('image/'));
-    if (videos.length && images.length) {
-      showToast('一次动态请选择图片或视频，不要混传');
-      event.target.value = '';
-      selectedMedia = [];
-      renderMediaPreview();
-      return;
-    }
-    if (videos.length > 1) {
-      showToast('视频最多上传1个');
+    if (files.some(file => file.type.startsWith('video/'))) {
+      showToast('暂不支持视频，请上传图片');
       event.target.value = '';
       selectedMedia = [];
       renderMediaPreview();
       return;
     }
     if (images.length > MAX_IMAGES) showToast('图片最多9张，已保留前9张');
-    if (videos.length) {
-      const duration = await getVideoDuration(videos[0]).catch(() => 0);
-      selectedMedia = [{ file: videos[0], media_type: 'video', duration_seconds: Math.round(duration) }];
-    } else {
-      selectedMedia = images.slice(0, MAX_IMAGES).map(file => ({ file, media_type: 'image', duration_seconds: null }));
-    }
+    selectedMedia = images.slice(0, MAX_IMAGES).map(file => ({ file, media_type: 'image', duration_seconds: null }));
     renderMediaPreview();
   };
 }
@@ -235,7 +222,7 @@ if (typeof handleMediaInput === 'function') {
   };
   document.addEventListener('click', event => {
     const media = event.target.closest?.('.feed-card .media-button');
-    if (!media || media.querySelector('video')) return;
+    if (!media) return;
     const img = media.querySelector('img');
     if (!img) return;
     event.preventDefault();
