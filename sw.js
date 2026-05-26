@@ -79,11 +79,39 @@ async function transformHomeResponse(response) {
   });
 }
 
+async function transformFeedPageResponse(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('text/html')) return response;
+
+  let html = await response.text();
+  html = html
+    .replace('最多9张图片，或1个30秒内视频。', '最多9张图片，或1个视频。')
+    .replace('图片最多9张；视频最多1个，不能超过30秒。', '图片最多9张；视频最多1个。');
+
+  return new Response(html, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+}
+
 async function transformFeedScriptResponse(response) {
   const contentType = response.headers.get('content-type') || '';
   if (!contentType.includes('javascript')) return response;
 
   let js = await response.text();
+  js = js
+    .replace("const MAX_VIDEO_SECONDS = 30;\n", '')
+    .replace(`    const duration = await getVideoDuration(videos[0]).catch(() => 999);
+    if (duration > MAX_VIDEO_SECONDS) {
+      showToast('视频不能超过30秒');
+      event.target.value = '';
+      selectedMedia = [];
+      renderMediaPreview();
+      return;
+    }
+`, "    const duration = await getVideoDuration(videos[0]).catch(() => 0);\n");
+
   if (js.includes('taoMerchantMixPatch')) {
     return new Response(js, {
       status: response.status,
@@ -220,7 +248,9 @@ self.addEventListener('fetch', (event) => {
         .then(async (response) => {
           const transformed = (url.pathname === '/' || url.pathname === '/index.html')
             ? await transformHomeResponse(response.clone())
-            : response;
+            : (url.pathname === '/feed/' || url.pathname === '/feed/index.html')
+              ? await transformFeedPageResponse(response.clone())
+              : response;
           const copy = transformed.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', copy));
           return transformed;
