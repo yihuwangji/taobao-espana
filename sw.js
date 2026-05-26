@@ -163,12 +163,12 @@ async function transformFeedScriptResponse(response) {
   const manualTaoMerchants = [
     {
       id: 'manual-cuadrada-redonda-triangular-manises',
-      title: 'Cuadrada, redonda y triangular S.L.',
+      title: '方圆货架',
       category: '商家黄页',
       city: 'Manises, Valencia',
       contact: '961 54 60 19',
       address: 'Avinguda de la Cova, 67D, 46940 Manises, Valencia',
-      description: 'Manises 店铺设备与货架商家，Google 公开资料显示评分 4.8，主营货架和店铺装备。网站：equipatutienda.es。',
+      description: 'Cuadrada, redonda y triangular S.L.，Manises 店铺设备与货架商家，Google 公开资料显示评分 4.8，主营货架和店铺装备。网站：equipatutienda.es。',
       images: ['https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=900&q=82'],
       created_at: new Date().toISOString()
     }
