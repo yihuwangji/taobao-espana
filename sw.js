@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v9';
+const CACHE_NAME = 'espana-life-v10';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -105,6 +105,8 @@ async function transformFeedScriptResponse(response) {
 
   let js = await response.text();
   js = js
+    .replaceAll("title: 'Cuadrada, redonda y triangular S.L.'", "title: '方圆货架'")
+    .replaceAll('Manises 店铺设备与货架商家，Google 公开资料显示评分 4.8，主营货架和店铺装备。网站：equipatutienda.es。', 'Cuadrada, redonda y triangular S.L.，Manises 店铺设备与货架商家，Google 公开资料显示评分 4.8，主营货架和店铺装备。网站：equipatutienda.es。')
     .replace("const MAX_VIDEO_SECONDS = 30;\n", '')
     .replace(`    const duration = await getVideoDuration(videos[0]).catch(() => 999);
     if (duration > MAX_VIDEO_SECONDS) {
