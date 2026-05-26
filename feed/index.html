@@ -211,6 +211,16 @@ function extractExternalLinkPatch(post) {
 function stripExternalLinkPatch(text) {
   return String(text || '').replace(/(?:\n|\s)*(?:链接|外部链接)[:：]\s*https?:\/\/[^\s，,]+/ig, '').trim();
 }
+function sanitizeMerchantImagesPatch() {
+  const safeImage = 'https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=900&q=82';
+  document.querySelectorAll('.merchant-card img').forEach(img => {
+    const src = img.currentSrc || img.src || '';
+    if (src.includes('photo-1542291026-7eec264c27ff')) {
+      img.src = safeImage;
+      img.removeAttribute('srcset');
+    }
+  });
+}
 if (typeof submitPost === 'function') {
   const originalSubmitPost = submitPost;
   submitPost = async function(event) {
@@ -232,6 +242,7 @@ if (typeof renderPosts === 'function') {
   const originalRenderPosts = renderPosts;
   renderPosts = function() {
     originalRenderPosts();
+    sanitizeMerchantImagesPatch();
     if (typeof filteredPosts !== 'function') return;
     const cards = [...document.querySelectorAll('#feedGrid > .feed-card:not(.merchant-card)')];
     filteredPosts().forEach((post, index) => {
@@ -252,6 +263,7 @@ if (typeof renderPosts === 'function') {
     });
   };
 }
+setInterval(sanitizeMerchantImagesPatch, 1200);
 if (typeof handleMediaInput === 'function') {
   handleMediaInput = async function(event) {
     const files = [...event.target.files];
