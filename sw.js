@@ -160,6 +160,19 @@ async function transformFeedScriptResponse(response) {
 ;(() => {
   const taoMerchantMixPatch = true;
   const merchantFallbackImage = 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=80';
+  const manualTaoMerchants = [
+    {
+      id: 'manual-cuadrada-redonda-triangular-manises',
+      title: 'Cuadrada, redonda y triangular S.L.',
+      category: '商家黄页',
+      city: 'Manises, Valencia',
+      contact: '961 54 60 19',
+      address: 'Avinguda de la Cova, 67D, 46940 Manises, Valencia',
+      description: 'Manises 店铺设备与货架商家，Google 公开资料显示评分 4.8，主营货架和店铺装备。网站：equipatutienda.es。',
+      images: ['https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=900&q=82'],
+      created_at: new Date().toISOString()
+    }
+  ];
 
   function merchantImages(raw) {
     if (Array.isArray(raw)) return raw.filter(Boolean).map(String);
@@ -179,7 +192,13 @@ async function transformFeedScriptResponse(response) {
     const grid = document.getElementById('feedGrid');
     if (!grid || typeof filteredMerchants !== 'function') return;
     grid.querySelectorAll('.merchant-card').forEach(card => card.remove());
-    const merchants = filteredMerchants();
+    const seenTitles = new Set();
+    const merchants = [...manualTaoMerchants, ...filteredMerchants()].filter(merchant => {
+      const key = String(merchant.title || merchant.id || '').trim().toLowerCase();
+      if (!key || seenTitles.has(key)) return false;
+      seenTitles.add(key);
+      return true;
+    });
     merchants.forEach(merchant => {
       const card = document.createElement('article');
       const photos = merchantImages(merchant.images);
