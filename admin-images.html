@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store, max-age=0">
+<title>图片美化 · 西班牙生活通后台</title>
+<style>
+:root{--bg:#10131a;--card:#191d28;--card2:#222838;--line:rgba(255,255,255,.09);--text:#f2f3f7;--muted:#8b91a8;--gold:#f2aa3c;--green:#14c784;--red:#ef5350;--blue:#4b8bff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC","Segoe UI",sans-serif;font-size:14px}.top{position:sticky;top:0;z-index:20;background:rgba(16,19,26,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}.top-inner,.shell{max-width:1180px;margin:0 auto}.top-inner{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:900;display:flex;align-items:center;gap:10px}.brand span{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--gold));display:grid;place-items:center}.sub{font-size:12px;color:var(--muted);line-height:1.6}.back,.btn{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:9px;padding:10px 13px;text-decoration:none;font-weight:800;cursor:pointer}.btn.gold{background:rgba(242,170,60,.14);border-color:rgba(242,170,60,.35);color:var(--gold)}.btn.green{background:rgba(20,199,132,.12);border-color:rgba(20,199,132,.35);color:var(--green)}.btn.red{background:rgba(239,83,80,.12);border-color:rgba(239,83,80,.35);color:#ff8b8b}.shell{padding:18px 14px 40px}.panel,.login{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}.login{max-width:420px;margin:56px auto}h1{font-size:20px;margin:0 0 4px}.form-row{display:grid;gap:10px;margin:12px 0}input{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:9px;padding:11px 12px;outline:none}.toolbar{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.toolbar input{flex:1;min-width:240px}.hidden{display:none!important}.error{min-height:18px;color:#ff8b8b;font-size:12px;margin-top:10px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#0c0f16;padding:4px}.photos img,.empty-img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#111827}.empty-img{display:grid;place-items:center;color:var(--muted);font-size:12px}.body{padding:14px}.title{font-weight:900;line-height:1.35}.meta{color:var(--muted);font-size:12px;margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}.actions{display:grid;gap:9px;margin-top:12px}.preview{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}.preview img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,80px);opacity:0;background:#11251d;color:var(--green);border:1px solid rgba(20,199,132,.35);border-radius:999px;padding:11px 16px;font-weight:900;transition:.25s;z-index:50}.toast.show{transform:translate(-50%,0);opacity:1}
+@media(max-width:700px){.top-inner{align-items:flex-start}.toolbar input{min-width:0}.grid{grid-template-columns:1fr}.brand strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><span>🖼️</span><div><strong>图片美化</strong><div class="sub">后台替换用户 / 商家展示图片</div></div></div>
+    <a class="back" href="/admin">返回后台</a>
+  </div>
+</header>
+
+<main class="shell">
+  <section id="loginBox" class="login">
+    <h1>后台登录</h1>
+    <div class="sub">需要拥有“信息管理”权限，才能替换发布信息的图片。</div>
+    <div class="form-row">
+      <input id="email" type="email" autocomplete="username" placeholder="后台邮箱">
+      <input id="password" type="password" autocomplete="current-password" placeholder="后台密码">
+      <button class="btn gold" id="loginBtn">登录</button>
+    </div>
+    <div class="error" id="loginError"></div>
+  </section>
+
+  <section id="appBox" class="hidden">
+    <div class="panel">
+      <h1>替换展示图片</h1>
+      <div class="sub">搜索用户发布的信息，选择更美观的图片上传。保存后会直接替换前台展示图，最多6张。</div>
+      <div class="toolbar">
+        <input id="search" placeholder="搜索标题 / 城市 / 联系方式 / 发布者">
+        <button class="btn" id="refreshBtn">刷新</button>
+        <button class="btn red" id="logoutBtn">退出</button>
+      </div>
+    </div>
+    <div id="cards" class="grid"></div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://jfhpsxfnbpsvvtqsdvco.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
+const BUCKET='listing-images';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let listings=[];
+const pendingImages=new Map();
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.classList.remove('show'),2400)}
+async function authHeader(){const session=(await sb.auth.getSession()).data.session;if(!session)throw new Error('请先登录');return {Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'}}
+async function api(path,body){const res=await fetch(path,{method:'POST',headers:await authHeader(),body:JSON.stringify(body)});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'请求失败');return data}
+function imagesOf(row){return Array.isArray(row.images)?row.images.filter(Boolean).slice(0,6):[]}
+async function login(){ $('loginError').textContent=''; $('loginBtn').disabled=true; $('loginBtn').textContent='登录中...'; const {error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value}); $('loginBtn').disabled=false; $('loginBtn').textContent='登录'; if(error){$('loginError').textContent='登录失败：'+error.message;return} await boot()}
+async function boot(){const session=(await sb.auth.getSession()).data.session;if(!session){$('loginBox').classList.remove('hidden');$('appBox').classList.add('hidden');return}$('loginBox').classList.add('hidden');$('appBox').classList.remove('hidden');await loadListings()}
+async function loadListings(){const box=$('cards');box.innerHTML='<div class="sub">加载中...</div>';const {data,error}=await sb.from('listings').select('id,title,category,city,contact,images,status,created_at,profiles(nickname,phone)').order('created_at',{ascending:false}).limit(300);if(error){box.innerHTML='<div class="sub" style="color:#ff8b8b">加载失败：'+esc(error.message)+'</div>';return}listings=data||[];render()}
+function render(){const q=($('search').value||'').toLowerCase().trim();const rows=listings.filter(row=>{const p=row.profiles||{};const text=[row.title,row.city,row.contact,row.category,row.status,p.nickname,p.phone].join(' ').toLowerCase();return !q||text.includes(q)});if(!rows.length){$('cards').innerHTML='<div class="sub">没有符合条件的信息</div>';return}$('cards').innerHTML=rows.map(row=>{const imgs=imagesOf(row);const user=row.profiles?.nickname||'游客/未知';return `<article class="card" id="card-${row.id}"><div class="photos">${imgs.length?imgs.slice(0,6).map(url=>`<img src="${esc(url)}" alt="">`).join(''):'<div class="empty-img">暂无图片</div>'}</div><div class="body"><div class="title">${esc(row.title||'未命名信息')}</div><div class="meta"><span>#${row.id}</span><span>${esc(row.category||'')}</span><span>📍${esc(row.city||'')}</span><span>${esc(user)}</span></div><div class="actions"><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="chooseImages(${row.id},this)"><div class="preview" id="preview-${row.id}"></div><button class="btn green" onclick="saveImages(${row.id})">上传并替换图片</button></div></div></article>`}).join('')}
+function chooseImages(id,input){const files=[...(input.files||[])].filter(f=>/^image\//.test(f.type)).slice(0,6);pendingImages.set(String(id),files);const preview=$('preview-'+id);preview.innerHTML=files.map(file=>`<img src="${esc(URL.createObjectURL(file))}" alt="">`).join('')}
+async function uploadOne(listingId,file,index){const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';const path=`admin/${listingId}/${Date.now()}-${index}.${ext}`;const {error}=await sb.storage.from(BUCKET).upload(path,file,{cacheControl:'31536000',upsert:false,contentType:file.type||'image/jpeg'});if(error)throw error;return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl}
+async function saveImages(id){const files=pendingImages.get(String(id))||[];if(!files.length){toast('请先选择图片');return}const card=$('card-'+id);const btn=card?.querySelector('.btn.green');if(btn){btn.disabled=true;btn.textContent='上传中...'}try{const urls=[];for(let i=0;i<files.length;i++)urls.push(await uploadOne(id,files[i],i));await api('/api/admin-listing-images',{id,images:urls});toast('图片已替换');pendingImages.delete(String(id));await loadListings()}catch(e){alert('替换失败：'+e.message)}finally{if(btn){btn.disabled=false;btn.textContent='上传并替换图片'}}}
+$('loginBtn').onclick=login;$('refreshBtn').onclick=loadListings;$('logoutBtn').onclick=async()=>{await sb.auth.signOut();location.reload()};$('search').oninput=render;$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});boot();
+</script>
+</body>
+</html>
