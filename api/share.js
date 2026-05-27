@@ -101,6 +101,11 @@ function listingDescription(listing) {
   ].filter(Boolean).join(' · ');
 }
 
+function firstListingImage(listing) {
+  const images = Array.isArray(listing?.images) ? listing.images : [];
+  return images.find(url => /^https?:\/\//i.test(String(url || ''))) || '';
+}
+
 module.exports = async function handler(req, res) {
   if (req.method === 'POST') {
     return recordPageView(req, res);
@@ -114,7 +119,7 @@ module.exports = async function handler(req, res) {
 
   if (numericId) {
     const params = new URLSearchParams({
-      select: 'id,title,description,category,city,price,address,created_at,user_id',
+      select: 'id,title,description,category,city,price,address,images,created_at,user_id',
       id: `eq.${numericId}`,
       status: 'eq.approved',
       limit: '1'
@@ -138,6 +143,7 @@ module.exports = async function handler(req, res) {
     ? `${SITE_NAME}｜${compact(listing.title)}`
     : `${SITE_NAME}｜西班牙华人生活服务平台`;
   const description = listingDescription(listing);
+  const shareImageUrl = firstListingImage(listing) || siteLogoUrl;
   const targetUrl = numericId ? `${siteUrl}/?listing=${encodeURIComponent(numericId)}` : siteUrl;
   const shareUrl = numericId ? `${siteUrl}/s/${encodeURIComponent(numericId)}` : siteUrl;
   const ogType = numericId ? 'article' : 'website';
@@ -155,8 +161,8 @@ module.exports = async function handler(req, res) {
 <meta property="og:site_name" content="${escapeHTML(SITE_NAME)}">
 <meta property="og:title" content="${escapeHTML(pageTitle)}">
 <meta property="og:description" content="${escapeHTML(description)}">
-<meta property="og:image" content="${escapeHTML(siteLogoUrl)}">
-<meta property="og:image:secure_url" content="${escapeHTML(siteLogoUrl)}">
+<meta property="og:image" content="${escapeHTML(shareImageUrl)}">
+<meta property="og:image:secure_url" content="${escapeHTML(shareImageUrl)}">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="300">
 <meta property="og:image:height" content="300">
@@ -164,8 +170,8 @@ module.exports = async function handler(req, res) {
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="${escapeHTML(pageTitle)}">
 <meta name="twitter:description" content="${escapeHTML(description)}">
-<meta name="twitter:image" content="${escapeHTML(siteLogoUrl)}">
-<link rel="image_src" href="${escapeHTML(siteLogoUrl)}">
+<meta name="twitter:image" content="${escapeHTML(shareImageUrl)}">
+<link rel="image_src" href="${escapeHTML(shareImageUrl)}">
 <link rel="canonical" href="${escapeHTML(targetUrl)}">
 <meta name="theme-color" content="#D42B2B">
 <script>
@@ -196,7 +202,7 @@ a,button{display:flex;align-items:center;justify-content:center;width:100%;min-h
 <body>
 <main class="card">
   <div class="site"><img src="${escapeHTML(siteLogoUrl)}" alt="">${escapeHTML(SITE_NAME)}</div>
-  <img src="${escapeHTML(siteLogoUrl)}" alt="${escapeHTML(SITE_NAME)}">
+  <img src="${escapeHTML(shareImageUrl)}" alt="${escapeHTML(SITE_NAME)}">
   <h1>${escapeHTML(pageTitle)}</h1>
   <p>${escapeHTML(description)}</p>
   <a id="open-detail-btn" href="${escapeHTML(targetUrl)}" target="_self" rel="noopener">打开查看详情</a>
