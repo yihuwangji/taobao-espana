@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store, max-age=0">
+<title>VIP管理 · 西班牙生活通后台</title>
+<style>
+:root{--bg:#0f1117;--card:#1a1d27;--card2:#222638;--line:rgba(255,255,255,.08);--text:#ececf4;--muted:#8686a2;--gold:#f5a623;--green:#00c896;--red:#e53935;--blue:#3b82f6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC","Segoe UI",sans-serif;font-size:14px}
+.shell{max-width:1180px;margin:0 auto;padding:18px 14px 40px}.top{position:sticky;top:0;z-index:10;background:rgba(15,17,23,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1180px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand span{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold),#e53935);color:#111}
+.back{color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--card2)}.back:hover{color:#fff}
+.login,.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 18px 46px rgba(0,0,0,.25)}.login{max-width:420px;margin:56px auto}
+h1{font-size:20px;margin:0 0 4px}.sub{color:var(--muted);font-size:12px;line-height:1.6}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.stat b{display:block;font-size:24px;color:var(--gold);margin-top:6px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+input,select{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:9px;padding:11px 12px;outline:none}input:focus,select:focus{border-color:rgba(245,166,35,.55)}
+.toolbar input{flex:1;min-width:220px}.toolbar select{width:160px}.btn{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer}.btn:hover{filter:brightness(1.08)}
+.btn.gold{background:rgba(245,166,35,.14);color:var(--gold);border-color:rgba(245,166,35,.35)}.btn.green{background:rgba(0,200,150,.12);color:var(--green);border-color:rgba(0,200,150,.35)}.btn.red{background:rgba(229,57,53,.12);color:#ff7777;border-color:rgba(229,57,53,.35)}
+.form-row{display:grid;gap:10px;margin:12px 0}.hidden{display:none!important}.error{color:#ff7777;font-size:12px;margin-top:10px;min-height:18px}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}th,td{text-align:left;border-bottom:1px solid var(--line);padding:12px 10px;vertical-align:middle}th{font-size:11px;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.03)}tr:last-child td{border-bottom:0}.user{font-weight:900}.small{font-size:12px;color:var(--muted);margin-top:3px}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:900;white-space:nowrap}.vip{background:rgba(245,166,35,.16);color:var(--gold)}.free{background:rgba(59,130,246,.14);color:#7fb0ff}.expired{background:rgba(229,57,53,.12);color:#ff7777}.actions{display:flex;gap:7px;flex-wrap:wrap}.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,80px);opacity:0;background:#11251d;color:var(--green);border:1px solid rgba(0,200,150,.35);border-radius:999px;padding:11px 16px;font-weight:900;transition:.25s;z-index:30}.toast.show{transform:translate(-50%,0);opacity:1}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}table,thead,tbody,tr,th,td{display:block}thead{display:none}tr{border-bottom:1px solid var(--line);padding:10px}td{border:0;padding:7px 0}td:before{content:attr(data-label);display:block;font-size:11px;color:var(--muted);margin-bottom:3px}.actions .btn{flex:1}.top-inner{align-items:flex-start}.brand{min-width:0}.brand strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><span>💎</span><div><strong>VIP管理</strong><div class="sub">西班牙生活通后台</div></div></div>
+    <a class="back" href="/admin">返回后台</a>
+  </div>
+</header>
+
+<main class="shell">
+  <section id="loginBox" class="login">
+    <h1>后台登录</h1>
+    <div class="sub">只有拥有“用户管理”权限的后台账号可以开通或取消 VIP。</div>
+    <div class="form-row">
+      <input id="email" type="email" autocomplete="username" placeholder="后台邮箱">
+      <input id="password" type="password" autocomplete="current-password" placeholder="后台密码">
+      <button class="btn gold" id="loginBtn">登录</button>
+    </div>
+    <div class="error" id="loginError"></div>
+  </section>
+
+  <section id="appBox" class="hidden">
+    <div class="panel">
+      <h1>游客 / 用户变 VIP</h1>
+      <div class="sub">先让游客注册账号。注册后在这里搜索手机号、昵称或邮箱，点击“开通1年VIP”。后台会保存真实 user_id 和操作日志。</div>
+      <div class="grid">
+        <div class="stat">全部用户<b id="totalCount">0</b></div>
+        <div class="stat">当前VIP<b id="vipCount">0</b></div>
+        <div class="stat">普通用户<b id="freeCount">0</b></div>
+        <div class="stat">已过期<b id="expiredCount">0</b></div>
+      </div>
+      <div class="toolbar">
+        <input id="search" placeholder="搜索昵称 / 手机 / 邮箱 / 城市">
+        <select id="filter">
+          <option value="">全部</option>
+          <option value="vip">只看VIP</option>
+          <option value="free">只看普通</option>
+          <option value="expired">只看过期</option>
+        </select>
+        <button class="btn" id="refreshBtn">刷新</button>
+        <button class="btn red" id="logoutBtn">退出</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;margin-top:14px">
+      <table>
+        <thead><tr><th>用户</th><th>手机</th><th>城市</th><th>VIP状态</th><th>发布数</th><th>注册时间</th><th>操作</th></tr></thead>
+        <tbody id="tbody"><tr><td colspan="7">加载中...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://jfhpsxfnbpsvvtqsdvco.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let users=[];
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmtDate(v){if(!v)return '—';const d=new Date(v);return Number.isNaN(d.getTime())?'—':d.toLocaleDateString('zh-CN')}
+function vipState(u){if(!u.vip_until)return 'free';const d=new Date(u.vip_until);if(Number.isNaN(d.getTime())||d<=new Date())return 'expired';return 'vip'}
+function vipText(u){const s=vipState(u);if(s==='vip')return 'VIP 至 '+fmtDate(u.vip_until);if(s==='expired')return '已过期 '+fmtDate(u.vip_until);return '普通用户'}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.classList.remove('show'),2600)}
+async function authHeader(){const session=(await sb.auth.getSession()).data.session;if(!session)throw new Error('请先登录');return {Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'}}
+async function api(body){const res=await fetch('/api/admin-vip',{method:'POST',headers:await authHeader(),body:JSON.stringify(body)});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'请求失败');return data}
+async function login(){ $('loginError').textContent=''; $('loginBtn').disabled=true; $('loginBtn').textContent='登录中...'; const email=$('email').value.trim(); const password=$('password').value; const {error}=await sb.auth.signInWithPassword({email,password}); $('loginBtn').disabled=false; $('loginBtn').textContent='登录'; if(error){$('loginError').textContent='登录失败：'+error.message;return} await boot()}
+async function boot(){const session=(await sb.auth.getSession()).data.session;if(!session){$('loginBox').classList.remove('hidden');$('appBox').classList.add('hidden');return}$('loginBox').classList.add('hidden');$('appBox').classList.remove('hidden');await loadUsers()}
+async function loadUsers(){try{$('tbody').innerHTML='<tr><td colspan="7">加载中...</td></tr>';const data=await api({action:'list'});users=data.users||[];render()}catch(e){$('tbody').innerHTML='<tr><td colspan="7" style="color:#ff7777">加载失败：'+esc(e.message)+'</td></tr>'}}
+function render(){const q=($('search').value||'').toLowerCase().trim();const f=$('filter').value;const rows=users.filter(u=>{const state=vipState(u);const text=[u.nickname,u.phone,u.email,u.city,vipText(u)].join(' ').toLowerCase();return(!q||text.includes(q))&&(!f||state===f)});$('totalCount').textContent=users.length;$('vipCount').textContent=users.filter(u=>vipState(u)==='vip').length;$('freeCount').textContent=users.filter(u=>vipState(u)==='free').length;$('expiredCount').textContent=users.filter(u=>vipState(u)==='expired').length;if(!rows.length){$('tbody').innerHTML='<tr><td colspan="7">没有符合条件的用户</td></tr>';return}$('tbody').innerHTML=rows.map(u=>{const state=vipState(u);return `<tr><td data-label="用户"><div class="user">${esc(u.nickname||'未知用户')}</div><div class="small">${esc(u.email||'')}</div></td><td data-label="手机">${esc(u.phone||'—')}</td><td data-label="城市">${esc(u.city||'—')}</td><td data-label="VIP状态"><span class="badge ${state}">${esc(vipText(u))}</span>${u.vip_source?`<div class="small">${esc(u.vip_source)}</div>`:''}</td><td data-label="发布数">${Number(u.post_count||0)}</td><td data-label="注册时间">${fmtDate(u.created_at)}</td><td data-label="操作"><div class="actions"><button class="btn gold" onclick="grantVip('${u.id}')">开通1年VIP</button>${state==='vip'?`<button class="btn red" onclick="cancelVip('${u.id}')">取消VIP</button>`:''}</div></td></tr>`}).join('')}
+async function grantVip(id){const u=users.find(x=>x.id===id);if(!u||!confirm('确定给「'+(u.nickname||u.phone||u.email)+'」开通/续费1年VIP吗？'))return;await api({action:'set_vip',userId:id,mode:'grant',days:365});toast('已开通1年VIP');await loadUsers()}
+async function cancelVip(id){const u=users.find(x=>x.id===id);if(!u||!confirm('确定取消「'+(u.nickname||u.phone||u.email)+'」的VIP吗？'))return;await api({action:'set_vip',userId:id,mode:'cancel'});toast('已取消VIP');await loadUsers()}
+$('loginBtn').onclick=login;$('refreshBtn').onclick=loadUsers;$('logoutBtn').onclick=async()=>{await sb.auth.signOut();location.reload()};$('search').oninput=render;$('filter').onchange=render;$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});boot();
+</script>
+</body>
+</html>
