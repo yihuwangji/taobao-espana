@@ -96,6 +96,24 @@ async function transformHomeResponse(response) {
     time: '刚刚',
     contact: '961 54 60 19'
   };
+  const valenciaSupplyListing = {
+    id: 900002,
+    cat: 'wholesale',
+    city: 'Valencia',
+    icon: '📦',
+    badge: '货源',
+    badgeType: 'gold',
+    title: 'Valencia 中国直发长期供应',
+    price: '满6000起发',
+    address: '西班牙 Madrid / Valencia',
+    description: '厨房、卫浴、文具、收纳、清洁、家居、汽车用品、五金、针织、体育、健身、宠物、生日等系列，中国直发长期供应，满6000起发，约75天到货。联系人：陈坚，微信 ID：Cj616550166。',
+    isMerchant: true,
+    images: ['/assets/manual/valencia-supply.svg'],
+    unit: '',
+    tags: ['货源批发', 'Valencia'],
+    time: '刚刚',
+    contact: '微信 Cj616550166'
+  };
   const mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(manualListing.address);
   function safe(value) {
     return String(value || '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
@@ -120,6 +138,29 @@ async function transformHomeResponse(response) {
     detail.innerHTML = '<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:36px">🏪</span><div><span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">商家黄页</span><h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">方圆货架</h3></div></div><div class="detail-photo-grid"><img src="' + safe(manualListing.images[0]) + '" alt="方圆货架" loading="lazy"></div><div class="detail-map-card"><a class="detail-map-preview" href="' + safe(mapUrl) + '" target="_blank" rel="noopener"><div class="detail-map-body"><div class="detail-map-pin">📍</div><div><div class="detail-map-title">地图位置 / 导航</div><div class="detail-map-address">' + safe(manualListing.address) + '</div></div></div></a></div><div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">详细描述</div><div style="font-size:14px;line-height:1.7;color:#333">' + safe(manualListing.description) + '</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:#fef3f2;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">价格</div><div style="font-size:16px;font-weight:700;color:#c0392b">面议</div></div><div style="background:#f0fdf4;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">省份/地区</div><div style="font-size:15px;font-weight:600;color:#166534">Valencia</div></div></div><div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px"><div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">联系方式</div><div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">961 54 60 19</div><div style="font-size:11px;color:#999;margin-top:6px">联系时请说明来自西班牙生活通</div></div><div class="detail-actions"><a class="detail-action" href="' + safe(mapUrl) + '" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">地图</a><button class="detail-action" onclick="copyText && copyText(\\'961 54 60 19\\').then(()=>showToast && showToast(\\'已复制\\'))">复制电话</button><a class="detail-action primary" href="http://equipatutienda.es/" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">网站</a></div></div>';
     openModal('detail');
   }
+  function openValenciaSupplyDetail(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const detail = document.getElementById('detailContent');
+    if (!detail || typeof openModal !== 'function') {
+      location.href = '/feed/';
+      return;
+    }
+    detail.innerHTML = '<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><span style="font-size:36px">📦</span><div><span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">货源批发</span><h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">Valencia 中国直发长期供应</h3></div></div><div class="detail-photo-grid"><img src="' + safe(valenciaSupplyListing.images[0]) + '" alt="Valencia 中国直发长期供应" loading="lazy"></div><div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">详细描述</div><div style="font-size:14px;line-height:1.7;color:#333">' + safe(valenciaSupplyListing.description) + '</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:#fef3f2;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">起发条件</div><div style="font-size:16px;font-weight:700;color:#c0392b">满6000起发</div></div><div style="background:#f0fdf4;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">地区</div><div style="font-size:15px;font-weight:600;color:#166534">Madrid / Valencia</div></div></div><div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px"><div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">联系方式</div><div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">微信 Cj616550166</div><div style="font-size:11px;color:#999;margin-top:6px">联系时请说明来自西班牙生活通</div></div><div class="detail-actions"><button class="detail-action primary" onclick="copyText && copyText(\\'Cj616550166\\').then(()=>showToast && showToast(\\'微信号已复制\\'))">复制微信</button><a class="detail-action" href="/feed/" style="text-align:center;text-decoration:none">去生活圈</a></div></div>';
+    openModal('detail');
+  }
+  function addValenciaSupplyCard() {
+    const grid = document.getElementById('listingsGrid');
+    if (!grid || document.getElementById('manual-valencia-supply-card')) return;
+    const card = document.createElement('div');
+    card.className = 'listing-card';
+    card.id = 'manual-valencia-supply-card';
+    card.onclick = openValenciaSupplyDetail;
+    card.innerHTML = '<div class="listing-img has-photo"><img src="' + safe(valenciaSupplyListing.images[0]) + '" alt="" loading="lazy"><div class="listing-badge gold">货源</div><button class="listing-share" onclick="event.stopPropagation(); openValenciaSupplyDetail(event)">查看</button></div><div class="listing-body"><div class="listing-title">Valencia 中国直发长期供应</div><div class="listing-tags"><span class="tag">货源批发</span><span class="tag">Valencia</span></div><div class="listing-meta"><div class="listing-price">满6000起发<span></span></div><div class="listing-loc">📍 Madrid / Valencia</div></div><div class="listing-open-hint"><span>🕐 刚刚</span><span>点开看详情 ›</span></div></div>';
+    grid.prepend(card);
+  }
   function patchDetail() {
     if (typeof viewListing === 'function' && !viewListing.manualLifeListingsPatch) {
       const originalViewListing = viewListing;
@@ -138,14 +179,18 @@ async function transformHomeResponse(response) {
       const originalRenderListings = renderListings;
       renderListings = function patchedRenderListings() {
         injectListing();
-        return originalRenderListings.apply(this, arguments);
+        const result = originalRenderListings.apply(this, arguments);
+        setTimeout(addValenciaSupplyCard, 0);
+        return result;
       };
       renderListings.manualLifeListingsPatch = true;
       window.renderListings = renderListings;
     }
     if (typeof renderListings === 'function') renderListings();
+    setTimeout(addValenciaSupplyCard, 200);
   }
   window.openManualFangyuanListing = openManualDetail;
+  window.openValenciaSupplyListing = openValenciaSupplyDetail;
   setTimeout(patchRender, 300);
   setTimeout(patchRender, 1500);
   setTimeout(patchRender, 3500);
@@ -257,6 +302,17 @@ async function transformFeedScriptResponse(response) {
       description: 'Cuadrada, redonda y triangular S.L.，Manises 店铺设备与货架商家，Google 公开资料显示评分 4.8，主营货架和店铺装备。网站：equipatutienda.es。',
       images: ['https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=900&q=82'],
       created_at: new Date().toISOString()
+    },
+    {
+      id: '900002',
+      title: 'Valencia 中国直发长期供应',
+      category: '货源批发',
+      city: 'Madrid / Valencia',
+      contact: '微信 Cj616550166',
+      address: '西班牙 Madrid / Valencia',
+      description: '厨房、卫浴、文具、收纳、清洁、家居、汽车用品、五金、针织、体育、健身、宠物、生日等系列，中国直发长期供应，满6000起发，约75天到货。联系人：陈坚，微信 ID：Cj616550166。',
+      images: ['/assets/manual/valencia-supply.svg'],
+      created_at: new Date().toISOString()
     }
   ];
 
@@ -295,33 +351,33 @@ async function transformFeedScriptResponse(response) {
         ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((merchant.address || '') + ' ' + (merchant.city || ''))
         : '';
       card.className = 'feed-card merchant-card';
-      card.innerHTML = \`
+      card.innerHTML = `
         <button class="media-button" type="button" aria-label="查看大图">
-          <img src="\${escapeHTML(photo)}" alt="\${escapeHTML(merchant.title || '商家资料')}" loading="lazy">
+          <img src="${escapeHTML(photo)}" alt="${escapeHTML(merchant.title || '商家资料')}" loading="lazy">
           <span class="burst-heart">♥</span>
         </button>
         <div class="card-body">
-          <h2 class="merchant-title">\${escapeHTML(merchant.title || '商家资料')}</h2>
-          <p class="card-desc">\${escapeHTML(merchant.description || '西班牙生活通商家资料')}</p>
+          <h2 class="merchant-title">${escapeHTML(merchant.title || '商家资料')}</h2>
+          <p class="card-desc">${escapeHTML(merchant.description || '西班牙生活通商家资料')}</p>
           <div class="tag-list">
             <span>#商家</span>
-            <span>#\${escapeHTML(merchant.category || '黄页')}</span>
-            <span>#\${escapeHTML(merchant.city || '西班牙')}</span>
+            <span>#${escapeHTML(merchant.category || '黄页')}</span>
+            <span>#${escapeHTML(merchant.city || '西班牙')}</span>
           </div>
           <div class="card-meta">
             <span class="author">西班牙生活通</span>
-            <span class="city">📍 \${escapeHTML(merchant.city || '西班牙')}</span>
-            <span class="time">\${typeof timeAgo === 'function' ? timeAgo(merchant.created_at) : ''}</span>
+            <span class="city">📍 ${escapeHTML(merchant.city || '西班牙')}</span>
+            <span class="time">${typeof timeAgo === 'function' ? timeAgo(merchant.created_at) : ''}</span>
           </div>
           <div class="merchant-actions">
             <button class="merchant-action save-merchant" type="button" aria-label="收藏">☆</button>
             <button class="merchant-action share-merchant" type="button" aria-label="分享">↗</button>
-            \${mapUrl ? \`<a class="merchant-action" href="\${escapeHTML(mapUrl)}" target="_blank" rel="noopener" aria-label="地图">⌖</a>\` : ''}
+            ${mapUrl ? `<a class="merchant-action" href="${escapeHTML(mapUrl)}" target="_blank" rel="noopener" aria-label="地图">⌖</a>` : ''}
           </div>
-          <a class="merchant-contact-btn" href="\${escapeHTML(contactHref)}" target="_blank" rel="noopener">联系</a>
-          <a class="merchant-detail-btn" href="/?listing=\${encodeURIComponent(merchant.id)}" aria-label="详情">详情</a>
+          <a class="merchant-contact-btn" href="${escapeHTML(contactHref)}" target="_blank" rel="noopener">联系</a>
+          <a class="merchant-detail-btn" href="/?listing=${encodeURIComponent(merchant.id)}" aria-label="详情">详情</a>
         </div>
-      \`;
+      `;
       card.querySelector('.media-button')?.addEventListener('click', () => {
         if (typeof openImageViewer === 'function') openImageViewer(photo, merchant.title || '商家资料');
       });
