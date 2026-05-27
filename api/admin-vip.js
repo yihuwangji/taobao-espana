@@ -32,6 +32,26 @@ function addDays(date, days) {
   return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
 }
 
+function normalizePhone(value) {
+  return String(value || '').trim().replace(/[^\d+]/g, '');
+}
+
+function phoneDigits(value) {
+  return normalizePhone(value).replace(/\D/g, '');
+}
+
+function authEmailFromPhone(phone) {
+  return `taobaoespana.${phoneDigits(phone)}@gmail.com`;
+}
+
+function authPasswordFromPin(pin) {
+  return String(pin || '') + '#EspanaLife2026';
+}
+
+function randomPin() {
+  return String(Math.floor(1000 + Math.random() * 9000));
+}
+
 function publicUser(authUser, profile) {
   const vipUntil = profile?.vip_until || null;
   const vipDate = vipUntil ? new Date(vipUntil) : null;
@@ -115,6 +135,86 @@ async function updateVip(body) {
   return { userId, vipUntil: vipUntil.toISOString(), days };
 }
 
+async function createVipAccount(body) {
+  const nickname = String(body.nickname || '').trim();
+  const city = String(body.city || 'Barcelona').trim() || 'Barcelona';
+  const phone = normalizePhone(body.phone);
+  const digits = phoneDigits(phone);
+  const days = Math.max(1, Math.min(3650, Number(body.days || 365)));
+  const pin = /^\d{4}$/.test(String(body.pin || '').trim()) ? String(body.pin).trim() : randomPin();
+
+  if (!nickname) throw new Error('请填写游客名称');
+  if (digits.length < 6) throw new Error('请填写正确的手机号');
+
+  const email = authEmailFromPhone(phone);
+  const password = authPasswordFromPin(pin);
+  const now = new Date();
+  const vipUntil = addDays(now, days);
+  const metadata = {
+    nickname,
+    city,
+    phone,
+    account_type: 'phone',
+    created_by_admin: true
+  };
+
+  const createResponse = await serviceFetch('/auth/v1/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: metadata
+    })
+  });
+
+  const createText = await createResponse.text();
+  let created;
+  try {
+    created = createText ? JSON.parse(createText) : null;
+  } catch {
+    created = { message: createText };
+  }
+
+  if (!createResponse.ok) {
+    const message = created?.msg || created?.message || '创建账号失败';
+    if (/already|registered|exists/i.test(message)) {
+      throw new Error('这个手机号已经有账号，请在列表里搜索后直接开通或重置密码。');
+    }
+    throw new Error(message);
+  }
+
+  const userId = created?.id;
+  if (!userId) throw new Error('账号已创建，但没有返回用户ID');
+
+  const profileResponse = await serviceFetch('/rest/v1/profiles?on_conflict=id', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify({
+      id: userId,
+      nickname,
+      city,
+      phone,
+      vip_until: vipUntil.toISOString(),
+      vip_source: 'admin_created',
+      vip_granted_at: now.toISOString(),
+      updated_at: now.toISOString()
+    })
+  });
+  if (!profileResponse.ok) throw new Error(await profileResponse.text());
+
+  return {
+    userId,
+    phone,
+    pin,
+    email,
+    nickname,
+    city,
+    vipUntil: vipUntil.toISOString(),
+    days
+  };
+}
+
 async function writeLog(adminId, action, targetId, note = '') {
   await serviceFetch('/rest/v1/admin_logs', {
     method: 'POST',
@@ -150,6 +250,16 @@ module.exports = async function handler(req, res) {
       await writeLog(admin.user.id, 'user_set_vip', result.userId, JSON.stringify({
         mode: body.mode || 'grant',
         days: result.days || null,
+        vipUntil: result.vipUntil
+      }));
+      return json(res, 200, { ok: true, ...result });
+    }
+    if (body.action === 'create_vip_account') {
+      const result = await createVipAccount(body);
+      await writeLog(admin.user.id, 'user_create_vip_account', result.userId, JSON.stringify({
+        phone: result.phone,
+        nickname: result.nickname,
+        days: result.days,
         vipUntil: result.vipUntil
       }));
       return json(res, 200, { ok: true, ...result });
