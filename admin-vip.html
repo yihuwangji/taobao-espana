@@ -18,9 +18,10 @@ h1{font-size:20px;margin:0 0 4px}.sub{color:var(--muted);font-size:12px;line-hei
 input,select{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:9px;padding:11px 12px;outline:none}input:focus,select:focus{border-color:rgba(245,166,35,.55)}
 .toolbar input{flex:1;min-width:220px}.toolbar select{width:160px}.btn{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer}.btn:hover{filter:brightness(1.08)}
 .btn.gold{background:rgba(245,166,35,.14);color:var(--gold);border-color:rgba(245,166,35,.35)}.btn.green{background:rgba(0,200,150,.12);color:var(--green);border-color:rgba(0,200,150,.35)}.btn.red{background:rgba(229,57,53,.12);color:#ff7777;border-color:rgba(229,57,53,.35)}
+.create-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr .7fr auto;gap:10px;margin-top:14px}.credential{display:none;margin-top:14px;background:#10151f;border:1px solid rgba(245,166,35,.35);border-radius:12px;padding:14px}.credential.show{display:block}.credential textarea{width:100%;min-height:110px;margin-top:10px;border:1px solid var(--line);background:#0d1018;color:var(--text);border-radius:9px;padding:10px;resize:vertical}
 .form-row{display:grid;gap:10px;margin:12px 0}.hidden{display:none!important}.error{color:#ff7777;font-size:12px;margin-top:10px;min-height:18px}
 table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}th,td{text-align:left;border-bottom:1px solid var(--line);padding:12px 10px;vertical-align:middle}th{font-size:11px;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.03)}tr:last-child td{border-bottom:0}.user{font-weight:900}.small{font-size:12px;color:var(--muted);margin-top:3px}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:900;white-space:nowrap}.vip{background:rgba(245,166,35,.16);color:var(--gold)}.free{background:rgba(59,130,246,.14);color:#7fb0ff}.expired{background:rgba(229,57,53,.12);color:#ff7777}.actions{display:flex;gap:7px;flex-wrap:wrap}.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,80px);opacity:0;background:#11251d;color:var(--green);border:1px solid rgba(0,200,150,.35);border-radius:999px;padding:11px 16px;font-weight:900;transition:.25s;z-index:30}.toast.show{transform:translate(-50%,0);opacity:1}
-@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}table,thead,tbody,tr,th,td{display:block}thead{display:none}tr{border-bottom:1px solid var(--line);padding:10px}td{border:0;padding:7px 0}td:before{content:attr(data-label);display:block;font-size:11px;color:var(--muted);margin-bottom:3px}.actions .btn{flex:1}.top-inner{align-items:flex-start}.brand{min-width:0}.brand strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}.create-grid{grid-template-columns:1fr}table,thead,tbody,tr,th,td{display:block}thead{display:none}tr{border-bottom:1px solid var(--line);padding:10px}td{border:0;padding:7px 0}td:before{content:attr(data-label);display:block;font-size:11px;color:var(--muted);margin-bottom:3px}.actions .btn{flex:1}.top-inner{align-items:flex-start}.brand{min-width:0}.brand strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 </style>
 </head>
 <body>
@@ -45,8 +46,26 @@ table{width:100%;border-collapse:collapse;background:var(--card);border:1px soli
 
   <section id="appBox" class="hidden">
     <div class="panel">
-      <h1>游客 / 用户变 VIP</h1>
-      <div class="sub">先让游客注册账号。注册后在这里搜索手机号、昵称或邮箱，点击“开通1年VIP”。后台会保存真实 user_id 和操作日志。</div>
+      <h1>创建游客 VIP 账号</h1>
+      <div class="sub">后台直接生成账号和4位密码，发给游客。游客下次在首页点“登录”，输入手机号和密码即可使用。</div>
+      <div class="create-grid">
+        <input id="newNickname" placeholder="游客名称 / 店名">
+        <input id="newPhone" placeholder="手机号">
+        <input id="newCity" placeholder="城市" value="Barcelona">
+        <input id="newDays" type="number" min="1" max="3650" value="365" placeholder="VIP天数">
+        <button class="btn gold" id="createVipBtn">生成VIP账号</button>
+      </div>
+      <div class="credential" id="credentialBox">
+        <strong>发给游客的登录信息</strong>
+        <div class="sub">复制下面内容，通过 WhatsApp / 微信发给游客。</div>
+        <textarea id="credentialText" readonly></textarea>
+        <button class="btn green" id="copyCredentialBtn">复制账号密码</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h1>已有用户 VIP 管理</h1>
+      <div class="sub">已经注册过的用户，可在这里搜索手机号、昵称或邮箱，手动开通或取消 VIP。</div>
       <div class="grid">
         <div class="stat">全部用户<b id="totalCount">0</b></div>
         <div class="stat">当前VIP<b id="vipCount">0</b></div>
@@ -93,9 +112,12 @@ async function login(){ $('loginError').textContent=''; $('loginBtn').disabled=t
 async function boot(){const session=(await sb.auth.getSession()).data.session;if(!session){$('loginBox').classList.remove('hidden');$('appBox').classList.add('hidden');return}$('loginBox').classList.add('hidden');$('appBox').classList.remove('hidden');await loadUsers()}
 async function loadUsers(){try{$('tbody').innerHTML='<tr><td colspan="7">加载中...</td></tr>';const data=await api({action:'list'});users=data.users||[];render()}catch(e){$('tbody').innerHTML='<tr><td colspan="7" style="color:#ff7777">加载失败：'+esc(e.message)+'</td></tr>'}}
 function render(){const q=($('search').value||'').toLowerCase().trim();const f=$('filter').value;const rows=users.filter(u=>{const state=vipState(u);const text=[u.nickname,u.phone,u.email,u.city,vipText(u)].join(' ').toLowerCase();return(!q||text.includes(q))&&(!f||state===f)});$('totalCount').textContent=users.length;$('vipCount').textContent=users.filter(u=>vipState(u)==='vip').length;$('freeCount').textContent=users.filter(u=>vipState(u)==='free').length;$('expiredCount').textContent=users.filter(u=>vipState(u)==='expired').length;if(!rows.length){$('tbody').innerHTML='<tr><td colspan="7">没有符合条件的用户</td></tr>';return}$('tbody').innerHTML=rows.map(u=>{const state=vipState(u);return `<tr><td data-label="用户"><div class="user">${esc(u.nickname||'未知用户')}</div><div class="small">${esc(u.email||'')}</div></td><td data-label="手机">${esc(u.phone||'—')}</td><td data-label="城市">${esc(u.city||'—')}</td><td data-label="VIP状态"><span class="badge ${state}">${esc(vipText(u))}</span>${u.vip_source?`<div class="small">${esc(u.vip_source)}</div>`:''}</td><td data-label="发布数">${Number(u.post_count||0)}</td><td data-label="注册时间">${fmtDate(u.created_at)}</td><td data-label="操作"><div class="actions"><button class="btn gold" onclick="grantVip('${u.id}')">开通1年VIP</button>${state==='vip'?`<button class="btn red" onclick="cancelVip('${u.id}')">取消VIP</button>`:''}</div></td></tr>`}).join('')}
+function loginMessage(result){return `您的西班牙生活通VIP账号已开通\n\n登录入口：https://espanalife.app/\n用户名：${result.phone}\n密码：${result.pin}\nVIP到期：${fmtDate(result.vipUntil)}\n\n下次登录：打开网站 > 点击登录 > 输入手机号和4位密码。`}
+async function createVipAccount(){const btn=$('createVipBtn');const payload={action:'create_vip_account',nickname:$('newNickname').value.trim(),phone:$('newPhone').value.trim(),city:$('newCity').value.trim()||'Barcelona',days:Number($('newDays').value||365)};if(!payload.nickname||!payload.phone){toast('请填写游客名称和手机号');return}btn.disabled=true;btn.textContent='生成中...';try{const result=await api(payload);$('credentialText').value=loginMessage(result);$('credentialBox').classList.add('show');toast('VIP账号已生成');await loadUsers()}catch(e){alert('生成失败：'+e.message)}finally{btn.disabled=false;btn.textContent='生成VIP账号'}}
+async function copyCredential(){const text=$('credentialText').value;if(!text)return;try{await navigator.clipboard.writeText(text);toast('账号密码已复制')}catch{ $('credentialText').select(); document.execCommand('copy'); toast('账号密码已复制') }}
 async function grantVip(id){const u=users.find(x=>x.id===id);if(!u||!confirm('确定给「'+(u.nickname||u.phone||u.email)+'」开通/续费1年VIP吗？'))return;await api({action:'set_vip',userId:id,mode:'grant',days:365});toast('已开通1年VIP');await loadUsers()}
 async function cancelVip(id){const u=users.find(x=>x.id===id);if(!u||!confirm('确定取消「'+(u.nickname||u.phone||u.email)+'」的VIP吗？'))return;await api({action:'set_vip',userId:id,mode:'cancel'});toast('已取消VIP');await loadUsers()}
-$('loginBtn').onclick=login;$('refreshBtn').onclick=loadUsers;$('logoutBtn').onclick=async()=>{await sb.auth.signOut();location.reload()};$('search').oninput=render;$('filter').onchange=render;$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});boot();
+$('loginBtn').onclick=login;$('createVipBtn').onclick=createVipAccount;$('copyCredentialBtn').onclick=copyCredential;$('refreshBtn').onclick=loadUsers;$('logoutBtn').onclick=async()=>{await sb.auth.signOut();location.reload()};$('search').oninput=render;$('filter').onchange=render;$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});boot();
 </script>
 </body>
 </html>
