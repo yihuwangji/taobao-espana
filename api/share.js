@@ -206,7 +206,7 @@ a,button{display:flex;align-items:center;justify-content:center;width:100%;min-h
   <h1>${escapeHTML(pageTitle)}</h1>
   <p>${escapeHTML(description)}</p>
   <a id="open-detail-btn" href="${escapeHTML(targetUrl)}" target="_self" rel="noopener">打开查看详情</a>
-  <p class="hint">微信里请点上方按钮查看详情；如果没有跳转，请复制链接到浏览器打开。</p>
+  <p class="hint">微信里可点右上角 ... 分享到朋友圈；也可点上方按钮查看详情。</p>
 </main>
 </body>
 </html>`);
