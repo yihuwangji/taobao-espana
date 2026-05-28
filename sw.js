@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v23';
+const CACHE_NAME = 'espana-life-v24';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -191,6 +191,7 @@ function injectHomePatch(html) {
       appBadge.setAttribute('role', 'button');
       appBadge.setAttribute('tabindex', '0');
       appBadge.setAttribute('aria-label', '下载手机 APP');
+      appBadge.setAttribute('onclick', "event.preventDefault(); event.stopPropagation(); window.location.href='/download'; return false;");
       if (!appBadge.dataset.downloadBound) {
         appBadge.dataset.downloadBound = '1';
         appBadge.addEventListener('click', (event) => {
@@ -233,7 +234,7 @@ async function transformHomeResponse(response) {
   let html = await response.text();
   html = html
     .replaceAll('淘商圈', '生活圈')
-    .replace('<span class="brand-domain">espanalife.app</span>', '<span class="brand-domain" role="button" tabindex="0" aria-label="下载手机 APP">下载手机 APP</span>')
+    .replace('<span class="brand-domain">espanalife.app</span>', `<span class="brand-domain" role="button" tabindex="0" aria-label="下载手机 APP" onclick="event.preventDefault(); event.stopPropagation(); window.location.href='/download'; return false;">下载手机 APP</span>`)
     .replaceAll('老王跟小宋工作室', '欧桥开放平台')
     .replaceAll('Wang & Song Studio', 'EuroBridge Open Platform')
     .replace(/\s*<li>\s*<a[^>]*id="footerWhatsapp"[^>]*>[\s\S]*?<\/a>\s*<\/li>/g, '')
@@ -316,4 +317,5 @@ self.addEventListener('fetch', (event) => {
       });
     })
   );
-});
+}
+);
