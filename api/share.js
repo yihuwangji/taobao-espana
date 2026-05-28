@@ -59,6 +59,36 @@ async function recordPageView(req, res) {
   return json(res, 200, { ok: true });
 }
 
+async function publicHotAds(req, res) {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return json(res, 200, { ok: true, value: { enabled: true, rotateSeconds: 180, listingIds: [] }, listings: [] });
+  }
+  const settingsResponse = await serviceFetch('/rest/v1/site_settings?key=eq.hot_ads&select=value&limit=1');
+  const settingsRows = settingsResponse.ok ? await settingsResponse.json() : [];
+  const value = settingsRows[0]?.value || {};
+  const listingIds = Array.isArray(value.listingIds)
+    ? value.listingIds.map(id => Number(id)).filter(Number.isInteger).filter(id => id > 0).slice(0, 20)
+    : [];
+  let listings = [];
+  if (value.enabled !== false && listingIds.length) {
+    const response = await serviceFetch(`/rest/v1/listings?id=in.(${listingIds.join(',')})&status=eq.approved&select=id,title,description,category,city,price,address,images,created_at,is_pinned,user_id`);
+    if (response.ok) {
+      const rows = await response.json();
+      const order = new Map(listingIds.map((id, index) => [String(id), index]));
+      listings = rows.sort((a, b) => (order.get(String(a.id)) ?? 999) - (order.get(String(b.id)) ?? 999));
+    }
+  }
+  return json(res, 200, {
+    ok: true,
+    value: {
+      enabled: value.enabled !== false,
+      rotateSeconds: Math.max(30, Math.min(1800, Number(value.rotateSeconds || 180))),
+      listingIds
+    },
+    listings
+  });
+}
+
 function getRequestSiteUrl(req) {
   const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
   if (!host) return DEFAULT_SITE_URL;
@@ -146,6 +176,9 @@ module.exports = async function handler(req, res) {
   const id = compact(req.query.id);
   if (id === '__home') {
     return serveHomepage(req, res);
+  }
+  if (id === '__hot_ads') {
+    return publicHotAds(req, res);
   }
 
   const siteUrl = getRequestSiteUrl(req);
