@@ -19,6 +19,12 @@ const DEFAULT_CONTACT_INFO = {
   responseEs: 'Normalmente respondemos en un plazo de 24 horas'
 };
 
+const DEFAULT_HOT_ADS = {
+  enabled: true,
+  rotateSeconds: 180,
+  listingIds: []
+};
+
 function json(res, status, body) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
@@ -61,6 +67,18 @@ function normalizeContactInfo(value = {}) {
   };
 }
 
+function normalizeHotAds(value = {}) {
+  const listingIds = Array.isArray(value.listingIds)
+    ? value.listingIds.map(id => Number(id)).filter(Number.isInteger).filter(id => id > 0)
+    : [];
+  const rotateSeconds = Math.max(30, Math.min(1800, Number(value.rotateSeconds || DEFAULT_HOT_ADS.rotateSeconds)));
+  return {
+    enabled: value.enabled !== false,
+    rotateSeconds,
+    listingIds: [...new Set(listingIds)].slice(0, 20)
+  };
+}
+
 async function serviceFetch(path, options = {}) {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   return fetch(`${SUPABASE_URL}${path}`, {
@@ -85,6 +103,13 @@ async function getContactInfo() {
   return normalizeContactInfo(rows[0]?.value || DEFAULT_CONTACT_INFO);
 }
 
+async function getHotAds() {
+  const response = await serviceFetch('/rest/v1/site_settings?key=eq.hot_ads&select=value&limit=1');
+  if (!response.ok) throw new Error(await response.text());
+  const rows = await response.json();
+  return normalizeHotAds(rows[0]?.value || DEFAULT_HOT_ADS);
+}
+
 async function updateContactInfo(value, adminId) {
   const normalized = normalizeContactInfo(value);
   const response = await serviceFetch('/rest/v1/site_settings?on_conflict=key&select=key,value,updated_at', {
@@ -92,6 +117,22 @@ async function updateContactInfo(value, adminId) {
     headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
     body: JSON.stringify([{
       key: 'contact_info',
+      value: normalized,
+      updated_by: adminId,
+      updated_at: new Date().toISOString()
+    }])
+  });
+  if (!response.ok) throw new Error(await response.text());
+  return normalized;
+}
+
+async function updateHotAds(value, adminId) {
+  const normalized = normalizeHotAds(value);
+  const response = await serviceFetch('/rest/v1/site_settings?on_conflict=key&select=key,value,updated_at', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify([{
+      key: 'hot_ads',
       value: normalized,
       updated_by: adminId,
       updated_at: new Date().toISOString()
@@ -119,6 +160,9 @@ module.exports = async function handler(req, res) {
     if (action === 'get') {
       return json(res, 200, { ok: true, value: await getContactInfo() });
     }
+    if (action === 'get_hot_ads') {
+      return json(res, 200, { ok: true, value: await getHotAds() });
+    }
     if (action === 'update') {
       const value = await updateContactInfo(body.value || {}, admin.user.id);
       await serviceFetch('/rest/v1/admin_logs', {
@@ -128,6 +172,19 @@ module.exports = async function handler(req, res) {
           action: 'update_site_contact',
           target_type: 'site_settings',
           target_id: 'contact_info'
+        }])
+      }).catch(() => null);
+      return json(res, 200, { ok: true, value });
+    }
+    if (action === 'update_hot_ads') {
+      const value = await updateHotAds(body.value || {}, admin.user.id);
+      await serviceFetch('/rest/v1/admin_logs', {
+        method: 'POST',
+        body: JSON.stringify([{
+          admin_id: admin.user.id,
+          action: 'update_hot_ads',
+          target_type: 'site_settings',
+          target_id: 'hot_ads'
         }])
       }).catch(() => null);
       return json(res, 200, { ok: true, value });
