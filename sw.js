@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v21';
+const CACHE_NAME = 'espana-life-v22';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -63,16 +63,17 @@ function injectHomePatch(html) {
   }
 
   .header-main .logo-title-row {
+    flex-direction: column !important;
     flex-wrap: nowrap !important;
-    gap: 8px !important;
-    align-items: center !important;
+    gap: 4px !important;
+    align-items: flex-start !important;
   }
 
   .header-main .logo-text .brand-domain {
     flex: 0 0 auto !important;
     margin-top: 0 !important;
     white-space: nowrap !important;
-    transform: translateY(1px);
+    transform: none !important;
   }
 
   .header-main .search-bar button {
