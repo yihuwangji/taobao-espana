@@ -317,5 +317,4 @@ self.addEventListener('fetch', (event) => {
       });
     })
   );
-}
-);
+});
