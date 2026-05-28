@@ -94,7 +94,7 @@
 
   async function loadConfiguredAds() {
     try {
-      const response = await fetch('/api/hot-ads', { cache: 'no-store' });
+      const response = await fetch('/api/share?id=__hot_ads', { cache: 'no-store' });
       const result = await response.json();
       if (!response.ok || !result.ok || result.value?.enabled === false) return [];
       const rows = Array.isArray(result.listings) ? result.listings : [];
