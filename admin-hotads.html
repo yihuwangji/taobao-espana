@@ -39,6 +39,7 @@ input,select{background:#100c0a;border:1px solid rgba(255,255,255,.14);color:#ff
     </div>
     <div class="status" id="status"></div>
   </section>
+
   <div class="grid toolbar">
     <section class="card">
       <h2 style="font-size:16px;margin:0 0 12px">已加入轮播</h2>
@@ -66,7 +67,7 @@ function setStatus(text){$('status').textContent=text||''}
 async function adminApi(body){
   const session=(await sb.auth.getSession()).data.session;
   if(!session) throw new Error('请先登录后台 /admin');
-  const res=await fetch('/api/admin-hot-ads',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify(body)});
+  const res=await fetch('/api/admin-site-settings',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify(body)});
   const data=await res.json().catch(()=>({}));
   if(!res.ok) throw new Error(data.message||data.error||'操作失败');
   return data;
@@ -77,7 +78,7 @@ async function requireLogin(){
   return true;
 }
 async function loadSettings(){
-  const data=await adminApi({action:'get'});
+  const data=await adminApi({action:'get_hot_ads'});
   settings={enabled:data.value?.enabled!==false,rotateSeconds:Number(data.value?.rotateSeconds||180),listingIds:Array.isArray(data.value?.listingIds)?data.value.listingIds.map(Number).filter(Boolean):[]};
   $('enabled').checked=settings.enabled;
   $('rotateSeconds').value=String(settings.rotateSeconds);
@@ -88,7 +89,18 @@ async function loadListings(){
   listings=data||[];
 }
 function rowHtml(item, selected, index){
-  return `<div class="item"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="title">${selected ? `${index+1}. ` : ''}${esc(item.title||`信息 #${item.id}`)}</div><div class="meta">#${esc(item.id)} · ${esc(item.category||'')} · 📍 ${esc(item.city||'')} · ${esc(item.contact||'')}</div></div>${selected?`<button class="btn red" onclick="removeItem(${item.id})">移除</button>`:`<button class="btn gold" onclick="addItem(${item.id})">加入轮播</button>`}</div>${selected?`<div class="row" style="margin-top:10px"><button class="btn" ${index===0?'disabled':''} onclick="moveItem(${item.id},-1)">上移</button><button class="btn" ${index===settings.listingIds.length-1?'disabled':''} onclick="moveItem(${item.id},1)">下移</button></div>`:''}</div>`;
+  return `<div class="item">
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="title">${selected ? `${index+1}. ` : ''}${esc(item.title||`信息 #${item.id}`)}</div>
+        <div class="meta">#${esc(item.id)} · ${esc(item.category||'')} · 📍 ${esc(item.city||'')} · ${esc(item.contact||'')}</div>
+      </div>
+      ${selected
+        ? `<button class="btn red" onclick="removeItem(${item.id})">移除</button>`
+        : `<button class="btn gold" onclick="addItem(${item.id})">加入轮播</button>`}
+    </div>
+    ${selected ? `<div class="row" style="margin-top:10px"><button class="btn" ${index===0?'disabled':''} onclick="moveItem(${item.id},-1)">上移</button><button class="btn" ${index===settings.listingIds.length-1?'disabled':''} onclick="moveItem(${item.id},1)">下移</button></div>` : ''}
+  </div>`;
 }
 function renderSelected(){
   const ids=settings.listingIds||[];
@@ -109,7 +121,7 @@ async function save(){
   try{
     setStatus('保存中...');
     const value={enabled:$('enabled').checked,rotateSeconds:Number($('rotateSeconds').value||180),listingIds:settings.listingIds||[]};
-    const data=await adminApi({action:'update',value});
+    const data=await adminApi({action:'update_hot_ads',value});
     settings=data.value;
     setStatus('已保存，首页今日热卖广告会使用这些客户轮播。');
     render();
