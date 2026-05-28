@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v14';
+const CACHE_NAME = 'espana-life-v15';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -26,9 +26,40 @@ self.addEventListener('activate', (event) => {
 });
 
 function injectHomePatch(html) {
-  if (html.includes('footerBrandPatch20260528')) return html;
+  if (html.includes('headerBrandScale20260528')) return html;
 
   const footerPatch = `
+<style id="headerBrandScale20260528">
+  .header-main .logo-text h1 {
+    font-size: clamp(24px, 5vw, 32px) !important;
+    line-height: 1.02 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .header-main .logo-text span {
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+  }
+
+  .header-main .logo {
+    min-width: min(100%, 300px);
+  }
+
+  @media (max-width: 430px) {
+    .header-main {
+      gap: 10px 14px !important;
+    }
+
+    .header-main .logo-text h1 {
+      font-size: 25px !important;
+    }
+
+    .header-main .logo-text .brand-domain {
+      font-size: 12px !important;
+      padding: 3px 8px !important;
+    }
+  }
+</style>
 <script id="footerBrandPatch20260528">
 (() => {
   function patchFooter() {
