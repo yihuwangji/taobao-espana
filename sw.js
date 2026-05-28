@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v22';
+const CACHE_NAME = 'espana-life-v23';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -74,6 +74,7 @@ function injectHomePatch(html) {
     margin-top: 0 !important;
     white-space: nowrap !important;
     transform: none !important;
+    cursor: pointer !important;
   }
 
   .header-main .search-bar button {
@@ -184,6 +185,27 @@ function injectHomePatch(html) {
 <script id="footerBrandPatch20260528">
 (() => {
   function patchFooter() {
+    const appBadge = document.querySelector('.header-main .brand-domain');
+    if (appBadge) {
+      appBadge.textContent = '下载手机 APP';
+      appBadge.setAttribute('role', 'button');
+      appBadge.setAttribute('tabindex', '0');
+      appBadge.setAttribute('aria-label', '下载手机 APP');
+      if (!appBadge.dataset.downloadBound) {
+        appBadge.dataset.downloadBound = '1';
+        appBadge.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          window.location.href = '/download';
+        });
+        appBadge.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            window.location.href = '/download';
+          }
+        });
+      }
+    }
     document.querySelectorAll('footer li').forEach((item) => {
       const text = item.textContent || '';
       if (text.includes('+34') || text.includes('WhatsApp')) item.remove();
@@ -211,6 +233,7 @@ async function transformHomeResponse(response) {
   let html = await response.text();
   html = html
     .replaceAll('淘商圈', '生活圈')
+    .replace('<span class="brand-domain">espanalife.app</span>', '<span class="brand-domain" role="button" tabindex="0" aria-label="下载手机 APP">下载手机 APP</span>')
     .replaceAll('老王跟小宋工作室', '欧桥开放平台')
     .replaceAll('Wang & Song Studio', 'EuroBridge Open Platform')
     .replace(/\s*<li>\s*<a[^>]*id="footerWhatsapp"[^>]*>[\s\S]*?<\/a>\s*<\/li>/g, '')
