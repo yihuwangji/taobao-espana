@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v19';
+const CACHE_NAME = 'espana-life-v20';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -30,6 +30,10 @@ function injectHomePatch(html) {
 
   const footerPatch = `
 <style id="headerBrandScale20260528">
+  .header-top {
+    display: none !important;
+  }
+
   .header-main .logo-text h1 {
     font-size: clamp(24px, 5vw, 32px) !important;
     line-height: 1.02 !important;
