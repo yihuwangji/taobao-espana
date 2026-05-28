@@ -6,6 +6,7 @@
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
   const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+  const esc = (value) => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 
   function patchHeader() {
     const badge = $('.brand-domain');
@@ -46,7 +47,7 @@
       <div class="section today-hot-section" id="todayHotDealsSection">
         <div class="section-title">
           <h3>今日热卖推荐</h3>
-          <a href="#" class="see-all" onclick="openModal('post');return false;">商家入口 →</a>
+          <a href="/admin-hotads.html" class="see-all">商家入口 →</a>
         </div>
         <div class="paid-ad-strip" id="paidAdStrip"></div>
       </div>
@@ -80,18 +81,6 @@
     hot ? hot.after(link) : nav.prepend(link);
   }
 
-  function addHotOption() {
-    ['postCat', 'editCat'].forEach((id) => {
-      const select = document.getElementById(id);
-      if (!select || [...select.options].some((option) => option.value === '今日热卖')) return;
-      const option = document.createElement('option');
-      option.value = '今日热卖';
-      option.textContent = id === 'postCat' ? '🔥 今日热卖' : '今日热卖';
-      const business = [...select.options].find((item) => item.value === '生意');
-      business ? business.after(option) : select.append(option);
-    });
-  }
-
   function collectAds() {
     return $$('.listing-card').slice(0, 3).map((card) => ({
       type: 'customer',
@@ -101,6 +90,26 @@
       city: clean(card.querySelector('.listing-loc')?.textContent) || '西班牙',
       price: clean(card.querySelector('.listing-price')?.textContent) || '面议'
     }));
+  }
+
+  async function loadConfiguredAds() {
+    try {
+      const response = await fetch('/api/hot-ads', { cache: 'no-store' });
+      const result = await response.json();
+      if (!response.ok || !result.ok || result.value?.enabled === false) return [];
+      const rows = Array.isArray(result.listings) ? result.listings : [];
+      return rows.map(row => ({
+        type: 'configured',
+        id: row.id,
+        img: (Array.isArray(row.images) && row.images[0]) || '/assets/icons/wechat-share-logo-20260521.jpg',
+        title: row.title || '商家广告',
+        city: row.city || '西班牙',
+        price: row.price || '面议',
+        rotateSeconds: Number(result.value?.rotateSeconds || 180)
+      }));
+    } catch (error) {
+      return [];
+    }
   }
 
   function dotsHtml() {
@@ -128,27 +137,32 @@
     }
     strip.innerHTML = `
       <article class="paid-ad-card">
-        <img src="${slide.img}" loading="lazy" alt="">
+        <img src="${esc(slide.img)}" loading="lazy" alt="">
         <div class="paid-ad-body">
           <div class="paid-ad-label">广告 · 今日热卖</div>
-          <div class="paid-ad-title">${slide.title}</div>
-          <div class="paid-ad-meta"><span>${slide.city}</span><span>${slide.price}</span></div>
+          <div class="paid-ad-title">${esc(slide.title)}</div>
+          <div class="paid-ad-meta"><span>${esc(slide.city)}</span><span>${esc(slide.price)}</span></div>
         </div>
       </article>${dotsHtml()}
     `;
-    $('#paidAdStrip .paid-ad-card').onclick = () => slide.card?.click();
+    $('#paidAdStrip .paid-ad-card').onclick = () => {
+      if (slide.type === 'configured' && slide.id) location.href = '/?listing=' + encodeURIComponent(slide.id);
+      else slide.card?.click();
+    };
   }
 
-  function startAds() {
+  async function startAds() {
     if (!ensureHotSection()) return;
-    slides = [...collectAds(), { type: 'house' }];
+    const configured = await loadConfiguredAds();
+    slides = configured.length ? [...configured, { type: 'house' }] : [...collectAds(), { type: 'house' }];
     showAd();
     if (timer) clearInterval(timer);
     if (slides.length > 1) {
+      const interval = Math.max(30, Number(slides[0]?.rotateSeconds || ROTATE_MS / 1000)) * 1000;
       timer = setInterval(() => {
         index = (index + 1) % slides.length;
         showAd();
-      }, ROTATE_MS);
+      }, interval);
     }
   }
 
@@ -166,7 +180,6 @@
     addMobileAuth();
     addHotNav();
     addLifeCircleNav();
-    addHotOption();
     patchLabels();
     startAds();
   }
