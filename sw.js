@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v15';
+const CACHE_NAME = 'espana-life-v16';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -57,6 +57,33 @@ function injectHomePatch(html) {
     .header-main .logo-text .brand-domain {
       font-size: 12px !important;
       padding: 3px 8px !important;
+    }
+  }
+
+  .hero {
+    background: #fff !important;
+    padding: 22px 16px !important;
+    border-bottom: 1px solid rgba(158,28,28,0.1);
+  }
+
+  .hero::before,
+  .hero::after {
+    display: none !important;
+  }
+
+  .hero-activity {
+    color: var(--ink) !important;
+    max-width: none !important;
+  }
+
+  .hero-index {
+    border-color: var(--gold) !important;
+    box-shadow: 0 8px 22px rgba(80,34,15,0.1) !important;
+  }
+
+  @media (max-width: 430px) {
+    .hero {
+      padding: 18px 16px 12px !important;
     }
   }
 </style>
