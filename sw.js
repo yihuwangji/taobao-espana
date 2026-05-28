@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v24';
+const CACHE_NAME = 'espana-life-v25';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -187,6 +187,8 @@ function injectHomePatch(html) {
   function patchFooter() {
     const appBadge = document.querySelector('.header-main .brand-domain');
     if (appBadge) {
+      const logoLink = appBadge.closest('a.logo');
+      if (logoLink) logoLink.setAttribute('href', '/download');
       appBadge.textContent = '下载手机 APP';
       appBadge.setAttribute('role', 'button');
       appBadge.setAttribute('tabindex', '0');
@@ -234,6 +236,7 @@ async function transformHomeResponse(response) {
   let html = await response.text();
   html = html
     .replaceAll('淘商圈', '生活圈')
+    .replace('<a href="#" class="logo">', '<a href="/download" class="logo">')
     .replace('<span class="brand-domain">espanalife.app</span>', `<span class="brand-domain" role="button" tabindex="0" aria-label="下载手机 APP" onclick="event.preventDefault(); event.stopPropagation(); window.location.href='/download'; return false;">下载手机 APP</span>`)
     .replaceAll('老王跟小宋工作室', '欧桥开放平台')
     .replaceAll('Wang & Song Studio', 'EuroBridge Open Platform')
