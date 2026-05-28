@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>热卖广告管理 - 西班牙生活通</title>
+<style>
+body{margin:0;background:#120f0d;color:#f8efe5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+header{position:sticky;top:0;z-index:5;background:#18120f;border-bottom:1px solid rgba(255,255,255,.08);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:18px;margin:0}.sub{font-size:12px;color:#b8aaa0;margin-top:4px}.wrap{max-width:1180px;margin:0 auto;padding:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:#1c1714;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;box-shadow:0 14px 34px rgba(0,0,0,.25)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.btn{border:0;border-radius:9px;padding:9px 12px;background:#2a231f;color:#fff;font-weight:800;cursor:pointer}.btn.gold{background:#f5a623;color:#21150c}.btn.green{background:#16a34a}.btn.red{background:#d42b2b}.btn:disabled{opacity:.45;cursor:not-allowed}
+input,select{background:#100c0a;border:1px solid rgba(255,255,255,.14);color:#fff;border-radius:9px;padding:10px 12px;font:inherit}input{width:100%;box-sizing:border-box}.list{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto;padding-right:4px}.item{border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;background:#15110f}.title{font-weight:900;line-height:1.45}.meta{font-size:12px;color:#b8aaa0;margin-top:5px;line-height:1.6}.empty{padding:24px;text-align:center;color:#b8aaa0;border:1px dashed rgba(255,255,255,.16);border-radius:10px}.toolbar{margin:16px 0}.status{font-size:13px;color:#f5a623;min-height:18px}.toplink{color:#f5a623;text-decoration:none;font-weight:800}
+@media(max-width:820px){.grid{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}.list{max-height:none}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>🔥 今日热卖广告轮播</h1>
+    <div class="sub">选择任意已上线客户信息，首页广告位会按顺序轮流展示。</div>
+  </div>
+  <div class="row">
+    <a class="toplink" href="/admin">返回后台</a>
+    <button class="btn" onclick="logout()">退出</button>
+  </div>
+</header>
+<main class="wrap">
+  <section class="card">
+    <div class="row">
+      <label class="row"><input type="checkbox" id="enabled" style="width:auto" checked> 启用轮播</label>
+      <select id="rotateSeconds">
+        <option value="60">每1分钟切换</option>
+        <option value="180" selected>每3分钟切换</option>
+        <option value="300">每5分钟切换</option>
+        <option value="600">每10分钟切换</option>
+      </select>
+      <button class="btn green" onclick="save()">保存广告设置</button>
+      <button class="btn" onclick="loadAll()">刷新</button>
+    </div>
+    <div class="status" id="status"></div>
+  </section>
+  <div class="grid toolbar">
+    <section class="card">
+      <h2 style="font-size:16px;margin:0 0 12px">已加入轮播</h2>
+      <div class="list" id="selected"></div>
+    </section>
+    <section class="card">
+      <h2 style="font-size:16px;margin:0 0 12px">选择客户信息</h2>
+      <input id="search" placeholder="搜索标题 / 城市 / 电话 / 分类..." oninput="renderCandidates()">
+      <div class="list" id="candidates" style="margin-top:12px"></div>
+    </section>
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://jfhpsxfnbpsvvtqsdvco.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let listings=[];
+let settings={enabled:true,rotateSeconds:180,listingIds:[]};
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const norm=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+const digits=v=>String(v||'').replace(/\D/g,'');
+function setStatus(text){$('status').textContent=text||''}
+async function adminApi(body){
+  const session=(await sb.auth.getSession()).data.session;
+  if(!session) throw new Error('请先登录后台 /admin');
+  const res=await fetch('/api/admin-hot-ads',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify(body)});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.message||data.error||'操作失败');
+  return data;
+}
+async function requireLogin(){
+  const session=(await sb.auth.getSession()).data.session;
+  if(!session){ location.href='/admin'; return false; }
+  return true;
+}
+async function loadSettings(){
+  const data=await adminApi({action:'get'});
+  settings={enabled:data.value?.enabled!==false,rotateSeconds:Number(data.value?.rotateSeconds||180),listingIds:Array.isArray(data.value?.listingIds)?data.value.listingIds.map(Number).filter(Boolean):[]};
+  $('enabled').checked=settings.enabled;
+  $('rotateSeconds').value=String(settings.rotateSeconds);
+}
+async function loadListings(){
+  const {data,error}=await sb.from('listings').select('id,title,category,city,price,contact,address,status,created_at,images').eq('status','approved').order('created_at',{ascending:false}).limit(1000);
+  if(error) throw error;
+  listings=data||[];
+}
+function rowHtml(item, selected, index){
+  return `<div class="item"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="title">${selected ? `${index+1}. ` : ''}${esc(item.title||`信息 #${item.id}`)}</div><div class="meta">#${esc(item.id)} · ${esc(item.category||'')} · 📍 ${esc(item.city||'')} · ${esc(item.contact||'')}</div></div>${selected?`<button class="btn red" onclick="removeItem(${item.id})">移除</button>`:`<button class="btn gold" onclick="addItem(${item.id})">加入轮播</button>`}</div>${selected?`<div class="row" style="margin-top:10px"><button class="btn" ${index===0?'disabled':''} onclick="moveItem(${item.id},-1)">上移</button><button class="btn" ${index===settings.listingIds.length-1?'disabled':''} onclick="moveItem(${item.id},1)">下移</button></div>`:''}</div>`;
+}
+function renderSelected(){
+  const ids=settings.listingIds||[];
+  if(!ids.length){$('selected').innerHTML='<div class="empty">还没有客户广告。右边搜索后点“加入轮播”。</div>';return}
+  $('selected').innerHTML=ids.map((id,index)=>rowHtml(listings.find(x=>Number(x.id)===Number(id))||{id,title:`信息 #${id}`},true,index)).join('');
+}
+function renderCandidates(){
+  const q=norm($('search').value);
+  const chosen=new Set((settings.listingIds||[]).map(String));
+  const rows=listings.filter(x=>!chosen.has(String(x.id))).filter(x=>!q||norm([x.title,x.category,x.city,x.contact,x.address,x.price].join(' ')).includes(q)||digits(x.contact).includes(digits(q))).slice(0,100);
+  $('candidates').innerHTML=rows.length?rows.map(x=>rowHtml(x,false,0)).join(''):'<div class="empty">没有找到可加入的信息</div>';
+}
+function render(){renderSelected();renderCandidates()}
+function addItem(id){settings.listingIds=[...new Set([...(settings.listingIds||[]),Number(id)].filter(Boolean))].slice(0,20);render()}
+function removeItem(id){settings.listingIds=(settings.listingIds||[]).filter(x=>Number(x)!==Number(id));render()}
+function moveItem(id,dir){const ids=[...(settings.listingIds||[])];const i=ids.findIndex(x=>Number(x)===Number(id));const t=i+dir;if(i<0||t<0||t>=ids.length)return;[ids[i],ids[t]]=[ids[t],ids[i]];settings.listingIds=ids;render()}
+async function save(){
+  try{
+    setStatus('保存中...');
+    const value={enabled:$('enabled').checked,rotateSeconds:Number($('rotateSeconds').value||180),listingIds:settings.listingIds||[]};
+    const data=await adminApi({action:'update',value});
+    settings=data.value;
+    setStatus('已保存，首页今日热卖广告会使用这些客户轮播。');
+    render();
+  }catch(e){setStatus('保存失败：'+e.message)}
+}
+async function loadAll(){
+  try{
+    setStatus('加载中...');
+    if(!await requireLogin())return;
+    await Promise.all([loadSettings(),loadListings()]);
+    render();
+    setStatus('已加载');
+  }catch(e){setStatus('加载失败：'+e.message)}
+}
+async function logout(){await sb.auth.signOut();location.href='/admin'}
+loadAll();
+</script>
+</body>
+</html>
