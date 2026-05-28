@@ -30,6 +30,7 @@
       <div class="mobile-auth-shortcuts">
         <a href="#" class="mobile-auth-link primary" onclick="openModal('login');return false;">登录</a>
         <a href="#" class="mobile-auth-link" onclick="openModal('register');return false;">注册</a>
+        <a href="/feed/" class="mobile-auth-link primary">生活圈</a>
         <a href="#" class="mobile-auth-link primary" onclick="openModal('profile');return false;">我的信息</a>
         <a href="#" class="mobile-auth-link" onclick="openModal('post');return false;">＋ 发布信息</a>
       </div>
@@ -66,6 +67,17 @@
     };
     const first = nav.querySelector('.nav-cat');
     first ? first.after(link) : nav.prepend(link);
+  }
+
+  function addLifeCircleNav() {
+    const nav = $('.nav-cats');
+    if (!nav || nav.querySelector('a[href="/feed/"]')) return;
+    const link = document.createElement('a');
+    link.href = '/feed/';
+    link.className = 'nav-cat';
+    link.textContent = '生活圈🔥';
+    const hot = nav.querySelector('a[href="#todayHotDealsSection"]');
+    hot ? hot.after(link) : nav.prepend(link);
   }
 
   function addHotOption() {
@@ -153,6 +165,7 @@
     patchHeader();
     addMobileAuth();
     addHotNav();
+    addLifeCircleNav();
     addHotOption();
     patchLabels();
     startAds();
