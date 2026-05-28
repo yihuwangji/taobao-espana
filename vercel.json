@@ -22,65 +22,62 @@
       "dest": "/admin.html"
     },
     {
-      "src": "/download",
-      "dest": "/download.html"
+      "src": "/admin-vip",
+      "headers": {
+        "Cache-Control": "no-store, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "dest": "/admin-vip.html"
     },
     {
-      "src": "/publish",
-      "dest": "/index.html"
+      "src": "/admin-vip.html",
+      "headers": {
+        "Cache-Control": "no-store, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "dest": "/admin-vip.html"
     },
     {
-      "src": "/privacy",
-      "dest": "/privacy.html"
+      "src": "/admin-images",
+      "headers": {
+        "Cache-Control": "no-store, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "dest": "/admin-images.html"
     },
     {
-      "src": "/api/register",
-      "dest": "/api/register.js"
+      "src": "/admin-images.html",
+      "headers": {
+        "Cache-Control": "no-store, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Content-Type-Options": "nosniff"
+      },
+      "dest": "/admin-images.html"
     },
-    {
-      "src": "/api/referral",
-      "dest": "/api/referral.js"
-    },
-    {
-      "src": "/api/admin-delete",
-      "dest": "/api/admin-delete.js"
-    },
-    {
-      "src": "/api/admin-listing-batch",
-      "dest": "/api/admin-listing-batch.js"
-    },
-    {
-      "src": "/api/admin-user-permissions",
-      "dest": "/api/admin-user-permissions.js"
-    },
-    {
-      "src": "/api/admin-site-settings",
-      "dest": "/api/admin-site-settings.js"
-    },
-    {
-      "src": "/api/admin-download-apk",
-      "dest": "/api/admin-download-apk.js"
-    },
-    {
-      "src": "/api/admin-import-merchants",
-      "dest": "/api/admin-import-merchants.js"
-    },
-    {
-      "src": "/api/admin-update-merchant-contacts",
-      "dest": "/api/admin-update-merchant-contacts.js"
-    },
-    {
-      "src": "/api/admin-update-merchant-images",
-      "dest": "/api/admin-update-merchant-images.js"
-    },
-    {
-      "src": "/s/([^/]+)",
-      "dest": "/api/share?id=$1"
-    },
-    {
-      "src": "/share/([^/]+)",
-      "dest": "/api/share?id=$1"
-    },
+    { "src": "/download", "dest": "/download.html" },
+    { "src": "/publish", "dest": "/index.html" },
+    { "src": "/privacy", "dest": "/privacy.html" },
+    { "src": "/api/register", "dest": "/api/register.js" },
+    { "src": "/api/referral", "dest": "/api/referral.js" },
+    { "src": "/api/admin-delete", "dest": "/api/admin-delete.js" },
+    { "src": "/api/admin-listing-batch", "dest": "/api/admin-listing-batch.js" },
+    { "src": "/api/admin-user-permissions", "dest": "/api/admin-user-permissions.js" },
+    { "src": "/api/admin-site-settings", "dest": "/api/admin-site-settings.js" },
+    { "src": "/api/admin-vip", "dest": "/api/admin-vip.js" },
+    { "src": "/api/admin-listing-images", "dest": "/api/admin-listing-images.js" },
+    { "src": "/api/admin-download-apk", "dest": "/api/admin-download-apk.js" },
+    { "src": "/api/admin-import-merchants", "dest": "/api/admin-import-merchants.js" },
+    { "src": "/api/admin-update-merchant-contacts", "dest": "/api/admin-update-merchant-contacts.js" },
+    { "src": "/api/admin-update-merchant-images", "dest": "/api/admin-update-merchant-images.js" },
+    { "src": "/s/([^/]+)", "dest": "/api/share?id=$1" },
+    { "src": "/share/([^/]+)", "dest": "/api/share?id=$1" },
     {
       "src": "/",
       "headers": {
@@ -88,119 +85,90 @@
         "Pragma": "no-cache",
         "Expires": "0"
       },
-      "dest": "/api/home.js"
+      "dest": "/api/share?id=__home"
     }
   ],
   "headers": [
     {
       "source": "/admin",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     },
     {
       "source": "/admin.html",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    },
+    {
+      "source": "/admin-vip",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    },
+    {
+      "source": "/admin-vip.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    },
+    {
+      "source": "/admin-images",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    },
+    {
+      "source": "/admin-images.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     },
     {
       "source": "/sw.js",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache"
-        },
-        {
-          "key": "Service-Worker-Allowed",
-          "value": "/"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
+        { "key": "Cache-Control", "value": "no-cache" },
+        { "key": "Service-Worker-Allowed", "value": "/" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     },
     {
       "source": "/manifest.webmanifest",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/manifest+json; charset=utf-8"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
+        { "key": "Content-Type", "value": "application/manifest+json; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     },
     {
       "source": "/.well-known/assetlinks.json",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json; charset=utf-8"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     },
     {
       "source": "/downloads/(.*).apk",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/vnd.android.package-archive"
-        },
-        {
-          "key": "Content-Disposition",
-          "value": "attachment"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=86400"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
+        { "key": "Content-Type", "value": "application/vnd.android.package-archive" },
+        { "key": "Content-Disposition", "value": "attachment" },
+        { "key": "Cache-Control", "value": "public, max-age=86400" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     }
   ]
