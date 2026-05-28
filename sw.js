@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v16';
+const CACHE_NAME = 'espana-life-v17';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -81,9 +81,51 @@ function injectHomePatch(html) {
     box-shadow: 0 8px 22px rgba(80,34,15,0.1) !important;
   }
 
+  .nav-cats {
+    background: rgba(255,255,255,0.92) !important;
+    gap: 8px !important;
+    padding: 10px 14px !important;
+    border-top: 1px solid rgba(158,28,28,0.08);
+    border-bottom: 1px solid rgba(158,28,28,0.1);
+    box-shadow: 0 8px 22px rgba(80,34,15,0.08);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+  }
+
+  .nav-cat {
+    min-height: 40px !important;
+    padding: 0 14px !important;
+    border: 1px solid rgba(158,28,28,0.1) !important;
+    border-radius: 999px !important;
+    background: linear-gradient(180deg, #fff 0%, #fff8ee 100%) !important;
+    color: #6f1c16 !important;
+    font-size: 14px !important;
+    font-weight: 850 !important;
+    box-shadow: 0 5px 14px rgba(80,34,15,0.08) !important;
+  }
+
+  .nav-cat:hover,
+  .nav-cat.active {
+    background: linear-gradient(180deg, #fff6df 0%, #ffd36a 100%) !important;
+    color: #5a160f !important;
+    border-color: rgba(245,166,35,0.78) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 8px 18px rgba(245,166,35,0.2) !important;
+  }
+
   @media (max-width: 430px) {
     .hero {
       padding: 18px 16px 12px !important;
+    }
+
+    .nav-cats {
+      padding: 9px 12px !important;
+      gap: 7px !important;
+    }
+
+    .nav-cat {
+      min-height: 38px !important;
+      padding: 0 13px !important;
+      font-size: 14px !important;
     }
   }
 </style>
