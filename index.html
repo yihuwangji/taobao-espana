@@ -1585,6 +1585,42 @@
   .footer-col a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; transition: color 0.2s; }
   .footer-col a:hover { color: white; }
 
+  .footer-wechat-qr {
+    display: block;
+    width: 138px;
+    margin-top: 14px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .footer-wechat-qr img {
+    width: 112px;
+    height: 112px;
+    display: block;
+    margin: 0 auto 8px;
+    border-radius: 10px;
+    background: white;
+    object-fit: cover;
+  }
+
+  .footer-wechat-qr-title {
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+
+  .footer-wechat-qr-id {
+    color: rgba(255,255,255,0.64);
+    font-size: 11px;
+    line-height: 1.5;
+    word-break: break-all;
+  }
+
   .footer-bottom {
     max-width: 1200px;
     margin: 0 auto;
@@ -2182,6 +2218,14 @@
       gap: 20px 18px;
     }
     .footer-col:first-child { grid-column: 1 / -1; }
+    .footer-wechat-qr {
+      width: 128px;
+      padding: 8px;
+    }
+    .footer-wechat-qr img {
+      width: 104px;
+      height: 104px;
+    }
     .footer-bottom {
       display: block;
       line-height: 1.8;
@@ -2544,6 +2588,11 @@
         <li><a href="#" id="footerWhatsapp" onclick="openModal('contactUs'); return false;">📱 WhatsApp</a></li>
         <li><a href="#" id="footerFacebook" onclick="openModal('contactUs'); return false;">📘 Facebook</a></li>
       </ul>
+      <a class="footer-wechat-qr" id="footerWechatQrLink" href="/assets/contact/wechat-qr-espana-life-20260529.jpg" target="_blank" rel="noopener" aria-label="查看客服微信二维码">
+        <img id="footerWechatQrImage" src="/assets/contact/wechat-qr-espana-life-20260529.jpg" alt="西班牙生活通客服微信二维码" loading="eager">
+        <div class="footer-wechat-qr-title">扫码加客服</div>
+        <div class="footer-wechat-qr-id">微信号：<span id="footerWechatQrId">espana_life</span></div>
+      </a>
     </div>
     <div class="footer-col">
       <h4 data-i18n="footer.help">帮助中心</h4>
@@ -4571,6 +4620,9 @@ function updateContactFooter() {
   const group = document.getElementById('footerWechatGroup');
   const whatsapp = document.getElementById('footerWhatsapp');
   const facebook = document.getElementById('footerFacebook');
+  const footerQrLink = document.getElementById('footerWechatQrLink');
+  const footerQrImage = document.getElementById('footerWechatQrImage');
+  const footerQrId = document.getElementById('footerWechatQrId');
   if (wechat) wechat.textContent = info.wechatId;
   if (email) email.textContent = info.email;
   if (hours) hours.textContent = info.supportHours;
@@ -4578,6 +4630,9 @@ function updateContactFooter() {
   if (group) group.textContent = '▦ 微信二维码';
   if (whatsapp) whatsapp.style.display = 'none';
   if (facebook) facebook.style.display = 'none';
+  if (footerQrId) footerQrId.textContent = info.wechatId;
+  if (footerQrImage) footerQrImage.src = info.wechatQrUrl || DEFAULT_CONTACT_INFO.wechatQrUrl;
+  if (footerQrLink) footerQrLink.href = info.wechatQrUrl || DEFAULT_CONTACT_INFO.wechatQrUrl;
 }
 
 async function loadSiteContactInfo() {
