@@ -4455,16 +4455,17 @@ const CONTACT_CONTENT = {
 };
 
 const DEFAULT_CONTACT_INFO = {
-  officialAccount: '西班牙生活通',
-  wechatGroup: '西班牙华人生活交流群',
+  officialAccount: '',
+  wechatGroup: '',
   wechatId: 'espana_life',
+  wechatQrUrl: '/assets/contact/wechat-qr-espana-life-20260529.jpg',
   whatsapp: '+34 ',
   facebookName: 'España Life',
   facebookUrl: '',
   email: 'aladaya@gmail.com',
   supportHours: '9:00-22:00',
-  groupZh: '加入西班牙华人生活交流群，与更多华人朋友互动',
-  groupEs: 'Únete a la comunidad china en España para compartir información útil',
+  groupZh: '',
+  groupEs: '',
   introZh: '感谢您使用西班牙生活通！如有任何问题或建议，请通过以下方式联系我们：',
   introEs: 'Gracias por usar España Life. Si tienes alguna pregunta o sugerencia, puedes contactar con nosotros por estos medios:',
   responseZh: '我们通常在24小时内回复您的咨询',
@@ -4478,6 +4479,7 @@ function normalizeContactInfo(value = {}) {
     officialAccount: String(value.officialAccount || DEFAULT_CONTACT_INFO.officialAccount).trim() || DEFAULT_CONTACT_INFO.officialAccount,
     wechatGroup: String(value.wechatGroup || DEFAULT_CONTACT_INFO.wechatGroup).trim() || DEFAULT_CONTACT_INFO.wechatGroup,
     wechatId: String(value.wechatId || DEFAULT_CONTACT_INFO.wechatId).trim() || DEFAULT_CONTACT_INFO.wechatId,
+    wechatQrUrl: String(value.wechatQrUrl || DEFAULT_CONTACT_INFO.wechatQrUrl).trim() || DEFAULT_CONTACT_INFO.wechatQrUrl,
     whatsapp: String(value.whatsapp || DEFAULT_CONTACT_INFO.whatsapp).trim() || DEFAULT_CONTACT_INFO.whatsapp,
     facebookName: String(value.facebookName || DEFAULT_CONTACT_INFO.facebookName).trim() || DEFAULT_CONTACT_INFO.facebookName,
     facebookUrl: String(value.facebookUrl || DEFAULT_CONTACT_INFO.facebookUrl).trim() || DEFAULT_CONTACT_INFO.facebookUrl,
@@ -4508,6 +4510,20 @@ function contactCard(icon, title, text, href = '') {
   `;
 }
 
+function wechatQrCard(info, lang = 'zh') {
+  const qrUrl = info.wechatQrUrl || DEFAULT_CONTACT_INFO.wechatQrUrl;
+  const title = lang === 'es' ? 'Código QR de WeChat' : '微信二维码';
+  const hint = lang === 'es' ? 'Escanea con WeChat o añade el ID de atención al cliente.' : '微信扫一扫，添加西班牙生活通客服。';
+  return `
+    <div style="background:#f0fff4;border:1.5px solid #bbf7d0;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-weight:800;margin-bottom:8px;color:#047857">${escapeHTML(title)}</div>
+      <img src="${escapeHTML(qrUrl)}" alt="${escapeHTML(title)}" style="width:min(260px,100%);border-radius:12px;display:block;margin:0 auto 8px;background:white">
+      <div style="color:#166534;font-size:13px;font-weight:700">微信号：${escapeHTML(info.wechatId)}</div>
+      <div style="color:#666;font-size:12px;margin-top:4px">${escapeHTML(hint)}</div>
+    </div>
+  `;
+}
+
 function facebookDisplay(info) {
   return info.facebookUrl ? `${info.facebookName} · ${info.facebookUrl}` : info.facebookName;
 }
@@ -4525,11 +4541,8 @@ function buildContactContent(lang) {
       body: `
         <p style="margin-bottom:16px">${escapeHTML(info.introEs)}</p>
         <div style="display:flex;flex-direction:column;gap:12px">
-          ${contactCard('💬', 'Cuenta oficial de WeChat', `Busca “${info.officialAccount}” y síguenos en WeChat`)}
-          ${contactCard('📢', 'Grupo de WeChat', `${info.wechatGroup} · ${info.groupEs}`)}
-          ${contactCard('📱', 'WhatsApp', info.whatsapp, siteWhatsappUrl)}
-          ${contactCard('📘', 'Facebook', facebookDisplay(info))}
           ${contactCard('💚', 'Atención por WeChat', `Añade: ${info.wechatId}. Horario: ${info.supportHours} (hora de España)`)}
+          ${wechatQrCard(info, 'es')}
           ${contactCard('📧', 'Correo electrónico', info.email)}
         </div>
         <p style="margin-top:16px;font-size:12px;color:#999;text-align:center">${escapeHTML(info.responseEs)}</p>
@@ -4542,11 +4555,8 @@ function buildContactContent(lang) {
     body: `
       <p style="margin-bottom:16px">${escapeHTML(info.introZh)}</p>
       <div style="display:flex;flex-direction:column;gap:12px">
-        ${contactCard('💬', '微信公众号', `搜索“${info.officialAccount}”关注我们的公众号`)}
-        ${contactCard('📢', '微信群', `${info.wechatGroup} · ${info.groupZh}`)}
-        ${contactCard('📱', 'WhatsApp', info.whatsapp, siteWhatsappUrl)}
-        ${contactCard('📘', 'Facebook', facebookDisplay(info))}
         ${contactCard('💚', '微信客服', `添加客服微信：${info.wechatId}，工作时间 ${info.supportHours}（西班牙时间）`)}
+        ${wechatQrCard(info, 'zh')}
         ${contactCard('📧', '电子邮件', info.email)}
       </div>
       <p style="margin-top:16px;font-size:12px;color:#999;text-align:center">${escapeHTML(info.responseZh)}</p>
@@ -4566,8 +4576,10 @@ function updateContactFooter() {
   if (wechat) wechat.textContent = info.wechatId;
   if (email) email.textContent = info.email;
   if (hours) hours.textContent = info.supportHours;
-  if (official) official.textContent = `💬 ${info.officialAccount}`;
-  if (group) group.textContent = `📢 ${info.wechatGroup}`;
+  if (official) official.textContent = `💬 客服微信：${info.wechatId}`;
+  if (group) group.textContent = '▦ 微信二维码';
+  if (whatsapp) whatsapp.style.display = 'none';
+  if (facebook) facebook.style.display = 'none';
   if (whatsapp) {
     const href = whatsappHref(info.whatsapp);
     whatsapp.textContent = `📱 ${info.whatsapp || 'WhatsApp'}`;
