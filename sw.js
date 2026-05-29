@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v28-reset';
+const CACHE_NAME = 'espana-life-v29-lang';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
@@ -14,7 +14,7 @@ self.addEventListener('activate', (event) => {
       try {
         const url = new URL(client.url);
         if (url.origin === self.location.origin && !url.searchParams.has('fresh')) {
-          url.searchParams.set('fresh', '28');
+          url.searchParams.set('fresh', '29');
           await client.navigate(url.toString());
         }
       } catch (error) {}
@@ -31,6 +31,41 @@ self.addEventListener('message', (event) => {
   }
 });
 
+async function withUiPatch(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('text/html')) return response;
+
+  let html = await response.text();
+  if (!html.includes('langVisibilityFix20260529')) {
+    html = html.replace('</head>', `
+<style id="langVisibilityFix20260529">
+  .header-main .header-lang.lang-switch {
+    background: #fff8ec !important;
+    border: 1px solid rgba(158,28,28,0.24) !important;
+    box-shadow: 0 4px 12px rgba(80,34,15,0.08) !important;
+  }
+
+  .header-main .header-lang .lang-btn {
+    color: #9e1c1c !important;
+    font-weight: 900 !important;
+    opacity: 1 !important;
+  }
+
+  .header-main .header-lang .lang-btn.active {
+    background: #d92727 !important;
+    color: #fff !important;
+  }
+</style>
+</head>`);
+  }
+
+  return new Response(html, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+}
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
@@ -40,11 +75,13 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/admin')) return;
 
   event.respondWith(
-    fetch(request, { cache: 'no-store' }).catch(() => {
-      if (request.mode === 'navigate') {
-        return fetch('/index.html?offline_fallback=1', { cache: 'no-store' });
-      }
-      return caches.match(request);
-    })
+    fetch(request, { cache: 'no-store' })
+      .then((response) => (request.mode === 'navigate' ? withUiPatch(response) : response))
+      .catch(() => {
+        if (request.mode === 'navigate') {
+          return fetch('/index.html?offline_fallback=1', { cache: 'no-store' }).then(withUiPatch);
+        }
+        return caches.match(request);
+      })
   );
 });
