@@ -2502,6 +2502,34 @@ function adminWhatsAppUrlForListing(listing) {
   return `https://wa.me/${number}?text=${encodeURIComponent(buildPublishedWhatsAppMessage(listing))}`;
 }
 
+function adminContactSettingText(inputId, key, fallback = '') {
+  const value = document.getElementById(inputId)?.value || DEFAULT_CONTACT_SETTINGS?.[key] || fallback;
+  return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+buildPublishedWhatsAppMessage = function(listing) {
+  const title = String(listing?.title || '您的信息').replace(/\s+/g, ' ').trim();
+  const url = adminListingShareUrl(listing);
+  const wechatId = adminContactSettingText('contactWechatId', 'wechatId', 'espana_life');
+  return [
+    '【西班牙生活通】发布成功通知 ✅',
+    '',
+    `您好，您的信息《${title}》已经审核通过，并已在西班牙生活通正式发布成功。`,
+    `详情链接：${url}`,
+    '',
+    '为了下次修改、续发、置顶、广告推广或领取商家信息更方便，请保存我们的联系方式：',
+    `西班牙生活通客服微信：${wechatId}`,
+    '',
+    '微信二维码：请添加上面的客服微信，客服会发送二维码给您保存。',
+    '也可以打开 espanalife.app，在“联系我们”里查看最新客服信息。',
+    '',
+    '[España Life] Anuncio publicado correctamente ✅',
+    `Su anuncio "${title}" ya ha sido aprobado y publicado en España Life.`,
+    `Enlace: ${url}`,
+    `WeChat de atención al cliente: ${wechatId}`
+  ].join('\n');
+};
+
 function buildAdminContactWhatsAppMessage(context = '') {
   const cleanContext = String(context || '').replace(/\s+/g, ' ').trim();
   return [
