@@ -3898,7 +3898,7 @@ async function shareReferralInvite() {
   const inviteUrl = getReferralInviteUrl();
   if (!inviteUrl) return;
   const code = window._referralStatus?.referralCode || '';
-  const text = `我在用西班牙生活通，招工、租房、生意转让、二手和生活服务都能看。我的转发码：${code}。打开这个链接支持我领取VIP：${inviteUrl}`;
+  const text = `我刚注册了西班牙生活通，这里可以看西班牙本地招工、房源、二手、生意转让和商家服务信息，也可以免费发布信息。打开看看：${inviteUrl}\n我的转发码：${code}`;
   if (navigator.share && !isWeChatBrowser()) {
     try {
       await navigator.share({ title: '西班牙生活通', text, url: inviteUrl });
@@ -3909,6 +3909,76 @@ async function shareReferralInvite() {
   }
   await copyText(text);
   showToast(isWeChatBrowser() ? '已复制分享文案，去微信聊天粘贴发送' : '已复制邀请文案和链接');
+}
+
+function closeRegisterSuccess() {
+  const modal = document.getElementById('registerSuccessModal');
+  if (modal) modal.classList.remove('open');
+  syncModalScrollLock();
+}
+
+function ensureRegisterSuccessModal() {
+  let modal = document.getElementById('registerSuccessModal');
+  if (modal) return modal;
+  modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'registerSuccessModal';
+  modal.innerHTML = `
+    <div class="modal relative" style="max-width:480px">
+      <button class="modal-close" onclick="closeRegisterSuccess()">✕</button>
+      <div id="registerSuccessBody"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  ensureModalRoot(modal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === this) closeRegisterSuccess();
+  });
+  return modal;
+}
+
+function showRegisterSuccessNotice() {
+  const modal = ensureRegisterSuccessModal();
+  const body = document.getElementById('registerSuccessBody');
+  const info = normalizeContactInfo(siteContactInfo);
+  const inviteUrl = getReferralInviteUrl();
+  const code = window._referralStatus?.referralCode || '';
+  if (body) {
+    body.innerHTML = `
+      <div style="text-align:center;margin-bottom:14px">
+        <div style="font-size:42px;line-height:1;margin-bottom:8px">🎉</div>
+        <h3 style="margin:0;color:var(--red);font-size:22px">注册成功</h3>
+        <p style="margin:8px 0 0;color:#666;font-size:14px;line-height:1.7">欢迎加入西班牙生活通！你的账号已开通，可以免费发布信息。</p>
+      </div>
+      <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:12px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-weight:900;color:#9a3412;margin-bottom:6px">下一步可以做什么？</div>
+        <div style="font-size:13px;color:#7c2d12;line-height:1.8">
+          1. 点击“发布信息”，发布招工、房源、二手或生意转让。<br>
+          2. 分享你的专属链接，邀请10位好友打开，可免费领1年VIP。<br>
+          3. 保存客服微信，后续审核、置顶、修改信息都方便联系。
+        </div>
+      </div>
+      <div style="background:#f0fff4;border:1.5px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:12px;text-align:center">
+        <div style="font-weight:900;color:#047857;margin-bottom:8px">西班牙生活通客服微信</div>
+        <img src="${escapeHTML(info.wechatQrUrl || DEFAULT_CONTACT_INFO.wechatQrUrl)}" alt="客服微信二维码" style="width:min(210px,100%);border-radius:12px;background:white;display:block;margin:0 auto 8px">
+        <div style="font-size:13px;color:#166534;font-weight:800">微信号：${escapeHTML(info.wechatId)}</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">请截图或长按保存，方便下次联系。</div>
+      </div>
+      ${inviteUrl ? `
+        <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:12px">
+          <div style="font-size:12px;font-weight:900;color:#334155;margin-bottom:6px">我的转发码：<span style="color:#b91c1c;font-size:16px">${escapeHTML(code)}</span></div>
+          <input readonly value="${escapeHTML(inviteUrl)}" onclick="this.select()" style="width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;font-size:12px;color:#334155;background:white">
+        </div>
+      ` : ''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onclick="copyReferralInvite()" style="border:none;border-radius:10px;background:#16a34a;color:white;font-weight:900;padding:11px 8px;cursor:pointer">复制分享链接</button>
+        <button onclick="closeRegisterSuccess();openModal('post')" style="border:none;border-radius:10px;background:linear-gradient(135deg,#d71920,#ffb21c);color:white;font-weight:900;padding:11px 8px;cursor:pointer">马上发布信息</button>
+      </div>
+      <button onclick="closeRegisterSuccess();openModal('profile')" style="width:100%;margin-top:10px;border:1.5px solid #e5e7eb;border-radius:10px;background:white;color:#555;font-weight:800;padding:10px;cursor:pointer">查看我的账号</button>
+    `;
+  }
+  modal.classList.add('open');
+  syncModalScrollLock();
 }
 
 async function openReferralCenter() {
@@ -4775,8 +4845,9 @@ async function submitRegister() {
   btn.textContent = '注册';
   btn.disabled = false;
   closeModal('register');
-  showToast('🎉 注册成功，已自动登录。去“我的”复制专属链接，邀请10位好友可免费领1年VIP');
-  loadReferralStatus();
+  await loadReferralStatus();
+  showRegisterSuccessNotice();
+  showToast('🎉 注册成功，已自动登录');
 }
 
 // ===== 用户登录 =====
