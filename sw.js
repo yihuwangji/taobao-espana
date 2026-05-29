@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v29-lang';
+const CACHE_NAME = 'espana-life-v30-listings';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
@@ -14,7 +14,7 @@ self.addEventListener('activate', (event) => {
       try {
         const url = new URL(client.url);
         if (url.origin === self.location.origin && !url.searchParams.has('fresh')) {
-          url.searchParams.set('fresh', '29');
+          url.searchParams.set('fresh', '30');
           await client.navigate(url.toString());
         }
       } catch (error) {}
@@ -56,6 +56,51 @@ async function withUiPatch(response) {
     color: #fff !important;
   }
 </style>
+<script id="listingCountRecovery20260529">
+(() => {
+  const MIN_EXPECTED_LISTINGS = 3;
+
+  function countVisibleListings() {
+    const grid = document.getElementById('listingsGrid');
+    if (!grid) return null;
+    return {
+      grid,
+      cards: grid.querySelectorAll('.listing-card').length,
+      text: grid.textContent || ''
+    };
+  }
+
+  function resetFilters() {
+    try { if (typeof currentCat !== 'undefined') currentCat = 'all'; } catch (error) {}
+    try { if (typeof currentCity !== 'undefined') currentCity = '全部'; } catch (error) {}
+    try { if (typeof currentMerchant !== 'undefined') currentMerchant = ''; } catch (error) {}
+    try { if (typeof currentSearch !== 'undefined') currentSearch = ''; } catch (error) {}
+    try {
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) searchInput.value = '';
+    } catch (error) {}
+  }
+
+  function recoverListings() {
+    const state = countVisibleListings();
+    if (!state) return;
+
+    const looksStuck = state.text.includes('加载中') || state.text.includes('Cargando');
+    const tooFewListings = state.cards > 0 && state.cards < MIN_EXPECTED_LISTINGS;
+    if (!looksStuck && !tooFewListings) return;
+
+    resetFilters();
+    try { if (typeof updateMerchantFilterUI === 'function') updateMerchantFilterUI(); } catch (error) {}
+    try { if (typeof syncListingTitle === 'function') syncListingTitle(); } catch (error) {}
+    try { if (typeof loadListings === 'function') loadListings(); } catch (error) {}
+  }
+
+  window.addEventListener('load', () => {
+    setTimeout(recoverListings, 1800);
+    setTimeout(recoverListings, 4200);
+  });
+})();
+</script>
 </head>`);
   }
 
