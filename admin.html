@@ -1411,28 +1411,12 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           <div class="config-box">
             <h4>📞 联系方式设置</h4>
             <div class="config-row">
-              <label>微信公众号</label>
-              <input type="text" id="contactOfficialAccount" placeholder="西班牙生活通">
-            </div>
-            <div class="config-row">
-              <label>微信群</label>
-              <input type="text" id="contactWechatGroup" placeholder="西班牙华人生活交流群">
-            </div>
-            <div class="config-row">
               <label>客服微信</label>
               <input type="text" id="contactWechatId" placeholder="espana_life">
             </div>
             <div class="config-row">
-              <label>WhatsApp</label>
-              <input type="text" id="contactWhatsapp" placeholder="+34 6XX XXX XXX">
-            </div>
-            <div class="config-row">
-              <label>Facebook 名称</label>
-              <input type="text" id="contactFacebookName" placeholder="España Life">
-            </div>
-            <div class="config-row">
-              <label>Facebook 链接</label>
-              <input type="text" id="contactFacebookUrl" placeholder="https://www.facebook.com/...">
+              <label>微信二维码</label>
+              <a href="/assets/contact/wechat-qr-espana-life-20260529.jpg" target="_blank" rel="noopener" style="flex:1;color:#16a34a;font-weight:700;text-decoration:none;word-break:break-all">查看/下载客服微信二维码</a>
             </div>
             <div class="config-row">
               <label>电子邮件</label>
@@ -1449,14 +1433,6 @@ tr:hover td { background: rgba(255,255,255,0.02); }
             <div class="config-row">
               <label>西语开头</label>
               <input type="text" id="contactIntroEs" placeholder="Gracias por usar España Life...">
-            </div>
-            <div class="config-row">
-              <label>微信群中文</label>
-              <input type="text" id="contactGroupZh" placeholder="加入西班牙华人生活交流群，与更多华人朋友互动">
-            </div>
-            <div class="config-row">
-              <label>微信群西语</label>
-              <input type="text" id="contactGroupEs" placeholder="Únete a la comunidad china en España...">
             </div>
             <div class="config-row">
               <label>回复提示中文</label>
@@ -3722,16 +3698,16 @@ function addPin() { closeModal('pin'); showToast('📌 置顶已添加', 'succes
 function openPinModal() { openModal('pin'); }
 
 const DEFAULT_CONTACT_SETTINGS = {
-  officialAccount: '西班牙生活通',
-  wechatGroup: '西班牙华人生活交流群',
+  officialAccount: '',
+  wechatGroup: '',
   wechatId: 'espana_life',
-  whatsapp: '+34 ',
-  facebookName: 'España Life',
+  whatsapp: '',
+  facebookName: '',
   facebookUrl: '',
   email: 'aladaya@gmail.com',
   supportHours: '9:00-22:00',
-  groupZh: '加入西班牙华人生活交流群，与更多华人朋友互动',
-  groupEs: 'Únete a la comunidad china en España para compartir información útil',
+  groupZh: '',
+  groupEs: '',
   introZh: '感谢您使用西班牙生活通！如有任何问题或建议，请通过以下方式联系我们：',
   introEs: 'Gracias por usar España Life. Si tienes alguna pregunta o sugerencia, puedes contactar con nosotros por estos medios:',
   responseZh: '我们通常在24小时内回复您的咨询',
@@ -3745,18 +3721,11 @@ function contactInputValue(id, fallback = '') {
 function fillContactSettings(value = {}) {
   const settings = { ...DEFAULT_CONTACT_SETTINGS, ...(value || {}) };
   const pairs = {
-    contactOfficialAccount: settings.officialAccount,
-    contactWechatGroup: settings.wechatGroup,
     contactWechatId: settings.wechatId,
-    contactWhatsapp: settings.whatsapp,
-    contactFacebookName: settings.facebookName,
-    contactFacebookUrl: settings.facebookUrl,
     contactEmail: settings.email,
     contactSupportHours: settings.supportHours,
     contactIntroZh: settings.introZh,
     contactIntroEs: settings.introEs,
-    contactGroupZh: settings.groupZh,
-    contactGroupEs: settings.groupEs,
     contactResponseZh: settings.responseZh,
     contactResponseEs: settings.responseEs
   };
@@ -3768,18 +3737,18 @@ function fillContactSettings(value = {}) {
 
 function collectContactSettings() {
   return {
-    officialAccount: contactInputValue('contactOfficialAccount', DEFAULT_CONTACT_SETTINGS.officialAccount),
-    wechatGroup: contactInputValue('contactWechatGroup', DEFAULT_CONTACT_SETTINGS.wechatGroup),
+    officialAccount: '',
+    wechatGroup: '',
     wechatId: contactInputValue('contactWechatId', DEFAULT_CONTACT_SETTINGS.wechatId),
-    whatsapp: contactInputValue('contactWhatsapp', DEFAULT_CONTACT_SETTINGS.whatsapp),
-    facebookName: contactInputValue('contactFacebookName', DEFAULT_CONTACT_SETTINGS.facebookName),
-    facebookUrl: contactInputValue('contactFacebookUrl', DEFAULT_CONTACT_SETTINGS.facebookUrl),
+    whatsapp: '',
+    facebookName: '',
+    facebookUrl: '',
     email: contactInputValue('contactEmail', DEFAULT_CONTACT_SETTINGS.email),
     supportHours: contactInputValue('contactSupportHours', DEFAULT_CONTACT_SETTINGS.supportHours),
     introZh: contactInputValue('contactIntroZh', DEFAULT_CONTACT_SETTINGS.introZh),
     introEs: contactInputValue('contactIntroEs', DEFAULT_CONTACT_SETTINGS.introEs),
-    groupZh: contactInputValue('contactGroupZh', DEFAULT_CONTACT_SETTINGS.groupZh),
-    groupEs: contactInputValue('contactGroupEs', DEFAULT_CONTACT_SETTINGS.groupEs),
+    groupZh: '',
+    groupEs: '',
     responseZh: contactInputValue('contactResponseZh', DEFAULT_CONTACT_SETTINGS.responseZh),
     responseEs: contactInputValue('contactResponseEs', DEFAULT_CONTACT_SETTINGS.responseEs)
   };

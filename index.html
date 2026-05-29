@@ -2539,8 +2539,8 @@
     <div class="footer-col">
       <h4 data-i18n="footer.follow">关注我们</h4>
       <ul>
-        <li><a href="#" id="footerOfficialAccount" onclick="openModal('contactUs'); return false;">💬 微信公众号</a></li>
-        <li><a href="#" id="footerWechatGroup" onclick="openModal('contactUs'); return false;">📢 微信群</a></li>
+        <li><a href="#" id="footerOfficialAccount" onclick="openModal('contactUs'); return false;">💬 客服微信</a></li>
+        <li><a href="#" id="footerWechatGroup" onclick="openModal('contactUs'); return false;">▦ 微信二维码</a></li>
         <li><a href="#" id="footerWhatsapp" onclick="openModal('contactUs'); return false;">📱 WhatsApp</a></li>
         <li><a href="#" id="footerFacebook" onclick="openModal('contactUs'); return false;">📘 Facebook</a></li>
       </ul>
@@ -4386,15 +4386,15 @@ const CONTACT_CONTENT = {
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
           <span style="font-size:28px">💬</span>
           <div>
-            <div style="font-weight:700;margin-bottom:2px">微信公众号</div>
-            <div style="color:#666;font-size:13px">搜索“西班牙生活通”关注我们的公众号</div>
+            <div style="font-weight:700;margin-bottom:2px">微信客服</div>
+            <div style="color:#666;font-size:13px">添加客服微信：espana_life，工作时间 9:00-22:00（西班牙时间）</div>
           </div>
         </div>
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
           <span style="font-size:28px">📱</span>
           <div>
-            <div style="font-weight:700;margin-bottom:2px">微信客服</div>
-            <div style="color:#666;font-size:13px">添加客服微信：espana_life，工作时间 9:00-22:00（西班牙时间）</div>
+            <div style="font-weight:700;margin-bottom:2px">微信二维码</div>
+            <div style="color:#666;font-size:13px">微信扫一扫，添加西班牙生活通客服</div>
           </div>
         </div>
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
@@ -4407,8 +4407,8 @@ const CONTACT_CONTENT = {
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
           <span style="font-size:28px">📢</span>
           <div>
-            <div style="font-weight:700;margin-bottom:2px">微信交流群</div>
-            <div style="color:#666;font-size:13px">加入西班牙华人生活交流群，与更多华人朋友互动</div>
+            <div style="font-weight:700;margin-bottom:2px">客服说明</div>
+            <div style="color:#666;font-size:13px">目前官方联系方式仅保留客服微信，方便统一回复</div>
           </div>
         </div>
       </div>
@@ -4423,8 +4423,8 @@ const CONTACT_CONTENT = {
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
           <span style="font-size:28px">💬</span>
           <div>
-            <div style="font-weight:700;margin-bottom:2px">Cuenta oficial de WeChat</div>
-            <div style="color:#666;font-size:13px">Busca “西班牙生活通” y síguenos en WeChat</div>
+            <div style="font-weight:700;margin-bottom:2px">Atención por WeChat</div>
+            <div style="color:#666;font-size:13px">Añade: espana_life. Horario: 9:00-22:00 (hora de España)</div>
           </div>
         </div>
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
@@ -4444,8 +4444,8 @@ const CONTACT_CONTENT = {
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
           <span style="font-size:28px">📢</span>
           <div>
-            <div style="font-weight:700;margin-bottom:2px">Grupo de WeChat</div>
-            <div style="color:#666;font-size:13px">Únete a la comunidad china en España para compartir información útil</div>
+            <div style="font-weight:700;margin-bottom:2px">Código QR de WeChat</div>
+            <div style="color:#666;font-size:13px">Escanea el código QR para añadir atención al cliente</div>
           </div>
         </div>
       </div>
@@ -4459,8 +4459,8 @@ const DEFAULT_CONTACT_INFO = {
   wechatGroup: '',
   wechatId: 'espana_life',
   wechatQrUrl: '/assets/contact/wechat-qr-espana-life-20260529.jpg',
-  whatsapp: '+34 ',
-  facebookName: 'España Life',
+  whatsapp: '',
+  facebookName: '',
   facebookUrl: '',
   email: 'aladaya@gmail.com',
   supportHours: '9:00-22:00',
@@ -4535,7 +4535,6 @@ function whatsappHref(value) {
 function buildContactContent(lang) {
   const info = normalizeContactInfo(siteContactInfo);
   if (lang === 'es') {
-    const siteWhatsappUrl = whatsappHref(info.whatsapp);
     return {
       title: '📞 Contacto',
       body: `
@@ -4549,7 +4548,6 @@ function buildContactContent(lang) {
       `
     };
   }
-  const siteWhatsappUrl = whatsappHref(info.whatsapp);
   return {
     title: '📞 联系我们',
     body: `
@@ -4580,35 +4578,6 @@ function updateContactFooter() {
   if (group) group.textContent = '▦ 微信二维码';
   if (whatsapp) whatsapp.style.display = 'none';
   if (facebook) facebook.style.display = 'none';
-  if (whatsapp) {
-    const href = whatsappHref(info.whatsapp);
-    whatsapp.textContent = `📱 ${info.whatsapp || 'WhatsApp'}`;
-    if (href) {
-      whatsapp.href = href;
-      whatsapp.target = '_blank';
-      whatsapp.rel = 'noopener noreferrer';
-      whatsapp.onclick = null;
-    } else {
-      whatsapp.href = '#';
-      whatsapp.removeAttribute('target');
-      whatsapp.removeAttribute('rel');
-      whatsapp.onclick = function() { openModal('contactUs'); return false; };
-    }
-  }
-  if (facebook) {
-    facebook.textContent = `📘 ${info.facebookName || 'Facebook'}`;
-    if (info.facebookUrl) {
-      facebook.href = info.facebookUrl;
-      facebook.target = '_blank';
-      facebook.rel = 'noopener noreferrer';
-      facebook.onclick = null;
-    } else {
-      facebook.href = '#';
-      facebook.removeAttribute('target');
-      facebook.removeAttribute('rel');
-      facebook.onclick = function() { openModal('contactUs'); return false; };
-    }
-  }
 }
 
 async function loadSiteContactInfo() {
@@ -5267,15 +5236,15 @@ loadListings().then(handleInitialDeepLink);
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
           <span style="font-size:28px">💬</span>
           <div>
-            <div style="font-weight:700;margin-bottom:2px">微信公众号</div>
-            <div style="color:#666;font-size:13px">搜索"西班牙生活通"关注我们的公众号</div>
+            <div style="font-weight:700;margin-bottom:2px">微信客服</div>
+            <div style="color:#666;font-size:13px">添加客服微信：espana_life，工作时间 9:00-22:00（西班牙时间）</div>
           </div>
         </div>
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
           <span style="font-size:28px">📱</span>
           <div>
-            <div style="font-weight:700;margin-bottom:2px">微信客服</div>
-            <div style="color:#666;font-size:13px">添加客服微信：espana_life，工作时间 9:00-22:00（西班牙时间）</div>
+            <div style="font-weight:700;margin-bottom:2px">微信二维码</div>
+            <div style="color:#666;font-size:13px">微信扫一扫，添加西班牙生活通客服</div>
           </div>
         </div>
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
@@ -5288,8 +5257,8 @@ loadListings().then(handleInitialDeepLink);
         <div style="background:#fdf6ec;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
           <span style="font-size:28px">📢</span>
           <div>
-            <div style="font-weight:700;margin-bottom:2px">微信交流群</div>
-            <div style="color:#666;font-size:13px">加入西班牙华人生活交流群，与更多华人朋友互动</div>
+            <div style="font-weight:700;margin-bottom:2px">客服说明</div>
+            <div style="color:#666;font-size:13px">目前官方联系方式仅保留客服微信，方便统一回复</div>
           </div>
         </div>
       </div>
@@ -5541,7 +5510,7 @@ function handlePlaceholderLinkClick(event) {
 
   if (text.includes('用户协议') || text.includes('Acuerdo de Usuario') || text.includes('acuerdo de usuario')) { openModal('userAgreement'); return; }
   if (text.includes('隐私政策') || text.includes('Política de Privacidad') || text.includes('política de privacidad')) { openModal('privacyPolicy'); return; }
-  if (text.includes('公众号') || text.includes('微信群') || text.includes('WhatsApp') || text.includes('Facebook')) {
+  if (text.includes('客服微信') || text.includes('微信二维码') || text.includes('WhatsApp') || text.includes('Facebook')) {
     openModal('contactUs');
     return;
   }
