@@ -66,3 +66,5 @@ jobs:
           git add admin.html .github/workflows/apply-hotads-admin-entry.yml
           git commit -m "feat: add hot ads admin entry"
           git push
+
+# trigger: 2026-05-30T11:50:00+02:00
