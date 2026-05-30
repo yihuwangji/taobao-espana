@@ -81,6 +81,49 @@
     hot ? hot.after(link) : nav.prepend(link);
   }
 
+  function patchMerchantAdCategory() {
+    const select = $('#postCat');
+    if (select && ![...select.options].some(option => option.value === '商家广告')) {
+      const option = document.createElement('option');
+      option.value = '商家广告';
+      option.textContent = '🔥 商家广告/今日热卖';
+      option.dataset.i18n = 'nav.merchantAd';
+      const service = [...select.options].find(item => item.value === '服务');
+      service ? service.before(option) : select.appendChild(option);
+    }
+
+    const editSelect = $('#editCat');
+    if (editSelect && ![...editSelect.options].some(option => option.value === '商家广告')) {
+      const option = document.createElement('option');
+      option.value = '商家广告';
+      option.textContent = '商家广告/今日热卖';
+      const service = [...editSelect.options].find(item => item.value === '服务');
+      service ? service.before(option) : editSelect.appendChild(option);
+    }
+
+    if (!window.__merchantAdCategoryPatched) {
+      const oldIsMapCategory = window.isMapCategory;
+      window.isMapCategory = (category) => clean(category) === '商家广告' || (typeof oldIsMapCategory === 'function' && oldIsMapCategory(category));
+      window.__merchantAdCategoryPatched = true;
+    }
+
+    const applyMerchantPlaceholders = () => {
+      const category = $('#postCat')?.value;
+      if (category !== '商家广告') return;
+      const title = $('#postTitle');
+      const desc = $('#postDesc');
+      const price = $('#postPrice');
+      if (title) title.placeholder = '例如：Madrid 餐馆用品今日特价 / 新店开业优惠';
+      if (desc) desc.placeholder = '写清楚优惠内容、适合客户、活动时间、地址和联系方式。';
+      if (price) price.placeholder = '例如：面议 / 今日特价 / €99起';
+    };
+    if (select && !select.dataset.merchantAdBound) {
+      select.addEventListener('change', () => setTimeout(applyMerchantPlaceholders, 0));
+      select.dataset.merchantAdBound = '1';
+    }
+    applyMerchantPlaceholders();
+  }
+
   function collectAds() {
     return $$('.listing-card').slice(0, 3).map((card) => ({
       type: 'customer',
@@ -180,6 +223,7 @@
     addMobileAuth();
     addHotNav();
     addLifeCircleNav();
+    patchMerchantAdCategory();
     patchLabels();
     startAds();
   }
