@@ -9,7 +9,8 @@ const CATEGORY_ALLOWLIST = new Set([
   '\u6559\u80b2',
   '\u79df\u623f',
   '\u4e8c\u624b\u7269\u54c1',
-  '\u4e8c\u624b\u8f66'
+  '\u4e8c\u624b\u8f66',
+  '\u5546\u5bb6\u5e7f\u544a'
 ]);
 
 function json(res, status, body) {
