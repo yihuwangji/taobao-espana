@@ -38,21 +38,31 @@
     `);
   }
 
+  function removePublicAdminLinks(scope = document) {
+    scope.querySelectorAll('a[href*="admin-hotads"], #todayHotDealsSection .section-title .see-all').forEach((link) => {
+      if (/商家入口|admin-hotads/i.test(link.textContent || link.href || '')) link.remove();
+    });
+  }
+
   function ensureHotSection() {
     let section = $('#todayHotDealsSection');
-    if (section) return section;
+    if (section) {
+      removePublicAdminLinks(section);
+      return section;
+    }
     const target = $('#merchantFilterSection') || $('.merchant-filter-section') || $('#listingsGrid')?.closest('.section');
     if (!target) return null;
     target.insertAdjacentHTML('beforebegin', `
       <div class="section today-hot-section" id="todayHotDealsSection">
         <div class="section-title">
           <h3>今日热卖推荐</h3>
-          <a href="/admin-hotads.html" class="see-all">商家入口 →</a>
         </div>
         <div class="paid-ad-strip" id="paidAdStrip"></div>
       </div>
     `);
-    return $('#todayHotDealsSection');
+    section = $('#todayHotDealsSection');
+    removePublicAdminLinks(section || document);
+    return section;
   }
 
   function addHotNav() {
@@ -225,6 +235,7 @@
     addLifeCircleNav();
     patchMerchantAdCategory();
     patchLabels();
+    removePublicAdminLinks();
     startAds();
   }
 
