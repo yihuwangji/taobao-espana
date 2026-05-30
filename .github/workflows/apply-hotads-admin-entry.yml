@@ -1,0 +1,68 @@
+name: Apply hot ads admin entry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-hotads-admin-entry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-admin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch admin menu
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          admin = Path('admin.html')
+          text = admin.read_text(encoding='utf-8')
+
+          target = '''    <div class="nav-item" data-section="pinned" onclick="showPage('pinned',this)">
+      <span>📌</span> 置顶管理
+    </div>
+'''
+          entry = target + '''    <a class="nav-item" href="/admin-hotads.html">
+      <span>🔥</span> 今日热卖广告
+    </a>
+'''
+
+          if 'href="/admin-hotads.html"' not in text:
+              if target not in text:
+                  raise SystemExit('Could not find pinned menu anchor')
+              text = text.replace(target, entry, 1)
+
+          style_target = '''  color: var(--text-dim);
+  transition: all 0.2s;'''
+          style_entry = '''  color: var(--text-dim);
+  text-decoration: none;
+  transition: all 0.2s;'''
+          if 'text-decoration: none;' not in text:
+              if style_target not in text:
+                  raise SystemExit('Could not find nav item style anchor')
+              text = text.replace(style_target, style_entry, 1)
+
+          admin.write_text(text, encoding='utf-8')
+
+          workflow = Path('.github/workflows/apply-hotads-admin-entry.yml')
+          if workflow.exists():
+              workflow.unlink()
+          PY
+
+      - name: Commit result
+        run: |
+          if git diff --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin.html .github/workflows/apply-hotads-admin-entry.yml
+          git commit -m "feat: add hot ads admin entry"
+          git push
