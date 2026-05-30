@@ -24,25 +24,16 @@ jobs:
           admin = Path('admin.html')
           text = admin.read_text(encoding='utf-8')
 
-          target = '''    <div class="nav-item" data-section="pinned" onclick="showPage('pinned',this)">
-      <span>📌</span> 置顶管理
-    </div>
-'''
-          entry = target + '''    <a class="nav-item" href="/admin-hotads.html">
-      <span>🔥</span> 今日热卖广告
-    </a>
-'''
+          target = '    <div class="nav-item" data-section="pinned" onclick="showPage(\'pinned\',this)">\n      <span>📌</span> 置顶管理\n    </div>\n'
+          entry = target + '    <a class="nav-item" href="/admin-hotads.html">\n      <span>🔥</span> 今日热卖广告\n    </a>\n'
 
           if 'href="/admin-hotads.html"' not in text:
               if target not in text:
                   raise SystemExit('Could not find pinned menu anchor')
               text = text.replace(target, entry, 1)
 
-          style_target = '''  color: var(--text-dim);
-  transition: all 0.2s;'''
-          style_entry = '''  color: var(--text-dim);
-  text-decoration: none;
-  transition: all 0.2s;'''
+          style_target = '  color: var(--text-dim);\n  transition: all 0.2s;'
+          style_entry = '  color: var(--text-dim);\n  text-decoration: none;\n  transition: all 0.2s;'
           if 'text-decoration: none;' not in text:
               if style_target not in text:
                   raise SystemExit('Could not find nav item style anchor')
@@ -67,4 +58,4 @@ jobs:
           git commit -m "feat: add hot ads admin entry"
           git push
 
-# trigger: 2026-05-30T11:50:00+02:00
+# trigger: 2026-05-30T11:52:00+02:00
