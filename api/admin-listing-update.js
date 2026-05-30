@@ -2,7 +2,7 @@ const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
 const { requireAdminByMetadata } = require('./_admin-auth');
 
-const CATEGORY_ALLOWLIST = new Set(['招工', '租房', '生意', '二手物品', '二手车', '商家广告', '服务', '教育']);
+const CATEGORY_ALLOWLIST = new Set(['招工', '租房', '生意', '二手物品', '二手车', '商家广告', '商家广告/今日热卖', '今日热卖', '服务', '教育']);
 const STATUS_ALLOWLIST = new Set(['pending', 'approved', 'rejected', 'offline']);
 
 function json(res, status, body) {
