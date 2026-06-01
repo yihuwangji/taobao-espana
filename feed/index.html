@@ -3,320 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>淘商圈 / 货源动态 - 西班牙生活通</title>
-<meta name="description" content="西班牙生活通淘商圈，面向欧洲华商的货源动态、新品到仓、清仓特价、吐槽与生意经验社区。">
-<meta name="theme-color" content="#D42B2B">
+<title>欧圈 - 欧洲华人社区信息流</title>
+<meta name="description" content="欧圈，面向欧洲华人的移动端生活信息流。发布货源、招工、租房、二手、吐槽和商家动态。">
+<meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/assets/icons/icon-192.png?v=20260521" sizes="192x192">
-<link rel="stylesheet" href="/feed/feed.css?v=20260525-11">
-<style>
-.feed-card::after{background:linear-gradient(180deg,rgba(0,0,0,.08),transparent 28%),linear-gradient(0deg,rgba(0,0,0,.58),rgba(0,0,0,.03) 48%,transparent 70%)}
-.feed-hero,.feed-controls{display:none}
-.feed-brand strong{font-size:17px}.feed-brand strong::before{content:"西班牙生活通";display:block;font-size:13px;color:#7a5c3f;font-weight:800}.feed-brand strong{font-size:0}.feed-brand strong::after{content:"淘商圈";font-size:19px;color:#1a0a00}.feed-brand span{font-size:12px}
-.media-button{touch-action:pan-y}
-.card-body{pointer-events:none}
-.card-actions,.whatsapp-btn,.merchant-actions,.merchant-action,.merchant-contact-btn,.merchant-detail-btn{pointer-events:auto;touch-action:manipulation}
-.card-desc{right:58px;bottom:62px;-webkit-line-clamp:2}
-.tag-list{right:58px;bottom:38px}
-.card-meta{right:58px;bottom:14px}
-.merchant-card .card-desc{display:none}
-.merchant-title{right:58px;bottom:70px;font-size:14px}
-.merchant-card .tag-list{bottom:42px}
-.merchant-card .card-meta{bottom:17px}
-.external-link{position:absolute;left:12px;right:58px;bottom:38px;z-index:2;display:inline-flex;width:max-content;max-width:calc(100% - 76px);align-items:center;min-height:28px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.92);color:#d42b2b;font-size:12px;font-weight:900;text-decoration:none;box-shadow:0 6px 18px rgba(0,0,0,.12)}
-.image-viewer{position:fixed;inset:0;z-index:70;display:none;grid-template-rows:minmax(0,1fr) auto;padding:calc(58px + env(safe-area-inset-top)) 0 calc(12px + env(safe-area-inset-bottom));background:rgba(0,0,0,.94)}
-.image-viewer.open{display:grid}
-.image-viewer-track{display:flex;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
-.image-viewer-slide{display:grid;min-width:100%;place-items:center;padding:0 12px;scroll-snap-align:center}
-.image-viewer img{display:block;max-width:100%;max-height:100%;border-radius:12px;object-fit:contain}
-.image-viewer-close{position:fixed;top:calc(12px + env(safe-area-inset-top));right:14px;z-index:2;width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;cursor:pointer;font-size:28px;line-height:1}
-.image-viewer-title{max-height:28vh;overflow-y:auto;margin:10px 12px 0;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.92);font-size:14px;font-weight:800;line-height:1.55;text-align:left;white-space:pre-wrap;-webkit-overflow-scrolling:touch}
-@media (max-width:640px){.card-desc{right:52px;bottom:56px;font-size:13px}.tag-list{right:52px;bottom:34px;flex-wrap:nowrap;overflow:hidden}.tag-list span:nth-child(n+3){display:none}.card-meta{right:52px;bottom:12px}.merchant-title{right:52px;bottom:62px;font-size:13px;-webkit-line-clamp:2}.merchant-card .tag-list{bottom:36px}.merchant-card .card-meta{bottom:12px}}
-@media (max-width:640px){body{background:#f7f7f7}.feed-topbar{background:#fff;border-bottom:1px solid #eee}.feed-shell{padding:10px 10px calc(88px + env(safe-area-inset-bottom))}.feed-masonry{display:block;column-count:1}.feed-card{display:block;margin:0 0 12px;border:1px solid #eee;border-radius:12px;background:#fff;box-shadow:none;break-inside:auto}.feed-card::after{display:none}.media-button{aspect-ratio:4/5;min-height:0;background:#f2f2f2}.media-button img,.media-button video{min-height:0;max-height:none}.card-body{position:static;padding:10px 12px 12px;color:#1a0a00;pointer-events:auto}.card-desc,.merchant-title{position:static;display:block;margin:0 0 8px;overflow:visible;color:#1a0a00;font-size:15px;font-weight:800;line-height:1.5;text-shadow:none;-webkit-line-clamp:unset}.merchant-card .card-desc{display:block;font-size:13px;font-weight:600;color:#6b5a48}.tag-list{display:none}.card-meta{position:static;display:flex;margin-bottom:10px;color:#7a5c3f;text-shadow:none}.card-actions{position:static;display:flex;justify-content:space-between;gap:4px;margin-top:4px}.social-action{min-width:44px;min-height:34px;color:#6b5a48;text-shadow:none}.action-icon{width:24px;height:24px;color:inherit;font-size:22px}.action-count{color:#6b5a48}.whatsapp-btn,.merchant-contact-btn{position:absolute;right:10px;bottom:10px;width:48px;height:48px}.merchant-actions{position:static;display:flex;gap:12px;margin-top:4px}.merchant-action{width:36px;min-height:36px;background:#f4f4f4;color:#6b5a48}.merchant-detail-btn{position:absolute;right:66px;bottom:10px;width:48px;height:48px;background:#f4f4f4;color:#6b5a48}.mobile-compose-fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom))}}
-@media (max-width:640px){.external-link{position:static;max-width:100%;margin:0 0 10px;background:#fff2f2;color:#d42b2b;box-shadow:none}}
-</style>
+<link rel="stylesheet" href="/feed/feed.css?v=20260601-ouquan">
 </head>
 <body>
-<header class="feed-topbar">
-  <a class="feed-back" href="/" aria-label="返回首页">‹</a>
-  <div class="feed-brand">
-    <strong>淘商圈</strong>
-    <span>像朋友圈一样刷本地商圈</span>
+<div class="app-shell">
+  <header class="oq-header">
+    <a class="oq-back" href="/" aria-label="返回首页">‹</a>
+    <div class="oq-brand">
+      <strong>欧圈</strong>
+      <span>欧洲华人生活社区</span>
+    </div>
+    <button class="oq-search" type="button" id="searchToggle" aria-label="搜索">⌕</button>
+  </header>
+
+  <div class="oq-search-bar" id="searchBar" hidden>
+    <input id="feedSearchInput" type="search" placeholder="搜索标题、城市、分类、WhatsApp">
   </div>
-  <button class="feed-publish-mini" type="button" data-open-publish>发布</button>
-</header>
 
-<main class="feed-shell">
-  <section class="feed-hero" aria-label="淘商圈">
-    <div>
-      <p class="feed-kicker">EspañaLife Feed</p>
-      <h1>淘商圈</h1>
-      <p>像发朋友圈一样发货源、新品、清仓、吐槽和生意经验。</p>
+  <nav class="channel-tabs" id="channelTabs" aria-label="频道">
+    <button class="active" type="button" data-channel="推荐">推荐</button>
+    <button type="button" data-channel="附近">附近</button>
+    <button type="button" data-channel="货源">货源</button>
+    <button type="button" data-channel="招工">招工</button>
+    <button type="button" data-channel="租房">租房</button>
+    <button type="button" data-channel="二手">二手</button>
+    <button type="button" data-channel="吐槽">吐槽</button>
+    <button type="button" data-channel="商家">商家</button>
+  </nav>
+
+  <main class="feed-main" id="homeView">
+    <section class="masonry-grid" id="feedGrid" aria-live="polite"></section>
+  </main>
+</div>
+
+<nav class="bottom-nav" aria-label="底部导航">
+  <button class="active" type="button" data-nav="home"><span>⌂</span><b>首页</b></button>
+  <button type="button" data-nav="publish"><span>＋</span><b>发布</b></button>
+  <button type="button" data-nav="messages"><span>✉</span><b>消息</b></button>
+  <button type="button" data-nav="me"><span>◉</span><b>我的</b></button>
+</nav>
+
+<section class="detail-view" id="detailView" aria-hidden="true">
+  <div class="detail-panel">
+    <div class="detail-top">
+      <button type="button" id="detailClose" aria-label="返回">‹</button>
+      <strong>欧圈详情</strong>
+      <button type="button" id="detailShareTop" aria-label="分享">↗</button>
     </div>
-    <button class="feed-publish-main" type="button" data-open-publish>发布动态</button>
-  </section>
-
-  <section class="feed-controls" aria-label="筛选动态">
-    <div class="feed-mode-tabs" id="feedModeTabs" aria-label="内容模式">
-      <button class="active" type="button" data-mode="posts" onclick="switchFeedMode('posts', this)">动态</button>
-      <button type="button" data-mode="merchants" onclick="switchFeedMode('merchants', this)">商家</button>
-    </div>
-    <label class="feed-search">
-      <span>搜索</span>
-      <input id="feedSearchInput" type="search" placeholder="搜货源、城市、标签、WhatsApp">
-    </label>
-    <div class="feed-filter-row" id="feedSortTabs" aria-label="推荐流筛选">
-      <button class="active" type="button" data-sort="latest">最新</button>
-      <button type="button" data-sort="hot">热门</button>
-      <button type="button" data-sort="nearby">附近</button>
-      <button type="button" data-sort="new">新品</button>
-      <button type="button" data-sort="today">今日热卖</button>
-    </div>
-  </section>
-
-  <section class="feed-masonry" id="feedGrid" aria-live="polite"></section>
-</main>
-
-<button class="mobile-compose-fab" type="button" data-open-publish>发布动态</button>
-
-<div class="feed-compose" id="feedCompose" aria-hidden="true">
-  <div class="feed-compose-panel" role="dialog" aria-modal="true" aria-labelledby="composeTitle">
-    <div class="compose-head">
-      <div>
-        <h2 id="composeTitle">发布动态</h2>
-        <p>最多9张图片。</p>
+    <div class="detail-media" id="detailMedia"></div>
+    <article class="detail-content">
+      <div class="detail-author-row">
+        <div class="avatar" id="detailAvatar">欧</div>
+        <div>
+          <strong id="detailAuthor">匿名用户</strong>
+          <span id="detailMeta">西班牙</span>
+        </div>
+        <button class="follow-btn" type="button" id="detailFollow">关注</button>
       </div>
-      <button class="compose-close" type="button" data-close-publish aria-label="关闭">×</button>
+      <h1 id="detailTitle"></h1>
+      <p id="detailText"></p>
+      <div class="detail-tags" id="detailTags"></div>
+      <div class="detail-actions">
+        <button type="button" id="detailLike">♡ <span>0</span></button>
+        <button type="button" id="detailSave">☆ <span>收藏</span></button>
+        <button type="button" id="detailComment">评论</button>
+        <button type="button" id="detailShare">分享</button>
+      </div>
+      <a class="detail-whatsapp" id="detailWhatsapp" href="#" target="_blank" rel="noopener">WhatsApp 联系</a>
+      <section class="comment-box">
+        <h2>评论</h2>
+        <div class="comments-list" id="detailComments"></div>
+        <div class="comment-input-row">
+          <input id="commentInput" type="text" placeholder="说点什么，帮助更多华人了解情况">
+          <button id="sendComment" type="button">发送</button>
+        </div>
+      </section>
+    </article>
+  </div>
+</section>
+
+<section class="compose-sheet" id="composeSheet" aria-hidden="true">
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <button type="button" id="composeClose" aria-label="关闭">取消</button>
+      <strong>发布到欧圈</strong>
+      <button type="submit" form="feedPostForm" id="feedSubmitBtn">发布</button>
     </div>
     <form id="feedPostForm" class="compose-form">
-      <div class="form-block">
-        <label>图片</label>
-        <input id="feedMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
-        <p class="form-hint" id="mediaHint">图片最多9张。</p>
-        <div class="media-preview" id="mediaPreview"></div>
-      </div>
+      <label class="upload-box">
+        <input id="feedMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple>
+        <span>＋</span>
+        <b>上传图片/视频</b>
+        <small>图片最多9张，视频最多1个且30秒内</small>
+      </label>
+      <div class="media-preview" id="mediaPreview"></div>
+
       <label>
-        简短描述
-        <textarea id="feedDescription" rows="4" maxlength="500" placeholder="写货源、价格段、适合人群、到货时间，或你的生意经验…"></textarea>
+        标题
+        <input id="feedTitle" type="text" maxlength="60" placeholder="写一个吸引人的标题">
       </label>
       <label>
-        外部链接
-        <input id="feedExternalLink" type="url" inputmode="url" placeholder="https://example.com，可不填">
+        正文
+        <textarea id="feedDescription" rows="6" maxlength="900" placeholder="分享货源、招工、租房、二手、吐槽或商家动态..."></textarea>
       </label>
-      <div class="compose-grid">
+      <div class="form-grid">
+        <label>
+          分类
+          <select id="feedCategory">
+            <option>货源</option>
+            <option>招工</option>
+            <option>租房</option>
+            <option>二手</option>
+            <option>吐槽</option>
+            <option>商家</option>
+            <option>生活</option>
+          </select>
+        </label>
         <label>
           城市
-          <input id="feedCity" type="text" placeholder="Madrid / Barcelona / Valencia">
-        </label>
-        <label>
-          WhatsApp
-          <input id="feedWhatsapp" type="tel" placeholder="+34 6XX XXX XXX">
-        </label>
-      </div>
-      <div class="compose-grid">
-        <label>
-          标签
-          <input id="feedTags" type="text" placeholder="#新品 #批发 #今日热卖">
-        </label>
-        <label>
-          内容分类
-          <select id="feedCategory">
-            <option>货源动态</option>
-            <option>新品到仓</option>
-            <option>清仓特价</option>
-            <option>华人吐槽</option>
-            <option>生意经验</option>
-            <option>招工信息</option>
-            <option>店铺转让</option>
+          <select id="feedCity">
+            <option>Madrid</option>
+            <option>Barcelona</option>
+            <option>Valencia</option>
+            <option>Alicante</option>
+            <option>Sevilla</option>
+            <option>Zaragoza</option>
+            <option>Malaga</option>
+            <option>Bilbao</option>
+            <option>Badalona</option>
+            <option>Fuenlabrada</option>
+            <option>其他</option>
           </select>
         </label>
       </div>
+      <label>
+        WhatsApp / 电话
+        <input id="feedWhatsapp" type="tel" placeholder="+34 6XX XXX XXX">
+      </label>
+      <label>
+        标签
+        <input id="feedTags" type="text" placeholder="#马德里 #百元店 #急招">
+      </label>
       <label class="check-row">
         <input id="feedAnonymous" type="checkbox">
-        <span>匿名发布，前台显示“匿名华商”</span>
+        <span>匿名发布，前台显示“匿名用户”</span>
       </label>
-      <div class="rule-note">基础关键词审核已开启：赌博、色情、诈骗、仇恨攻击、假货侵权、恶意刷屏、人身攻击等内容会被拦截。</div>
-      <button class="submit-feed" id="feedSubmitBtn" type="submit">发布动态</button>
+      <p class="publish-note">请勿发布违法、诈骗、仇恨、人身攻击、假货侵权等内容。违规内容会被删除。</p>
     </form>
   </div>
-</div>
+</section>
+
+<section class="simple-sheet" id="messageSheet" aria-hidden="true">
+  <div class="sheet-panel compact">
+    <div class="sheet-head">
+      <button type="button" data-close-simple="messageSheet">关闭</button>
+      <strong>消息</strong>
+      <span></span>
+    </div>
+    <div class="empty-card">
+      <h2>暂无新消息</h2>
+      <p>以后点赞、评论、关注和客服通知会出现在这里。</p>
+    </div>
+  </div>
+</section>
+
+<section class="simple-sheet" id="meSheet" aria-hidden="true">
+  <div class="sheet-panel compact">
+    <div class="sheet-head">
+      <button type="button" data-close-simple="meSheet">关闭</button>
+      <strong>我的</strong>
+      <span></span>
+    </div>
+    <div class="profile-card">
+      <div class="avatar big">欧</div>
+      <h2 id="meName">欧圈用户</h2>
+      <p id="meHint">登录主站账号后，可以同步发布、评论和互动记录。</p>
+      <a href="/" class="home-link">返回西班牙生活通首页</a>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="feedToast"></div>
 
 <template id="feedCardTemplate">
   <article class="feed-card">
-    <button class="media-button" type="button"></button>
-    <div class="card-body">
-      <p class="card-desc"></p>
-      <div class="tag-list"></div>
-      <div class="card-meta">
-        <span class="author"></span>
+    <button class="card-media" type="button"></button>
+    <div class="card-copy">
+      <h2></h2>
+      <div class="card-user">
+        <span class="avatar mini">欧</span>
+        <span class="author">匿名用户</span>
+      </div>
+      <div class="card-stats">
         <span class="city"></span>
-        <span class="time"></span>
+        <span class="like-count">♡ 0</span>
+        <span class="comment-count">评论 0</span>
       </div>
-      <div class="card-actions">
-        <button class="social-action like-action" type="button" data-action="like" aria-label="点赞"><span class="action-icon">♡</span><span class="action-count"></span></button>
-        <button class="social-action" type="button" data-action="comment" aria-label="评论"><span class="action-icon">💬</span><span class="action-count"></span></button>
-        <button class="social-action save-action" type="button" data-action="save" aria-label="收藏"><span class="action-icon">☆</span><span class="action-count"></span></button>
-        <button class="social-action share-action" type="button" data-action="share" aria-label="分享"><span class="action-icon">↗</span></button>
-        <button class="social-action report-action" type="button" data-action="report" aria-label="举报"><span class="action-icon">!</span></button>
-      </div>
-      <a class="whatsapp-btn" target="_blank" rel="noreferrer">WhatsApp 联系</a>
     </div>
   </article>
 </template>
 
-<div class="comment-drawer" id="commentDrawer" aria-hidden="true">
-  <div class="comment-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="commentDrawerTitle">
-    <div class="drawer-grip" aria-hidden="true"></div>
-    <div class="drawer-head">
-      <h2 id="commentDrawerTitle">评论</h2>
-      <button type="button" id="closeCommentDrawer" aria-label="关闭评论">×</button>
-    </div>
-    <div class="drawer-comments" id="drawerComments"></div>
-    <div class="drawer-form">
-      <input id="drawerCommentInput" type="text" placeholder="说点什么">
-      <label><input id="drawerAnonymousComment" type="checkbox">匿名</label>
-      <button id="drawerCommentSend" type="button">发送</button>
-    </div>
-  </div>
-</div>
-
-<div class="image-viewer" id="imageViewer" aria-hidden="true">
-  <button class="image-viewer-close" type="button" id="imageViewerClose" aria-label="关闭大图">×</button>
-  <div class="image-viewer-track" id="imageViewerTrack"></div>
-  <div class="image-viewer-title" id="imageViewerTitle"></div>
-</div>
-
-<div class="feed-toast" id="feedToast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/feed/feed.js?v=20260525-13"></script>
-<script>
-function normalizeExternalLinkPatch(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return '';
-  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
-  try {
-    const url = new URL(withProtocol);
-    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
-  } catch (error) {
-    return '';
-  }
-}
-function extractExternalLinkPatch(post) {
-  const text = String(post?.external_url || post?.description || '');
-  const labelMatch = text.match(/(?:链接|外部链接)[:：]\s*(https?:\/\/[^\s，,]+)/i);
-  if (labelMatch) return normalizeExternalLinkPatch(labelMatch[1]);
-  const urlMatch = text.match(/https?:\/\/[^\s，,]+/i);
-  return urlMatch ? normalizeExternalLinkPatch(urlMatch[0]) : '';
-}
-function stripExternalLinkPatch(text) {
-  return String(text || '').replace(/(?:\n|\s)*(?:链接|外部链接)[:：]\s*https?:\/\/[^\s，,]+/ig, '').trim();
-}
-function sanitizeMerchantImagesPatch() {
-  const safeImage = 'https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=900&q=82';
-  document.querySelectorAll('.merchant-card img').forEach(img => {
-    const src = img.currentSrc || img.src || '';
-    if (src.includes('photo-1542291026-7eec264c27ff')) {
-      img.src = safeImage;
-      img.removeAttribute('srcset');
-    }
-  });
-}
-if (typeof submitPost === 'function') {
-  const originalSubmitPost = submitPost;
-  submitPost = async function(event) {
-    const linkInput = document.getElementById('feedExternalLink');
-    const descInput = document.getElementById('feedDescription');
-    const link = normalizeExternalLinkPatch(linkInput?.value || '');
-    if (linkInput?.value.trim() && !link) {
-      event.preventDefault();
-      showToast('外部链接格式不正确');
-      return;
-    }
-    if (link && descInput && !descInput.value.includes(link)) {
-      descInput.value = `${descInput.value.trim()}\n链接：${link}`.trim();
-    }
-    await originalSubmitPost(event);
-  };
-}
-if (typeof renderPosts === 'function') {
-  const originalRenderPosts = renderPosts;
-  renderPosts = function() {
-    originalRenderPosts();
-    sanitizeMerchantImagesPatch();
-    if (typeof filteredPosts !== 'function') return;
-    const cards = [...document.querySelectorAll('#feedGrid > .feed-card:not(.merchant-card)')];
-    filteredPosts().forEach((post, index) => {
-      const card = cards[index];
-      if (!card) return;
-      const link = extractExternalLinkPatch(post);
-      const desc = card.querySelector('.card-desc');
-      if (desc) desc.textContent = stripExternalLinkPatch(post.description) || post.title || '淘商圈动态';
-      if (link && !card.querySelector('.external-link')) {
-        const anchor = document.createElement('a');
-        anchor.className = 'external-link';
-        anchor.href = link;
-        anchor.target = '_blank';
-        anchor.rel = 'noopener noreferrer';
-        anchor.textContent = '打开链接';
-        card.querySelector('.tag-list')?.insertAdjacentElement('afterend', anchor);
-      }
-    });
-  };
-}
-setInterval(sanitizeMerchantImagesPatch, 1200);
-if (typeof handleMediaInput === 'function') {
-  handleMediaInput = async function(event) {
-    const files = [...event.target.files];
-    const images = files.filter(file => file.type.startsWith('image/'));
-    if (files.some(file => file.type.startsWith('video/'))) {
-      showToast('暂不支持视频，请上传图片');
-      event.target.value = '';
-      selectedMedia = [];
-      renderMediaPreview();
-      return;
-    }
-    if (images.length > MAX_IMAGES) showToast('图片最多9张，已保留前9张');
-    selectedMedia = images.slice(0, MAX_IMAGES).map(file => ({ file, media_type: 'image', duration_seconds: null }));
-    renderMediaPreview();
-  };
-}
-</script>
-<script>
-(() => {
-  const viewer = document.getElementById('imageViewer');
-  const track = document.getElementById('imageViewerTrack');
-  const title = document.getElementById('imageViewerTitle');
-  const close = () => {
-    viewer?.classList.remove('open');
-    viewer?.setAttribute('aria-hidden', 'true');
-    if (track) track.innerHTML = '';
-  };
-  const open = (images, text) => {
-    const list = Array.isArray(images) ? images.filter(Boolean) : [images].filter(Boolean);
-    if (!viewer || !track || !list.length) return;
-    track.innerHTML = list.map(src => `<div class="image-viewer-slide"><img src="${src.replace(/"/g, '&quot;')}" alt="大图预览"></div>`).join('');
-    if (title) title.textContent = text || '';
-    viewer.classList.add('open');
-    viewer.setAttribute('aria-hidden', 'false');
-    track.scrollTo({ left: 0, behavior: 'instant' });
-  };
-  document.addEventListener('click', event => {
-    const media = event.target.closest?.('.feed-card .media-button');
-    if (!media) return;
-    const img = media.querySelector('img');
-    if (!img) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const card = media.closest('.feed-card');
-    const cardText = card?.querySelector('.merchant-title,.card-desc')?.textContent?.trim();
-    const visibleImages = [...card?.querySelectorAll('.media-button img') || []].map(item => item.currentSrc || item.src);
-    open(visibleImages.length ? visibleImages : [img.currentSrc || img.src], cardText);
-  }, true);
-  document.getElementById('imageViewerClose')?.addEventListener('click', close);
-  viewer?.addEventListener('click', event => {
-    if (event.target === viewer) close();
-  });
-})();
-</script>
+<script src="/feed/feed.js?v=20260601-ouquan"></script>
 </body>
 </html>
