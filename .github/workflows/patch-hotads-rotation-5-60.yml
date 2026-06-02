@@ -1,0 +1,58 @@
+name: Patch hot ads rotation range
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set hot ads rotation to 5-60 seconds
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          function replace(file, from, to) {
+            let text = fs.readFileSync(file, 'utf8');
+            if (!text.includes(from)) throw new Error(`${file}: missing pattern ${from.slice(0, 80)}`);
+            text = text.replace(from, to);
+            fs.writeFileSync(file, text);
+          }
+          replace('admin-hotads.html', 'let settings={enabled:true,rotateSeconds:180,listingIds:[]};', 'let settings={enabled:true,rotateSeconds:5,listingIds:[]};');
+          replace('admin-hotads.html', 'settings={enabled:data.value?.enabled!==false,rotateSeconds:Number(data.value?.rotateSeconds||180),listingIds:Array.isArray(data.value?.listingIds)?data.value.listingIds.map(Number).filter(Boolean):[]};', 'settings={enabled:data.value?.enabled!==false,rotateSeconds:Math.max(5,Math.min(60,Number(data.value?.rotateSeconds||5))),listingIds:Array.isArray(data.value?.listingIds)?data.value.listingIds.map(Number).filter(Boolean):[]};');
+          replace('admin-hotads.html', 'const value={enabled:$(\'enabled\').checked,rotateSeconds:Number($(\'rotateSeconds\').value||180),listingIds:settings.listingIds||[]};', 'const value={enabled:$(\'enabled\').checked,rotateSeconds:Math.max(5,Math.min(60,Number($(\'rotateSeconds\').value||5))),listingIds:settings.listingIds||[]};');
+          const oldSelect = `<select id="rotateSeconds">
+        <option value="60">每1分钟切换</option>
+        <option value="180" selected>每3分钟切换</option>
+        <option value="300">每5分钟切换</option>
+        <option value="600">每10分钟切换</option>
+      </select>`;
+          const newSelect = `<select id="rotateSeconds">
+        <option value="5" selected>每5秒切换</option>
+        <option value="10">每10秒切换</option>
+        <option value="15">每15秒切换</option>
+        <option value="20">每20秒切换</option>
+        <option value="30">每30秒切换</option>
+        <option value="45">每45秒切换</option>
+        <option value="60">每60秒切换</option>
+      </select>`;
+          replace('admin-hotads.html', oldSelect, newSelect);
+          replace('api/admin-site-settings.js', 'rotateSeconds: 180,', 'rotateSeconds: 5,');
+          replace('api/admin-site-settings.js', 'const rotateSeconds = Math.max(30, Math.min(1800, Number(value.rotateSeconds || DEFAULT_HOT_ADS.rotateSeconds)));', 'const rotateSeconds = Math.max(5, Math.min(60, Number(value.rotateSeconds || DEFAULT_HOT_ADS.rotateSeconds)));');
+          replace('api/share.js', 'return json(res, 200, { ok: true, value: { enabled: true, rotateSeconds: 180, listingIds: [] }, listings: [] });', 'return json(res, 200, { ok: true, value: { enabled: true, rotateSeconds: 5, listingIds: [] }, listings: [] });');
+          replace('api/share.js', 'rotateSeconds: Math.max(30, Math.min(1800, Number(value.rotateSeconds || 180))),', 'rotateSeconds: Math.max(5, Math.min(60, Number(value.rotateSeconds || 5))),');
+          replace('home-patch.js', 'rotateSeconds: Number(result.value?.rotateSeconds || 180)', 'rotateSeconds: Number(result.value?.rotateSeconds || 5)');
+          replace('home-patch.js', 'const interval = Math.max(30, Number(slides[0]?.rotateSeconds || ROTATE_MS / 1000)) * 1000;', 'const interval = Math.max(5, Math.min(60, Number(slides[0]?.rotateSeconds || 5))) * 1000;');
+          NODE
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin-hotads.html api/admin-site-settings.js api/share.js home-patch.js
+          git diff --cached --quiet || git commit -m "Set hot ads rotation range to 5-60 seconds"
+          git push
