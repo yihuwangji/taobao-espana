@@ -55,7 +55,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 let listings=[];
 const pendingImages=new Map();
 const $=id=>document.getElementById(id);
-function esc(v){return String(v??'').replace(/[<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.classList.remove('show'),2400)}
 async function authHeader(){const session=(await sb.auth.getSession()).data.session;if(!session)throw new Error('请先登录');return {Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'}}
 async function api(path,body){const res=await fetch(path,{method:'POST',headers:await authHeader(),body:JSON.stringify(body)});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'请求失败');return data}
