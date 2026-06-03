@@ -5653,9 +5653,68 @@ function handlePlaceholderLinkClick(event) {
 
 document.addEventListener('click', handlePlaceholderLinkClick, true);
 
+function publicViewDisplayFromText(text, realValue = 0) {
+  const key = String(text || '');
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = ((hash << 5) - hash + key.charCodeAt(i)) | 0;
+  }
+  const seed = Math.abs(hash || 20260603);
+  const roll = seed % 100;
+  let baseline;
+  if (roll < 30) baseline = 50 + (seed % 56);
+  else if (roll < 62) baseline = 106 + ((seed >> 3) % 115);
+  else if (roll < 84) baseline = 221 + ((seed >> 5) % 210);
+  else if (roll < 96) baseline = 431 + ((seed >> 7) % 360);
+  else baseline = 791 + ((seed >> 9) % 620);
+  return baseline + Math.max(0, Number(realValue || 0));
+}
+
+function protectPublicViewNumbers(root = document) {
+  const eye = String.fromCodePoint(0x1f441);
+  const nodes = Array.from(root.querySelectorAll ? root.querySelectorAll('*') : []);
+  nodes.forEach(node => {
+    if (!node || node.children.length) return;
+    const text = node.textContent || '';
+    if (!text.includes(eye)) return;
+    const match = text.match(/(\d+)/);
+    if (!match) return;
+    const value = Number(match[1]);
+    if (!Number.isFinite(value) || value >= 50) return;
+    const card = node.closest('.listing-card,.my-listing-card,#detailContent') || node.parentElement;
+    const title = card?.querySelector?.('.listing-title,.mlc-title,h3')?.textContent || card?.textContent || text;
+    const display = publicViewDisplayFromText(title, value);
+    node.textContent = text.replace(match[1], String(display));
+  });
+}
+
+window.protectPublicViewNumbers = protectPublicViewNumbers;
+window.addEventListener('load', function() {
+  protectPublicViewNumbers();
+  setTimeout(protectPublicViewNumbers, 900);
+  setTimeout(protectPublicViewNumbers, 2400);
+});
+
+if (window.MutationObserver) {
+  const viewObserver = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === 1) protectPublicViewNumbers(node);
+        });
+      } else if (mutation.type === 'characterData') {
+        protectPublicViewNumbers(mutation.target.parentElement || document);
+      }
+    }
+  });
+  window.addEventListener('DOMContentLoaded', function() {
+    viewObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+  });
+}
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js').catch(function() {});
+    navigator.serviceWorker.register('/sw.js?v=20260603-public-views').catch(function() {});
   });
 }
 window.addEventListener('load', function() {
