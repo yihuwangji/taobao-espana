@@ -1,0 +1,15 @@
+name: Check public view counts
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify customer-facing view counts are synthetic
+        run: node scripts/check-public-view-counts.js

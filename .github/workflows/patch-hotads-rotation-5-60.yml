@@ -1,8 +1,7 @@
 name: Patch hot ads rotation range
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write

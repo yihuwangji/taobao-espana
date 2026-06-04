@@ -4226,7 +4226,6 @@ function filterCity(city, el) {
 }
 
 function getPublicViewCount(listing, extraView = 0) {
-  const realViews = Math.max(0, Number(listing?.view_count || 0) + extraView);
   const key = `${listing?.id || ''}:${listing?.created_at || ''}:${listing?.title || ''}`;
   let hash = 0;
   for (let i = 0; i < key.length; i++) {
@@ -4240,7 +4239,7 @@ function getPublicViewCount(listing, extraView = 0) {
   else if (roll < 84) baseline = 221 + ((seed >> 5) % 210);
   else if (roll < 96) baseline = 431 + ((seed >> 7) % 360);
   else baseline = 791 + ((seed >> 9) % 620);
-  return baseline + realViews;
+  return baseline;
 }
 
 async function viewListing(id) {
@@ -5667,7 +5666,7 @@ function publicViewDisplayFromText(text, realValue = 0) {
   else if (roll < 84) baseline = 221 + ((seed >> 5) % 210);
   else if (roll < 96) baseline = 431 + ((seed >> 7) % 360);
   else baseline = 791 + ((seed >> 9) % 620);
-  return baseline + Math.max(0, Number(realValue || 0));
+  return baseline;
 }
 
 function protectPublicViewNumbers(root = document) {
@@ -5680,10 +5679,12 @@ function protectPublicViewNumbers(root = document) {
     const match = text.match(/(\d+)/);
     if (!match) return;
     const value = Number(match[1]);
-    if (!Number.isFinite(value) || value >= 50) return;
-    const card = node.closest('.listing-card,.my-listing-card,#detailContent') || node.parentElement;
+    if (!Number.isFinite(value)) return;
+    const card = node.closest('.listing-card,.my-listing-card,#detailContent');
+    if (!card) return;
     const title = card?.querySelector?.('.listing-title,.mlc-title,h3')?.textContent || card?.textContent || text;
     const display = publicViewDisplayFromText(title, value);
+    if (value === display) return;
     node.textContent = text.replace(match[1], String(display));
   });
 }
@@ -5714,7 +5715,7 @@ if (window.MutationObserver) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js?v=20260603-public-views').catch(function() {});
+    navigator.serviceWorker.register('/sw.js?v=20260604-stable-public-views').catch(function() {});
   });
 }
 window.addEventListener('load', function() {
