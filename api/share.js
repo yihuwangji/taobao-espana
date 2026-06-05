@@ -156,7 +156,18 @@ function homepagePatchMarkup() {
   .paid-ad-cta{margin-top:6px!important;padding:4px 8px!important;background:#fff4df!important;color:var(--red-dark)!important;font-size:11px!important}
 }
 </style>
-<script src="/home-patch.js?v=20260605-uniform-ad-cards" defer></script>`;
+<style id="twoColumnCardsPatch20260605">
+@media(max-width:760px){
+  .paid-ad-strip{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;margin:0 0 10px!important}
+  .paid-ad-card{display:flex!important;flex-direction:column!important;height:232px!important;min-height:232px!important;border-radius:8px!important}
+  .paid-ad-card>img{position:relative!important;inset:auto!important;width:100%!important;height:112px!important;min-height:112px!important;object-fit:cover!important}
+  .paid-ad-card.house-ad:before{content:'广告';grid-column:auto!important;width:100%!important;height:112px!important;min-height:112px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+  .paid-ad-body{grid-column:auto!important;width:auto!important;height:120px!important;padding:9px 9px 8px!important;justify-content:flex-start!important}
+  .paid-ad-title{font-size:12.5px!important}
+  .paid-ad-dots{grid-column:1/-1!important;margin-top:0!important}
+}
+</style>
+<script src="/home-patch.js?v=20260605-two-column-cards" defer></script>`;
 }
 
 function injectHomepagePatch(html) {

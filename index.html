@@ -2154,20 +2154,21 @@
       min-width: 0;
     }
     .listings-grid {
-      grid-template-columns: 1fr;
-      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
     }
     .listing-card {
-      display: grid;
-      grid-template-columns: 96px minmax(0, 1fr);
-      height: 112px;
-      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      height: 232px;
+      min-height: 232px;
       animation: none;
     }
     .listing-img {
-      height: 100%;
+      height: 112px;
       min-height: 112px;
       font-size: 28px;
+      flex: 0 0 112px;
     }
     .listing-badge {
       top: 7px;
@@ -2186,8 +2187,8 @@
     }
     .listing-body {
       min-width: 0;
-      height: 112px;
-      padding: 11px 12px;
+      height: 120px;
+      padding: 9px 9px 8px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -2195,21 +2196,34 @@
     }
     .listing-title {
       margin-bottom: 4px;
-      font-size: 13px;
-      -webkit-line-clamp: 1;
+      font-size: 12.5px;
+      line-height: 1.35;
+      -webkit-line-clamp: 2;
     }
     .listing-meta {
       align-items: flex-start;
       flex-direction: column;
-      gap: 4px;
-      margin-top: 6px;
+      gap: 2px;
+      margin-top: 5px;
     }
-    .listing-price { font-size: 15px; }
+    .listing-price {
+      max-width: 100%;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .listing-loc {
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .listing-tags {
       gap: 4px;
-      margin-top: 6px;
+      margin-top: 4px;
       flex-wrap: nowrap;
-      max-height: 20px;
+      max-height: 18px;
       overflow: hidden;
     }
     .tag {
@@ -2244,7 +2258,11 @@
     .listing-open-hint {
       margin-top: auto;
       padding-top: 6px;
-      font-size: 11px;
+      gap: 5px;
+      font-size: 10px;
+    }
+    .listing-open-hint span:last-child {
+      display: none;
     }
     .btn-post {
       width: 100%;
@@ -2339,8 +2357,9 @@
   @media (max-width: 380px) {
     .hero h2 { font-size: 23px; }
     .cat-card { padding: 12px 6px 9px; }
-    .listing-card { grid-template-columns: 96px minmax(0, 1fr); height: 112px; min-height: 112px; }
-    .listing-img { min-height: 112px; }
+    .listing-card { height: 226px; min-height: 226px; }
+    .listing-img { height: 108px; min-height: 108px; flex-basis: 108px; }
+    .listing-body { height: 118px; }
     .footer-grid { grid-template-columns: 1fr; }
   }
 

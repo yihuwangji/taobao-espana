@@ -9,7 +9,7 @@
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 
   function ensureUniformAdCardStyle() {
-    if ($('#uniformAdCardPatch20260605')) return;
+    if ($('#twoColumnCardsPatch20260605')) return;
     document.head.insertAdjacentHTML('beforeend', `
       <style id="uniformAdCardPatch20260605">
       @media(max-width:760px){
@@ -24,6 +24,17 @@
         .paid-ad-title{margin-bottom:5px!important;color:var(--ink)!important;font-size:13px!important;line-height:1.35!important;text-shadow:none!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
         .paid-ad-meta{gap:6px!important;color:var(--ink-light)!important;font-size:11px!important;white-space:nowrap!important;overflow:hidden!important}
         .paid-ad-cta{margin-top:6px!important;padding:4px 8px!important;background:#fff4df!important;color:var(--red-dark)!important;font-size:11px!important}
+      }
+      </style>
+      <style id="twoColumnCardsPatch20260605">
+      @media(max-width:760px){
+        .paid-ad-strip{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;margin:0 0 10px!important}
+        .paid-ad-card{display:flex!important;flex-direction:column!important;height:232px!important;min-height:232px!important;border-radius:8px!important}
+        .paid-ad-card>img{position:relative!important;inset:auto!important;width:100%!important;height:112px!important;min-height:112px!important;object-fit:cover!important}
+        .paid-ad-card.house-ad:before{content:'广告';grid-column:auto!important;width:100%!important;height:112px!important;min-height:112px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+        .paid-ad-body{grid-column:auto!important;width:auto!important;height:120px!important;padding:9px 9px 8px!important;justify-content:flex-start!important}
+        .paid-ad-title{font-size:12.5px!important}
+        .paid-ad-dots{grid-column:1/-1!important;margin-top:0!important}
       }
       </style>
     `);
@@ -191,6 +202,31 @@
     return '<div class="paid-ad-dots">' + slides.map((_, i) => `<span class="paid-ad-dot ${i === index ? 'active' : ''}"></span>`).join('') + '</div>';
   }
 
+  function hotAdCardHtml(slide, slideIndex) {
+    if (slide.type === 'house') {
+      return `
+        <article class="paid-ad-card house-ad" data-slide-index="${slideIndex}">
+          <div class="paid-ad-body">
+            <div class="paid-ad-label">招商广告</div>
+            <div class="paid-ad-title">今日热卖广告位招商</div>
+            <div class="paid-ad-meta"><span>📍 全西班牙</span><span>商家可投放</span></div>
+            <div class="paid-ad-cta">发布广告 →</div>
+          </div>
+        </article>
+      `;
+    }
+    return `
+      <article class="paid-ad-card" data-slide-index="${slideIndex}">
+        <img src="${esc(slide.img)}" loading="lazy" alt="">
+        <div class="paid-ad-body">
+          <div class="paid-ad-label">广告 · 今日热卖</div>
+          <div class="paid-ad-title">${esc(slide.title)}</div>
+          <div class="paid-ad-meta"><span>${esc(slide.city)}</span><span>${esc(slide.price)}</span></div>
+        </div>
+      </article>
+    `;
+  }
+
   function showAd() {
     const strip = $('#paidAdStrip');
     if (!strip || !slides.length) return;
@@ -225,18 +261,37 @@
     };
   }
 
+  function showAdTwoColumn() {
+    const strip = $('#paidAdStrip');
+    if (!strip || !slides.length) return;
+    index %= slides.length;
+    const visibleIndexes = slides.length > 1 ? [index, (index + 1) % slides.length] : [index];
+    strip.innerHTML = visibleIndexes.map(i => hotAdCardHtml(slides[i], i)).join('') + dotsHtml();
+    $$('#paidAdStrip .paid-ad-card').forEach(card => {
+      card.onclick = () => {
+        const slide = slides[Number(card.dataset.slideIndex || index)] || slides[index];
+        if (slide.type === 'house') {
+          openModal('post');
+          return;
+        }
+        if (slide.type === 'configured' && slide.id) location.href = '/?listing=' + encodeURIComponent(slide.id);
+        else slide.card?.click();
+      };
+    });
+  }
+
   async function startAds() {
     if (!ensureHotSection()) return;
     const configured = await loadConfiguredAds();
     slides = configured.length ? [...configured, { type: 'house' }] : [...collectAds(), { type: 'house' }];
-    showAd();
+    showAdTwoColumn();
     if (timer) clearInterval(timer);
     if (slides.length > 1) {
       const seconds = Number(slides[0]?.rotateSeconds || ROTATE_MS / 1000);
       const interval = ([3, 5, 10].includes(seconds) ? seconds : 5) * 1000;
       timer = setInterval(() => {
         index = (index + 1) % slides.length;
-        showAd();
+        showAdTwoColumn();
       }, interval);
     }
   }
