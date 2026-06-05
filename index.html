@@ -2178,8 +2178,10 @@
       top: auto;
       right: 7px;
       bottom: 7px;
-      padding: 4px 7px;
+      padding: 3px 6px;
       font-size: 10px;
+      line-height: 1.1;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
     .listing-body {
       min-width: 0;
@@ -2206,9 +2208,10 @@
     }
     .listing-share {
       right: 6px;
-      top: 6px;
+      top: auto;
+      bottom: 6px;
       padding: 3px 6px;
-      font-size: 10px;
+      font-size: 9.5px;
     }
     .listing-map-chip {
       font-size: 9.5px;
@@ -3003,6 +3006,12 @@ function listingPlaceholderHtml(listing, displayCat) {
   return '<img class="worker-placeholder-img" src="/assets/listings/worker-recruitment-20260605.jpg" alt="招聘" loading="lazy">';
 }
 
+function listingShareLabel() {
+  return window.matchMedia && window.matchMedia('(max-width: 760px)').matches
+    ? tr('list.shareShort')
+    : tr('list.share');
+}
+
 const I18N = {
   zh: {
     'meta.title': '西班牙生活通 - 西班牙华人生活服务平台',
@@ -3037,7 +3046,7 @@ const I18N = {
     'footer.copy': '© 2026 西班牙生活通 · 版权所有', 'footer.coverage': '西班牙华人生活服务平台 | 覆盖西班牙省份/地区', 'footer.studio': '由 <a href="https://wang-song-studio.vercel.app/" target="_blank" rel="noreferrer">老王跟小宋工作室</a> 开发维护',
     'mobile.home': '首页', 'mobile.jobs': '招工', 'mobile.publish': '发布', 'mobile.latest': '最新',
     'list.emptyTitle': '暂无相关信息', 'list.emptyText': '试试其他条件，或发布第一条信息',
-    'list.share': '微信分享', 'list.map': '📍 地图', 'list.open': '点开看详情 ›',
+    'list.share': '微信分享', 'list.shareShort': '分享', 'list.map': '📍 地图', 'list.open': '点开看详情 ›',
     'listing.all': '最新信息', 'listing.worker': '招工求职', 'listing.jobseeker': '求职自荐', 'listing.house': '租房买房', 'listing.business': '生意转让',
     'listing.wholesale': '批发市场', 'listing.wholesale_100': '百元店/百货', 'listing.wholesale_bar': '酒吧/Bar',
     'listing.dating': '交友相亲', 'listing.goods': '二手物品/车', 'listing.service': '生活服务', 'listing.edu': '教育培训',
@@ -3101,7 +3110,7 @@ const I18N = {
     'footer.copy': '© 2026 España Life · Todos los derechos reservados', 'footer.coverage': 'Anuncios locales en España | Provincias de toda España', 'footer.studio': 'Desarrollado y mantenido por <a href="https://wang-song-studio.vercel.app/" target="_blank" rel="noreferrer">Wang & Song Studio</a>',
     'mobile.home': 'Inicio', 'mobile.jobs': 'Empleo', 'mobile.publish': 'Publicar', 'mobile.latest': 'Recientes',
     'list.emptyTitle': 'No hay anuncios relacionados', 'list.emptyText': 'Prueba otros filtros o publica el primer anuncio',
-    'list.share': 'Compartir', 'list.map': '📍 Mapa', 'list.open': 'Ver detalles ›',
+    'list.share': 'Compartir', 'list.shareShort': 'Compartir', 'list.map': '📍 Mapa', 'list.open': 'Ver detalles ›',
     'listing.all': 'Anuncios recientes', 'listing.worker': 'Empleo', 'listing.jobseeker': 'Busco trabajo', 'listing.house': 'Vivienda', 'listing.business': 'Traspasos',
     'listing.wholesale': 'Mayoristas', 'listing.wholesale_100': 'Bazares / todo a 100', 'listing.wholesale_bar': 'Bares',
     'listing.dating': 'Amistad y contactos', 'listing.goods': 'Segunda mano/coches', 'listing.service': 'Servicios', 'listing.edu': 'Formación',
@@ -4195,7 +4204,7 @@ function renderListings() {
         ${photos.length ? `<img src="${escapeHTML(photos[0])}" alt="" loading="lazy">` : listingPlaceholderHtml(l, displayCat)}
         <div class="listing-badge ${escapeHTML(l.badgeType)}">${escapeHTML(displayBadge)}</div>
         ${photos.length > 1 ? `<div class="listing-photo-count">📷 ${photos.length}</div>` : ''}
-        <button class="listing-share" onclick="shareListing(${l.id}, event)">${tr('list.share')}</button>
+        <button class="listing-share" onclick="shareListing(${l.id}, event)">${listingShareLabel()}</button>
       </div>
       <div class="listing-body">
         <div class="listing-title">${escapeHTML(l.title)}</div>
