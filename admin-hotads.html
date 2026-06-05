@@ -29,10 +29,9 @@ input,select{background:#100c0a;border:1px solid rgba(255,255,255,.14);color:#ff
     <div class="row">
       <label class="row"><input type="checkbox" id="enabled" style="width:auto" checked> 启用轮播</label>
       <select id="rotateSeconds">
-        <option value="60">每1分钟切换</option>
-        <option value="180" selected>每3分钟切换</option>
-        <option value="300">每5分钟切换</option>
-        <option value="600">每10分钟切换</option>
+        <option value="3">每3秒切换</option>
+        <option value="5" selected>每5秒切换</option>
+        <option value="10">每10秒切换</option>
       </select>
       <button class="btn green" onclick="save()">保存广告设置</button>
       <button class="btn" onclick="loadAll()">刷新</button>
@@ -58,7 +57,7 @@ const SUPABASE_URL='https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 let listings=[];
-let settings={enabled:true,rotateSeconds:180,listingIds:[]};
+let settings={enabled:true,rotateSeconds:5,listingIds:[]};
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const norm=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
@@ -79,7 +78,7 @@ async function requireLogin(){
 }
 async function loadSettings(){
   const data=await adminApi({action:'get_hot_ads'});
-  settings={enabled:data.value?.enabled!==false,rotateSeconds:Number(data.value?.rotateSeconds||180),listingIds:Array.isArray(data.value?.listingIds)?data.value.listingIds.map(Number).filter(Boolean):[]};
+  settings={enabled:data.value?.enabled!==false,rotateSeconds:Number(data.value?.rotateSeconds||5),listingIds:Array.isArray(data.value?.listingIds)?data.value.listingIds.map(Number).filter(Boolean):[]};
   $('enabled').checked=settings.enabled;
   $('rotateSeconds').value=String(settings.rotateSeconds);
 }
@@ -120,7 +119,7 @@ function moveItem(id,dir){const ids=[...(settings.listingIds||[])];const i=ids.f
 async function save(){
   try{
     setStatus('保存中...');
-    const value={enabled:$('enabled').checked,rotateSeconds:Number($('rotateSeconds').value||180),listingIds:settings.listingIds||[]};
+    const value={enabled:$('enabled').checked,rotateSeconds:Number($('rotateSeconds').value||5),listingIds:settings.listingIds||[]};
     const data=await adminApi({action:'update_hot_ads',value});
     settings=data.value;
     setStatus('已保存，首页今日热卖广告会使用这些客户轮播。');

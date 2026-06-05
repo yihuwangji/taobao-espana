@@ -21,7 +21,7 @@ const DEFAULT_CONTACT_INFO = {
 
 const DEFAULT_HOT_ADS = {
   enabled: true,
-  rotateSeconds: 180,
+  rotateSeconds: 5,
   listingIds: []
 };
 
@@ -71,7 +71,8 @@ function normalizeHotAds(value = {}) {
   const listingIds = Array.isArray(value.listingIds)
     ? value.listingIds.map(id => Number(id)).filter(Number.isInteger).filter(id => id > 0)
     : [];
-  const rotateSeconds = Math.max(30, Math.min(1800, Number(value.rotateSeconds || DEFAULT_HOT_ADS.rotateSeconds)));
+  const rawRotateSeconds = Number(value.rotateSeconds || DEFAULT_HOT_ADS.rotateSeconds);
+  const rotateSeconds = [3, 5, 10].includes(rawRotateSeconds) ? rawRotateSeconds : DEFAULT_HOT_ADS.rotateSeconds;
   return {
     enabled: value.enabled !== false,
     rotateSeconds,

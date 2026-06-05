@@ -61,7 +61,7 @@ async function recordPageView(req, res) {
 
 async function publicHotAds(req, res) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return json(res, 200, { ok: true, value: { enabled: true, rotateSeconds: 180, listingIds: [] }, listings: [] });
+    return json(res, 200, { ok: true, value: { enabled: true, rotateSeconds: 5, listingIds: [] }, listings: [] });
   }
   const settingsResponse = await serviceFetch('/rest/v1/site_settings?key=eq.hot_ads&select=value&limit=1');
   const settingsRows = settingsResponse.ok ? await settingsResponse.json() : [];
@@ -82,7 +82,7 @@ async function publicHotAds(req, res) {
     ok: true,
     value: {
       enabled: value.enabled !== false,
-      rotateSeconds: Math.max(30, Math.min(1800, Number(value.rotateSeconds || 180))),
+      rotateSeconds: [3, 5, 10].includes(Number(value.rotateSeconds)) ? Number(value.rotateSeconds) : 5,
       listingIds
     },
     listings

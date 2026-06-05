@@ -1,5 +1,5 @@
 (() => {
-  const ROTATE_MS = 180000;
+  const ROTATE_MS = 5000;
   let slides = [];
   let index = 0;
   let timer = null;
@@ -158,7 +158,7 @@
         title: row.title || '商家广告',
         city: row.city || '西班牙',
         price: row.price || '面议',
-        rotateSeconds: Number(result.value?.rotateSeconds || 180)
+        rotateSeconds: Number(result.value?.rotateSeconds || 5)
       }));
     } catch (error) {
       return [];
@@ -211,7 +211,8 @@
     showAd();
     if (timer) clearInterval(timer);
     if (slides.length > 1) {
-      const interval = Math.max(30, Number(slides[0]?.rotateSeconds || ROTATE_MS / 1000)) * 1000;
+      const seconds = Number(slides[0]?.rotateSeconds || ROTATE_MS / 1000);
+      const interval = ([3, 5, 10].includes(seconds) ? seconds : 5) * 1000;
       timer = setInterval(() => {
         index = (index + 1) % slides.length;
         showAd();
