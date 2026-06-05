@@ -8,6 +8,27 @@
   const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 
+  function ensureUniformAdCardStyle() {
+    if ($('#uniformAdCardPatch20260605')) return;
+    document.head.insertAdjacentHTML('beforeend', `
+      <style id="uniformAdCardPatch20260605">
+      @media(max-width:760px){
+        .paid-ad-strip{margin:0 0 10px!important}
+        .paid-ad-card{display:grid!important;grid-template-columns:96px minmax(0,1fr)!important;height:112px!important;min-height:112px!important;border:1.5px solid #eadfce!important;border-radius:8px!important;background:#fff!important;box-shadow:0 10px 26px rgba(80,34,15,.1)!important;overflow:hidden!important}
+        .paid-ad-card:after{display:none!important}
+        .paid-ad-card>img{position:relative!important;inset:auto!important;grid-column:1!important;width:96px!important;height:112px!important;object-fit:cover!important}
+        .paid-ad-card.house-ad:before{content:'广告';grid-column:1;width:96px;height:112px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#fff4d7 0%,#ffd36a 44%,#d42b2b 100%);color:#fff;font-weight:900;font-size:18px}
+        .paid-ad-card.house-ad{background:#fff!important}
+        .paid-ad-body{grid-column:2!important;width:auto!important;height:112px!important;box-sizing:border-box!important;padding:11px 12px!important;color:var(--ink)!important;display:flex!important;flex-direction:column!important;justify-content:center!important;overflow:hidden!important}
+        .paid-ad-label{margin-bottom:5px!important;padding:2px 7px!important;background:#fff4df!important;color:var(--red-dark)!important;border:1px solid rgba(212,43,43,.14)!important;font-size:10px!important}
+        .paid-ad-title{margin-bottom:5px!important;color:var(--ink)!important;font-size:13px!important;line-height:1.35!important;text-shadow:none!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+        .paid-ad-meta{gap:6px!important;color:var(--ink-light)!important;font-size:11px!important;white-space:nowrap!important;overflow:hidden!important}
+        .paid-ad-cta{margin-top:6px!important;padding:4px 8px!important;background:#fff4df!important;color:var(--red-dark)!important;font-size:11px!important}
+      }
+      </style>
+    `);
+  }
+
   function patchHeader() {
     const badge = $('.brand-domain');
     if (badge) {
@@ -230,6 +251,7 @@
   }
 
   function run() {
+    ensureUniformAdCardStyle();
     patchHeader();
     addMobileAuth();
     addHotNav();

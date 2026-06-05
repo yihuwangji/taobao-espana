@@ -2160,6 +2160,7 @@
     .listing-card {
       display: grid;
       grid-template-columns: 96px minmax(0, 1fr);
+      height: 112px;
       min-height: 112px;
       animation: none;
     }
@@ -2185,11 +2186,17 @@
     }
     .listing-body {
       min-width: 0;
+      height: 112px;
       padding: 11px 12px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
     .listing-title {
       margin-bottom: 4px;
       font-size: 13px;
+      -webkit-line-clamp: 1;
     }
     .listing-meta {
       align-items: flex-start;
@@ -2201,8 +2208,13 @@
     .listing-tags {
       gap: 4px;
       margin-top: 6px;
+      flex-wrap: nowrap;
+      max-height: 20px;
+      overflow: hidden;
     }
     .tag {
+      flex: 0 0 auto;
+      white-space: nowrap;
       padding: 2px 6px;
       font-size: 10px;
     }
@@ -2230,7 +2242,7 @@
       font-size: 19px;
     }
     .listing-open-hint {
-      margin-top: 6px;
+      margin-top: auto;
       padding-top: 6px;
       font-size: 11px;
     }
@@ -2327,8 +2339,8 @@
   @media (max-width: 380px) {
     .hero h2 { font-size: 23px; }
     .cat-card { padding: 12px 6px 9px; }
-    .listing-card { grid-template-columns: 78px minmax(0, 1fr); }
-    .listing-img { min-height: 96px; }
+    .listing-card { grid-template-columns: 96px minmax(0, 1fr); height: 112px; min-height: 112px; }
+    .listing-img { min-height: 112px; }
     .footer-grid { grid-template-columns: 1fr; }
   }
 
