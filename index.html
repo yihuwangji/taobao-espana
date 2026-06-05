@@ -1153,78 +1153,16 @@
   }
 
   .listing-img.placeholder-worker {
-    background:
-      radial-gradient(circle at 80% 18%, rgba(255,255,255,.38) 0 14px, transparent 15px),
-      linear-gradient(145deg, #fff4d7 0%, #ffd36a 44%, #d42b2b 100%);
+    background: #fff3d8;
     overflow: hidden;
     font-size: 0;
   }
 
-  .listing-img.placeholder-worker::before {
-    content: "招";
-    position: absolute;
-    right: -8px;
-    bottom: -22px;
-    color: rgba(255,255,255,.22);
-    font-size: 76px;
-    font-weight: 900;
-    line-height: 1;
-  }
-
-  .job-placeholder {
-    position: relative;
-    width: 72%;
-    max-width: 96px;
-    aspect-ratio: 1;
-    border-radius: 22px;
-    background: rgba(255,255,255,.88);
-    box-shadow: 0 10px 22px rgba(92,20,15,.18);
-    display: grid;
-    place-items: center;
-  }
-
-  .job-placeholder::before {
-    content: "";
-    position: absolute;
-    left: 18%;
-    top: 22%;
-    width: 26%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: #d42b2b;
-    box-shadow: 0 26px 0 12px #d42b2b;
-  }
-
-  .job-placeholder::after {
-    content: "";
-    position: absolute;
-    right: 18%;
-    top: 31%;
-    width: 28%;
-    height: 22%;
-    border-radius: 8px;
-    background: #f5a623;
-    box-shadow: inset 0 0 0 3px rgba(255,255,255,.72);
-  }
-
-  .job-lines {
-    position: absolute;
-    right: 15%;
-    bottom: 20%;
-    width: 40%;
-    display: grid;
-    gap: 5px;
-  }
-
-  .job-lines span {
-    height: 5px;
-    border-radius: 999px;
-    background: #8a1a14;
-    opacity: .78;
-  }
-
-  .job-lines span:nth-child(2) {
-    width: 72%;
+  .worker-placeholder-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   .listing-img.has-photo {
@@ -3062,7 +3000,7 @@ function listingPlaceholderClass(listing, displayCat) {
 
 function listingPlaceholderHtml(listing, displayCat) {
   if (!isWorkerListing(listing, displayCat)) return escapeHTML(listing?.icon || '📌');
-  return '<div class="job-placeholder" aria-hidden="true"><div class="job-lines"><span></span><span></span></div></div>';
+  return '<img class="worker-placeholder-img" src="/assets/listings/worker-recruitment-20260605.jpg" alt="招聘" loading="lazy">';
 }
 
 const I18N = {
