@@ -1,0 +1,32 @@
+.espana-life-phone-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 1px 5px;
+  color: #087a4b !important;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.26);
+  text-decoration: none !important;
+  font-weight: 700;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.espana-life-phone-link:hover {
+  background: rgba(16, 185, 129, 0.2);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.espana-life-phone-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 1px 5px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}

@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "西班牙生活通 电话邀请助手",
+  "version": "1.0.0",
+  "description": "在普通网页识别西班牙电话号码，点击后打开 WhatsApp 并填好西班牙生活通邀请文字。",
+  "permissions": ["storage"],
+  "host_permissions": ["<all_urls>"],
+  "icons": {
+    "192": "icons/icon-192.png",
+    "512": "icons/icon-512.png"
+  },
+  "action": {
+    "default_title": "西班牙生活通邀请助手",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "192": "icons/icon-192.png",
+      "512": "icons/icon-512.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

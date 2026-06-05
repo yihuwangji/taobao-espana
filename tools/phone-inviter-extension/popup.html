@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>西班牙生活通邀请助手</title>
+  <style>
+    body {
+      width: 330px;
+      margin: 0;
+      padding: 14px;
+      color: #2b1b12;
+      background: #fff8ed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    h1 {
+      margin: 0 0 10px;
+      color: #9e1c1c;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
+      font-weight: 800;
+    }
+    textarea {
+      width: 100%;
+      height: 128px;
+      box-sizing: border-box;
+      border: 1px solid #e8c79a;
+      border-radius: 8px;
+      padding: 9px;
+      resize: vertical;
+      font: inherit;
+      line-height: 1.45;
+      background: #fff;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    button, a {
+      min-height: 36px;
+      border: 0;
+      border-radius: 8px;
+      background: #d42b2b;
+      color: #fff;
+      font: inherit;
+      font-weight: 900;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    button.secondary {
+      background: #fff;
+      color: #9e1c1c;
+      border: 1px solid #e8c79a;
+    }
+    p {
+      margin: 9px 0 0;
+      color: #7c6450;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <h1>西班牙生活通 电话邀请助手</h1>
+  <label><input id="enabled" type="checkbox"> 启用电话号码识别</label>
+  <textarea id="message"></textarea>
+  <div class="actions">
+    <button id="save">保存</button>
+    <button class="secondary" id="reset">恢复默认</button>
+    <a href="https://espanalife.app/" target="_blank" rel="noopener">打开网站</a>
+    <button class="secondary" id="test">测试链接</button>
+  </div>
+  <p>说明：插件只会打开 WhatsApp 并填好文字，最后需要您手动点击发送，避免误发和违规。</p>
+  <script src="popup.js"></script>
+</body>
+</html>
