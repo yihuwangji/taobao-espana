@@ -136,6 +136,7 @@ const LISTING_FEED_CATEGORY = {
   服务: '商家',
   教育: '商家'
 };
+const DEFAULT_WORKER_COVER = '/assets/feed/worker-service-bazaar-20260606.jpg';
 
 function escapeHTML(value) {
   return String(value || '').replace(/[&<>"']/g, char => ({
@@ -263,6 +264,10 @@ function stableNumber(value, min, max) {
   const text = String(value || '');
   const seed = text.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   return min + (seed % Math.max(1, max - min + 1));
+}
+
+function defaultCoverForPost(post) {
+  return displayCategory(post) === '招工' ? DEFAULT_WORKER_COVER : '';
 }
 
 function isFeedPostId(id) {
@@ -446,6 +451,7 @@ function renderPosts() {
     const title = titleOf(post);
     const author = authorOf(post);
     const height = randomHeight(post);
+    const defaultCover = defaultCoverForPost(post);
     if (firstMedia?.url) {
       if (isVideo(firstMedia)) {
         mediaWrap.innerHTML = `<video src="${escapeHTML(firstMedia.url)}" poster="${escapeHTML(firstMedia.thumbnail_url || '')}" muted playsinline preload="metadata" style="height:${height}px"></video><span class="media-badge">视频</span>`;
@@ -453,6 +459,8 @@ function renderPosts() {
         mediaWrap.innerHTML = `<img src="${escapeHTML(firstMedia.thumbnail_url || firstMedia.url)}" alt="${escapeHTML(title)}" loading="lazy" style="height:${height}px">`;
       }
       if (mediaList.length > 1) mediaWrap.insertAdjacentHTML('beforeend', `<span class="media-badge">${mediaList.length}图</span>`);
+    } else if (defaultCover) {
+      mediaWrap.innerHTML = `<img class="default-worker-cover" src="${escapeHTML(defaultCover)}" alt="招聘" loading="lazy" style="height:${height}px">`;
     } else {
       mediaWrap.innerHTML = `<div class="placeholder-cover" style="height:${height}px">${escapeHTML(displayCategory(post) || '欧圈')}</div>`;
     }
@@ -474,6 +482,11 @@ function renderDetailMedia(post) {
   const wrap = document.getElementById('detailMedia');
   wrap.classList.toggle('multi', media.length > 1);
   if (!media.length) {
+    const defaultCover = defaultCoverForPost(post);
+    if (defaultCover) {
+      wrap.innerHTML = `<img class="default-worker-cover" src="${escapeHTML(defaultCover)}" alt="招聘">`;
+      return;
+    }
     wrap.innerHTML = `<div class="placeholder-cover" style="height:330px">${escapeHTML(displayCategory(post) || '欧圈')}</div>`;
     return;
   }
