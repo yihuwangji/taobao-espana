@@ -32,6 +32,7 @@ const sb = window.supabase
 let currentUser = null;
 let selectedMedia = [];
 let allPosts = [];
+let listingPosts = [];
 let merchantPosts = [];
 let activeChannel = '推荐';
 let searchTerm = '';
@@ -121,6 +122,20 @@ const fallbackPosts = [
     feed_media: [{ media_type: 'image', url: 'https://images.unsplash.com/photo-1556745757-8d76bdb6984b?auto=format&fit=crop&w=900&q=82' }]
   }
 ];
+
+const IMPORTED_MERCHANT_MARK = '平台代登记商家信息';
+const LISTING_FEED_CATEGORY = {
+  招工: '招工',
+  求职: '招工',
+  租房: '租房',
+  二手物品: '二手',
+  二手车: '二手',
+  生意: '商家',
+  商家广告: '商家',
+  商家黄页: '商家',
+  服务: '商家',
+  教育: '商家'
+};
 
 function escapeHTML(value) {
   return String(value || '').replace(/[&<>"']/g, char => ({
@@ -250,8 +265,53 @@ function stableNumber(value, min, max) {
   return min + (seed % Math.max(1, max - min + 1));
 }
 
+function isFeedPostId(id) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(id || ''));
+}
+
+function isImportedMerchantListing(row) {
+  const category = String(row?.category || '').trim();
+  return category === '商家黄页' || String(row?.description || '').includes(IMPORTED_MERCHANT_MARK);
+}
+
+function listingFeedCategory(row) {
+  const category = String(row?.category || '').trim();
+  const text = `${row?.title || ''} ${row?.description || ''}`;
+  if (/货源|批发|百元店|到仓|清仓|供应|mayorista|bazar/i.test(text)) return '货源';
+  return LISTING_FEED_CATEGORY[category] || '商家';
+}
+
+function listingToFeedPost(row) {
+  const category = listingFeedCategory(row);
+  const originalCategory = String(row?.category || '').trim();
+  const images = normalizeListingImages(row.images);
+  return {
+    id: `listing-${row.id}`,
+    source: 'listing',
+    source_listing_id: row.id,
+    title: row.title || '西班牙生活通信息',
+    description: row.description || row.address || '来自西班牙生活通的同步信息',
+    city: row.city || '西班牙',
+    whatsapp: extractPhone(row.contact),
+    category,
+    tags: ensureCategoryTag([originalCategory, row.city, row.price].filter(Boolean), category),
+    is_anonymous: !row.user_id,
+    author_name: row.user_id ? '西班牙生活通用户' : '游客发布',
+    like_count: stableNumber(`listing-${row.id}-like`, 12, 188),
+    comment_count: stableNumber(`listing-${row.id}-comment`, 0, 16),
+    save_count: stableNumber(`listing-${row.id}-save`, 5, 66),
+    created_at: row.created_at,
+    feed_media: images.map((url, index) => ({
+      media_type: 'image',
+      url,
+      thumbnail_url: url,
+      sort_order: index
+    }))
+  };
+}
+
 function allFeedItems() {
-  return [...allPosts, ...merchantPosts];
+  return [...allPosts, ...listingPosts, ...merchantPosts];
 }
 
 async function initUser() {
@@ -276,6 +336,24 @@ async function loadPosts() {
   const timeout = new Promise(resolve => setTimeout(() => resolve({ data: null, error: { message: 'timeout' } }), 2800));
   const { data, error } = await Promise.race([query, timeout]);
   allPosts = error || !data?.length ? fallbackPosts : data;
+  renderPosts();
+  openInitialPostFromHash();
+}
+
+async function loadListingsAsFeedPosts() {
+  if (!sb) return;
+  const query = sb
+    .from('listings')
+    .select('id,title,category,city,contact,address,description,images,price,created_at,user_id')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(140);
+  const timeout = new Promise(resolve => setTimeout(() => resolve({ data: null, error: { message: 'timeout' } }), 3000));
+  const { data, error } = await Promise.race([query, timeout]);
+  if (error || !data) return;
+  listingPosts = data
+    .filter(row => !isImportedMerchantListing(row))
+    .map(listingToFeedPost);
   renderPosts();
   openInitialPostFromHash();
 }
@@ -475,7 +553,7 @@ async function toggleReaction(type) {
   }
   saveLocalState();
   syncDetailActions();
-  if (!sb || postId.startsWith('demo-')) return;
+  if (!sb || !isFeedPostId(postId)) return;
   const session = (await sb.auth.getSession()).data.session;
   if (!session) return;
   if (active) await sb.from(table).delete().eq('post_id', activePost.id).eq('user_id', session.user.id);
@@ -495,7 +573,7 @@ function toggleFollow() {
 }
 
 async function getRemoteComments(post) {
-  if (!sb || String(post.id).startsWith('demo-')) return [];
+  if (!sb || !isFeedPostId(post.id)) return [];
   const query = sb
     .from('feed_comments')
     .select('id, body, is_anonymous, created_at')
@@ -545,7 +623,7 @@ async function sendComment() {
   saveLocalState();
   renderComments(await getAllComments(activePost));
   syncDetailActions();
-  if (!sb || postId.startsWith('demo-')) return;
+  if (!sb || !isFeedPostId(postId)) return;
   const session = (await sb.auth.getSession()).data.session;
   if (!session) return;
   await sb.from('feed_comments').insert({
@@ -863,5 +941,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('meHint').textContent = '你的发布、评论和互动会尽量同步到账号。';
   }
   await loadPosts();
+  loadListingsAsFeedPosts();
   loadMerchants();
+  if (sb) {
+    sb.channel('oq-listings-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'listings' }, () => {
+        loadListingsAsFeedPosts();
+      })
+      .subscribe();
+  }
 });
