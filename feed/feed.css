@@ -961,11 +961,60 @@ a {
   text-align: right;
 }
 
+.profile-links {
+  display: grid;
+  width: 100%;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.app-download-link {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border-radius: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, #ff365d, #ff9f2f);
+  color: white;
+  box-shadow: 0 10px 20px rgba(255, 54, 93, 0.2);
+  text-align: left;
+}
+
+.app-download-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.22);
+  color: white;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.app-download-link b,
+.app-download-link small {
+  display: block;
+}
+
+.app-download-link b {
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.app-download-link small {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .home-link {
-  display: inline-grid;
+  display: grid;
   min-height: 42px;
   place-items: center;
-  margin-top: 16px;
   border-radius: 999px;
   padding: 0 18px;
   background: #171717;
