@@ -628,7 +628,7 @@ function renderFeedCoinPanel(status) {
       <div class="coin-icon">币</div>
       <div>
         <div class="coin-title">我的平台币：<b>${balance}</b></div>
-        <p>转发欧圈或西班牙生活通信息可得 ${Number(status.shareRewardCoins || 2)} 平台币。今天还可奖励 ${remaining}/${dailyLimit} 次。</p>
+        <p>转发信息可得 ${Number(status.shareRewardCoins || 2)} 平台币；推荐好友首次打开你的专属链接可得 ${Number(status.referralRewardCoins || 5)} 平台币。今天普通转发还可奖励 ${remaining}/${dailyLimit} 次。</p>
       </div>
     </div>
     <div class="coin-rewards">

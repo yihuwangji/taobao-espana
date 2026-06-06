@@ -4134,8 +4134,8 @@ function renderReferralPanel(status) {
     <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
       <div style="font-size:26px;line-height:1">🎁</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:15px;font-weight:900;color:#064e3b;margin-bottom:3px">邀请10位好友，免费领1年VIP</div>
-        <div style="font-size:12px;color:#047857;line-height:1.5">${remaining === 0 ? '已达到活动条件，系统会自动开通或刷新会员状态。' : `已累计 ${count}/${target} 位，还差 ${remaining} 位好友打开你的链接。`}</div>
+        <div style="font-size:15px;font-weight:900;color:#064e3b;margin-bottom:3px">推荐好友赚平台币，10位好友免费领1年VIP</div>
+        <div style="font-size:12px;color:#047857;line-height:1.5">${remaining === 0 ? '已达到活动条件，系统会自动开通或刷新会员状态。' : `好友首次打开你的链接，每位奖励 ${Number(status.referralRewardCoins || 5)} 平台币；已累计 ${count}/${target} 位，还差 ${remaining} 位。`}</div>
       </div>
       <div style="font-size:18px;font-weight:900;color:#16a34a">${count}/${target}</div>
     </div>
@@ -4162,7 +4162,7 @@ function renderHeroReferralGuest() {
     <div class="hero-referral-top">
       <div>
         <div class="hero-referral-title">注册后自动生成专属转发码</div>
-        <div style="font-size:12px;color:#7c2d12;margin-top:3px;line-height:1.5">登录后这里会显示你的转发码、专属链接和邀请进度。</div>
+        <div style="font-size:12px;color:#7c2d12;margin-top:3px;line-height:1.5">推荐好友打开你的链接可赚平台币，10位不同好友还能免费领1年VIP。</div>
       </div>
       <div class="hero-referral-count">0/10</div>
     </div>
@@ -4193,7 +4193,7 @@ function renderHeroReferralCard(status) {
     <div class="hero-referral-top">
       <div>
         <div class="hero-referral-title">我的专属转发码</div>
-        <div style="font-size:12px;color:#047857;margin-top:3px;line-height:1.5">${remaining === 0 ? '已达标，系统会自动开通或刷新VIP。' : `已累计 ${count}/${target} 位，还差 ${remaining} 位好友打开。`}</div>
+        <div style="font-size:12px;color:#047857;margin-top:3px;line-height:1.5">${remaining === 0 ? '已达标，系统会自动开通或刷新VIP。继续推荐好友还能赚平台币。' : `好友首次打开奖励 ${Number(status.referralRewardCoins || 5)} 平台币；已累计 ${count}/${target} 位，还差 ${remaining} 位。`}</div>
       </div>
       <div class="hero-referral-count">${count}/${target}</div>
     </div>
@@ -4248,7 +4248,7 @@ function renderRewardsPanel(status) {
       <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#facc15);display:grid;place-items:center;color:white;font-size:24px;box-shadow:0 8px 18px rgba(245,158,11,.25)">币</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:15px;font-weight:950;color:#92400e">我的平台币：<span style="font-size:24px;color:#b45309">${balance}</span></div>
-        <div style="font-size:12px;color:#9a3412;line-height:1.55;margin-top:2px">转发信息可获得 ${Number(status.shareRewardCoins || 2)} 平台币。今天还可奖励 ${remaining}/${dailyLimit} 次，可兑换礼物或曝光权益。</div>
+        <div style="font-size:12px;color:#9a3412;line-height:1.55;margin-top:2px">转发信息可获得 ${Number(status.shareRewardCoins || 2)} 平台币；推荐好友首次打开专属链接可得 ${Number(status.referralRewardCoins || 5)} 平台币。今天普通转发还可奖励 ${remaining}/${dailyLimit} 次。</div>
       </div>
       <button onclick="loadRewardsStatus()" style="border:0;border-radius:999px;background:#fff7ed;color:#b45309;font-weight:900;padding:7px 10px;cursor:pointer">刷新</button>
     </div>
@@ -4433,7 +4433,8 @@ function showRegisterSuccessNotice() {
         <div style="font-size:13px;color:#7c2d12;line-height:1.8">
           1. 点击“发布信息”，发布招工、房源、二手或生意转让。<br>
           2. 你的账号已自动成为免费VIP，无需邀请好友、无需付款。<br>
-          3. 保存客服微信，后续审核、置顶、修改信息都方便联系。
+          3. 分享你的专属链接，好友首次打开可赚平台币，可兑换礼物或曝光权益。<br>
+          4. 保存客服微信，后续审核、置顶、修改信息都方便联系。
         </div>
       </div>
       <div style="background:#f0fff4;border:1.5px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:12px;text-align:center">

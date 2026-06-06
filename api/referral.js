@@ -5,6 +5,7 @@ const DEFAULT_SITE_URL = 'https://espanalife.app';
 const TARGET_COUNT = 10;
 const VIP_DAYS = 365;
 const SHARE_REWARD_COINS = 2;
+const REFERRAL_VISIT_REWARD_COINS = 5;
 const DAILY_SHARE_LIMIT = 10;
 
 function getRequestSiteUrl(req) {
@@ -239,6 +240,7 @@ async function rewardsStatusPayload(userId) {
     earned: wallet.earned,
     spent: wallet.spent,
     shareRewardCoins: SHARE_REWARD_COINS,
+    referralRewardCoins: REFERRAL_VISIT_REWARD_COINS,
     dailyShareLimit: DAILY_SHARE_LIMIT,
     todayShareCount: todayShares,
     todayRemaining: Math.max(0, DAILY_SHARE_LIMIT - todayShares),
@@ -385,6 +387,30 @@ async function handleRewardsAction(req, res, body) {
   return json(res, 400, { ok: false, error: 'invalid_action', message: '不支持的操作' });
 }
 
+async function awardReferralVisitCoins(referrerId, visitorHash, visitorIdHint) {
+  const uniqueKey = `referral:${referrerId}:${visitorHash}`;
+  const response = await serviceFetch('/rest/v1/platform_coin_transactions?on_conflict=unique_key&select=id,amount', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=ignore-duplicates,return=representation' },
+    body: JSON.stringify({
+      user_id: referrerId,
+      amount: REFERRAL_VISIT_REWARD_COINS,
+      type: 'referral_reward',
+      source_type: 'referral_visit',
+      source_id: String(visitorIdHint || '').slice(0, 40),
+      unique_key: uniqueKey,
+      note: '推荐好友访问获得平台币',
+      metadata: { visitorIdHint }
+    })
+  });
+  if (!response.ok && response.status !== 409) {
+    return { awarded: false, coinsAwarded: 0 };
+  }
+  const rows = response.ok ? await response.json().catch(() => []) : [];
+  const awarded = Array.isArray(rows) && rows.length > 0;
+  return { awarded, coinsAwarded: awarded ? REFERRAL_VISIT_REWARD_COINS : 0 };
+}
+
 async function handleStatus(req, res) {
   const user = await getUserFromBearer(req);
   if (!user?.id) {
@@ -408,7 +434,8 @@ async function handleStatus(req, res) {
     remaining: Math.max(0, TARGET_COUNT - count),
     vipUntil: reward.vipUntil || profile.vip_until || null,
     vipGranted: reward.granted,
-    qualified: count >= TARGET_COUNT
+    qualified: count >= TARGET_COUNT,
+    referralRewardCoins: REFERRAL_VISIT_REWARD_COINS
   });
 }
 
@@ -445,9 +472,9 @@ async function handleVisit(req, res) {
   const ipHash = ip ? sha256(`${salt}|ip|${ip}`) : null;
   const userAgentHash = userAgent ? sha256(`${salt}|ua|${userAgent}`) : null;
 
-  const insertResponse = await serviceFetch('/rest/v1/referral_visits?on_conflict=referrer_id,visitor_hash', {
+  const insertResponse = await serviceFetch('/rest/v1/referral_visits?on_conflict=referrer_id,visitor_hash&select=id', {
     method: 'POST',
-    headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' },
+    headers: { Prefer: 'resolution=ignore-duplicates,return=representation' },
     body: JSON.stringify({
       referrer_id: profile.id,
       visitor_hash: visitorHash,
@@ -463,17 +490,25 @@ async function handleVisit(req, res) {
     return json(res, 500, { error: 'record_failed', message: message || '邀请访问记录失败' });
   }
 
+  const insertedRows = insertResponse.ok ? await insertResponse.json().catch(() => []) : [];
+  const counted = Array.isArray(insertedRows) && insertedRows.length > 0;
+  const coinReward = counted
+    ? await awardReferralVisitCoins(profile.id, visitorHash, visitorId.slice(0, 12))
+    : { awarded: false, coinsAwarded: 0 };
   const count = await countVisits(profile.id);
   const freshProfile = await getProfileByUserId(profile.id);
   const reward = await grantVipIfQualified(freshProfile || profile, count);
 
   return json(res, 200, {
-    counted: insertResponse.status !== 409,
+    counted,
     count,
     target: TARGET_COUNT,
     remaining: Math.max(0, TARGET_COUNT - count),
     vipGranted: reward.granted,
-    vipUntil: reward.vipUntil || freshProfile?.vip_until || profile.vip_until || null
+    vipUntil: reward.vipUntil || freshProfile?.vip_until || profile.vip_until || null,
+    referralRewardCoins: REFERRAL_VISIT_REWARD_COINS,
+    coinAwarded: coinReward.awarded,
+    coinsAwarded: coinReward.coinsAwarded
   }, {
     'Set-Cookie': `xby_ref_visitor=${encodeURIComponent(visitorId)}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`
   });
