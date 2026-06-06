@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/assets/icons/icon-192.png?v=20260521" sizes="192x192">
-<link rel="stylesheet" href="/feed/feed.css?v=20260606-drafts">
+<link rel="stylesheet" href="/feed/feed.css?v=20260606-auth">
 </head>
 <body>
 <div class="app-shell">
@@ -195,6 +195,67 @@
       <div class="avatar big">欧</div>
       <h2 id="meName">欧圈用户</h2>
       <p id="meHint">登录主站账号后，可以同步发布、评论和互动记录。</p>
+      <div class="auth-card" id="feedAuthCard">
+        <div class="auth-tabs">
+          <button type="button" class="active" data-auth-mode="login">登录</button>
+          <button type="button" data-auth-mode="register">注册</button>
+        </div>
+        <div class="auth-pane active" id="feedLoginPane">
+          <label>
+            手机号
+            <input id="feedLoginPhone" type="tel" placeholder="+34 6XX XXX XXX" autocomplete="username">
+          </label>
+          <label>
+            4位密码
+            <input id="feedLoginPassword" type="password" inputmode="numeric" maxlength="4" placeholder="请输入4位数字密码" autocomplete="current-password">
+          </label>
+          <button type="button" id="feedLoginBtn">登录欧圈</button>
+          <small>使用西班牙生活通同一个账号。</small>
+        </div>
+        <div class="auth-pane" id="feedRegisterPane">
+          <label>
+            昵称
+            <input id="feedRegNickname" type="text" maxlength="20" placeholder="如：阿华 / 小李">
+          </label>
+          <label>
+            手机号
+            <input id="feedRegPhone" type="tel" placeholder="+34 6XX XXX XXX" autocomplete="username">
+          </label>
+          <label>
+            城市
+            <select id="feedRegCity">
+              <option>Madrid</option>
+              <option>Barcelona</option>
+              <option>Valencia</option>
+              <option>Alicante</option>
+              <option>Sevilla</option>
+              <option>Zaragoza</option>
+              <option>Malaga</option>
+              <option>Bilbao</option>
+              <option>Badalona</option>
+              <option>Fuenlabrada</option>
+              <option>其他</option>
+            </select>
+          </label>
+          <div class="auth-grid">
+            <label>
+              4位密码
+              <input id="feedRegPassword" type="password" inputmode="numeric" maxlength="4" placeholder="4位数字" autocomplete="new-password">
+            </label>
+            <label>
+              确认密码
+              <input id="feedRegPasswordConfirm" type="password" inputmode="numeric" maxlength="4" placeholder="再次输入" autocomplete="new-password">
+            </label>
+          </div>
+          <button type="button" id="feedRegisterBtn">注册并登录</button>
+          <small>无需邮箱认证，手机号必填。</small>
+        </div>
+      </div>
+      <div class="account-card" id="feedAccountCard" hidden>
+        <div><span>账号</span><strong id="feedAccountPhone">手机号账号</strong></div>
+        <div><span>城市</span><strong id="feedAccountCity">西班牙</strong></div>
+        <button type="button" id="feedLogoutBtn">退出登录</button>
+      </div>
       <a href="/" class="home-link">返回西班牙生活通首页</a>
     </div>
   </div>
@@ -221,6 +282,6 @@
 </template>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/feed/feed.js?v=20260606-drafts"></script>
+<script src="/feed/feed.js?v=20260606-auth"></script>
 </body>
 </html>

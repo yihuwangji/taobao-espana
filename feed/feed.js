@@ -31,6 +31,7 @@ const sb = window.supabase
   : null;
 
 let currentUser = null;
+let currentProfile = null;
 let selectedMedia = [];
 let allPosts = [];
 let listingPosts = [];
@@ -314,6 +315,31 @@ function phoneForWhatsApp(value) {
   return String(value || '').replace(/[^\d+]/g, '').replace(/^\+/, '');
 }
 
+function normalizePhone(value) {
+  return String(value || '').trim().replace(/[^\d+]/g, '');
+}
+
+function phoneDigits(value) {
+  return normalizePhone(value).replace(/\D/g, '');
+}
+
+function authEmailFromPhone(phone) {
+  return `taobaoespana.${phoneDigits(phone)}@gmail.com`;
+}
+
+function authPasswordFromPin(pin) {
+  return String(pin || '') + '#EspanaLife2026';
+}
+
+function isSyntheticAuthEmail(email) {
+  return /^taobaoespana\.\d+@gmail\.com$/i.test(email || '');
+}
+
+function publicAccountLabel(email, phone) {
+  if (phone) return phone;
+  return isSyntheticAuthEmail(email) ? '手机号账号' : (email || '手机号账号');
+}
+
 function normalizeListingImages(raw) {
   if (Array.isArray(raw)) return raw.filter(Boolean).map(String);
   if (!raw) return [];
@@ -398,6 +424,142 @@ async function initUser() {
   const timeout = new Promise(resolve => setTimeout(() => resolve({ data: { user: null } }), 1200));
   const { data } = await Promise.race([sb.auth.getUser(), timeout]);
   currentUser = data?.user || null;
+}
+
+async function loadCurrentProfile() {
+  currentProfile = null;
+  if (!sb || !currentUser?.id) return null;
+  const query = sb
+    .from('profiles')
+    .select('nickname, phone, city')
+    .eq('id', currentUser.id)
+    .maybeSingle();
+  const timeout = new Promise(resolve => setTimeout(() => resolve({ data: null }), 1500));
+  const result = await Promise.race([query, timeout]).catch(() => ({ data: null }));
+  currentProfile = result?.data || null;
+  return currentProfile;
+}
+
+function setAuthMode(mode) {
+  const nextMode = mode === 'register' ? 'register' : 'login';
+  document.querySelectorAll('[data-auth-mode]').forEach(button => {
+    button.classList.toggle('active', button.dataset.authMode === nextMode);
+  });
+  document.getElementById('feedLoginPane')?.classList.toggle('active', nextMode === 'login');
+  document.getElementById('feedRegisterPane')?.classList.toggle('active', nextMode === 'register');
+}
+
+function updateFeedAuthUI() {
+  const loggedIn = Boolean(currentUser);
+  const authCard = document.getElementById('feedAuthCard');
+  const accountCard = document.getElementById('feedAccountCard');
+  if (authCard) authCard.hidden = loggedIn;
+  if (accountCard) accountCard.hidden = !loggedIn;
+
+  const nickname = currentProfile?.nickname || currentUser?.user_metadata?.nickname || '欧圈用户';
+  const phone = currentProfile?.phone || currentUser?.user_metadata?.phone || '';
+  const city = currentProfile?.city || currentUser?.user_metadata?.city || '西班牙';
+  const meName = document.getElementById('meName');
+  const meHint = document.getElementById('meHint');
+  if (meName) meName.textContent = loggedIn ? nickname : '欧圈用户';
+  if (meHint) {
+    meHint.textContent = loggedIn
+      ? '已登录，可以发布欧圈内容并同步账号互动。'
+      : '登录主站账号后，可以同步发布、评论和互动记录。';
+  }
+  const accountPhone = document.getElementById('feedAccountPhone');
+  const accountCity = document.getElementById('feedAccountCity');
+  if (accountPhone) accountPhone.textContent = loggedIn ? publicAccountLabel(currentUser?.email, phone) : '手机号账号';
+  if (accountCity) accountCity.textContent = city;
+}
+
+function setButtonLoading(button, loadingText) {
+  if (!button) return () => {};
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = loadingText;
+  return () => {
+    button.disabled = false;
+    button.textContent = originalText;
+  };
+}
+
+async function loginFeedAccount() {
+  if (!sb) return showToast('账号服务暂时不可用，请稍后再试');
+  const phone = normalizePhone(document.getElementById('feedLoginPhone')?.value);
+  const pin = String(document.getElementById('feedLoginPassword')?.value || '').trim();
+  const digits = phoneDigits(phone);
+  if (!phone || !pin) return showToast('请填写手机号和4位密码');
+  if (digits.length < 6) return showToast('请填写正确的手机号');
+  if (!/^\d{4}$/.test(pin)) return showToast('密码请输入4位数字');
+
+  const restoreButton = setButtonLoading(document.getElementById('feedLoginBtn'), '登录中…');
+  const { data, error } = await sb.auth.signInWithPassword({
+    email: authEmailFromPhone(phone),
+    password: authPasswordFromPin(pin)
+  });
+  restoreButton();
+  if (error) return showToast('登录失败：手机号或密码不正确');
+  currentUser = data?.user || null;
+  await loadCurrentProfile();
+  updateFeedAuthUI();
+  showToast('欢迎回来，已登录欧圈');
+}
+
+async function registerFeedAccount() {
+  if (!sb) return showToast('账号服务暂时不可用，请稍后再试');
+  const nickname = String(document.getElementById('feedRegNickname')?.value || '').trim();
+  const phone = normalizePhone(document.getElementById('feedRegPhone')?.value);
+  const city = document.getElementById('feedRegCity')?.value || 'Madrid';
+  const password = String(document.getElementById('feedRegPassword')?.value || '').trim();
+  const confirmPassword = String(document.getElementById('feedRegPasswordConfirm')?.value || '').trim();
+  const digits = phoneDigits(phone);
+  if (!nickname || !phone || !password || !confirmPassword) return showToast('请填写昵称、手机号和密码');
+  if (digits.length < 6) return showToast('请填写正确的手机号');
+  if (!/^\d{4}$/.test(password)) return showToast('密码请设置为4位数字');
+  if (password !== confirmPassword) return showToast('两次密码不一致');
+
+  const restoreButton = setButtonLoading(document.getElementById('feedRegisterBtn'), '注册中…');
+  try {
+    const registerResponse = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname, city, phone, password })
+    });
+    const registerData = await registerResponse.json().catch(() => ({}));
+    if (!registerResponse.ok) {
+      const message = registerData.error === 'missing_service_role'
+        ? '注册服务正在配置，请联系客服处理'
+        : (registerData.message || '请稍后再试');
+      showToast(`注册失败：${message}`);
+      return;
+    }
+    const { data, error } = await sb.auth.signInWithPassword({
+      email: registerData.email || authEmailFromPhone(phone),
+      password: authPasswordFromPin(password)
+    });
+    if (error) {
+      showToast('账号已创建，请用手机号和4位密码登录');
+      setAuthMode('login');
+      return;
+    }
+    currentUser = data?.user || null;
+    currentProfile = { nickname, phone, city };
+    updateFeedAuthUI();
+    showToast('注册成功，已自动登录欧圈');
+  } catch (error) {
+    showToast(`注册失败：${error.message || '请稍后再试'}`);
+  } finally {
+    restoreButton();
+  }
+}
+
+async function logoutFeedAccount() {
+  if (sb) await sb.auth.signOut().catch(() => null);
+  currentUser = null;
+  currentProfile = null;
+  updateFeedAuthUI();
+  showToast('已退出登录');
 }
 
 async function loadPosts() {
@@ -873,7 +1035,10 @@ async function submitPost(event) {
       if (!session) {
         btn.disabled = false;
         btn.textContent = '发布';
-        return showToast('请先在主站登录后再发布');
+        closeCompose();
+        openSimpleSheet('meSheet');
+        setAuthMode('login');
+        return showToast('请先登录欧圈后再发布');
       }
       const basePayload = {
         user_id: session.user.id,
@@ -961,6 +1126,17 @@ function closeSimpleSheet(id) {
   document.getElementById(id).setAttribute('aria-hidden', 'true');
 }
 
+function handleBottomNavigation(button) {
+  if (!button) return;
+  document.querySelectorAll('.bottom-nav button').forEach(item => {
+    item.classList.toggle('active', item === button);
+  });
+  if (button.dataset.nav === 'home') window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (button.dataset.nav === 'publish') openCompose();
+  if (button.dataset.nav === 'messages') openSimpleSheet('messageSheet');
+  if (button.dataset.nav === 'me') openSimpleSheet('meSheet');
+}
+
 function bindEvents() {
   document.getElementById('searchToggle').addEventListener('click', () => {
     const searchBar = document.getElementById('searchBar');
@@ -981,11 +1157,13 @@ function bindEvents() {
   document.querySelector('.bottom-nav').addEventListener('click', event => {
     const button = event.target.closest('button[data-nav]');
     if (!button) return;
-    document.querySelectorAll('.bottom-nav button').forEach(item => item.classList.toggle('active', item === button));
-    if (button.dataset.nav === 'home') window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (button.dataset.nav === 'publish') openCompose();
-    if (button.dataset.nav === 'messages') openSimpleSheet('messageSheet');
-    if (button.dataset.nav === 'me') openSimpleSheet('meSheet');
+    handleBottomNavigation(button);
+  });
+  document.querySelectorAll('.bottom-nav button[data-nav]').forEach(button => {
+    button.addEventListener('click', event => {
+      event.stopPropagation();
+      handleBottomNavigation(button);
+    });
   });
   document.getElementById('detailClose').addEventListener('click', closeDetail);
   document.getElementById('detailLike').addEventListener('click', () => toggleReaction('like'));
@@ -1015,6 +1193,19 @@ function bindEvents() {
   document.getElementById('saveDraftBtn').addEventListener('click', saveDraft);
   document.getElementById('restoreDraftBtn').addEventListener('click', restoreDraft);
   document.getElementById('deleteDraftBtn').addEventListener('click', () => deleteDraft());
+  document.querySelectorAll('[data-auth-mode]').forEach(button => {
+    button.addEventListener('click', () => setAuthMode(button.dataset.authMode));
+  });
+  document.getElementById('feedLoginBtn')?.addEventListener('click', loginFeedAccount);
+  document.getElementById('feedRegisterBtn')?.addEventListener('click', registerFeedAccount);
+  document.getElementById('feedLogoutBtn')?.addEventListener('click', logoutFeedAccount);
+  ['feedLoginPassword', 'feedRegPasswordConfirm'].forEach(id => {
+    document.getElementById(id)?.addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      if (id === 'feedLoginPassword') loginFeedAccount();
+      if (id === 'feedRegPasswordConfirm') registerFeedAccount();
+    });
+  });
   window.addEventListener('hashchange', openInitialPostFromHash);
   updateDraftNotice();
 }
@@ -1029,14 +1220,18 @@ function openInitialPostFromHash() {
 document.addEventListener('DOMContentLoaded', async () => {
   bindEvents();
   await initUser();
-  if (currentUser) {
-    document.getElementById('meName').textContent = '已登录欧圈用户';
-    document.getElementById('meHint').textContent = '你的发布、评论和互动会尽量同步到账号。';
-  }
+  if (currentUser) await loadCurrentProfile();
+  updateFeedAuthUI();
   await loadPosts();
   loadListingsAsFeedPosts();
   loadMerchants();
   if (sb) {
+    sb.auth.onAuthStateChange(async (_event, session) => {
+      currentUser = session?.user || null;
+      if (currentUser) await loadCurrentProfile();
+      else currentProfile = null;
+      updateFeedAuthUI();
+    });
     sb.channel('oq-listings-sync')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'listings' }, () => {
         loadListingsAsFeedPosts();

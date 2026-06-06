@@ -835,6 +835,132 @@ a {
   line-height: 1.65;
 }
 
+.auth-card,
+.account-card {
+  width: 100%;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  background: white;
+  text-align: left;
+}
+
+.auth-card[hidden],
+.account-card[hidden] {
+  display: none;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  padding: 4px;
+  background: #f4f4f6;
+}
+
+.auth-tabs button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #4b4952;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.auth-tabs button.active {
+  background: var(--red);
+  color: white;
+  box-shadow: 0 5px 12px rgba(255, 54, 93, 0.18);
+}
+
+.auth-pane {
+  display: none;
+  gap: 10px;
+}
+
+.auth-pane.active {
+  display: grid;
+}
+
+.auth-pane label {
+  display: grid;
+  gap: 6px;
+  color: #33323a;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.auth-pane input,
+.auth-pane select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  outline: 0;
+  padding: 11px 12px;
+  background: white;
+  color: #202026;
+  font-size: 14px;
+}
+
+.auth-pane > button,
+.account-card button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--red);
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.auth-pane > button:disabled,
+.account-card button:disabled {
+  opacity: 0.64;
+  cursor: wait;
+}
+
+.auth-pane small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.account-card {
+  display: grid;
+  gap: 10px;
+}
+
+.account-card div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #f7f7f9;
+  color: #24232a;
+  font-size: 13px;
+}
+
+.account-card span {
+  color: var(--muted);
+}
+
+.account-card strong {
+  text-align: right;
+}
+
 .home-link {
   display: inline-grid;
   min-height: 42px;
