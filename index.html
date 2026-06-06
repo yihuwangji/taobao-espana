@@ -1205,6 +1205,75 @@
   .listing-badge.blue { background: #2563EB; }
   .listing-badge.green { background: #16A34A; }
 
+  .guide-level-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    max-width: 100%;
+    border: 1px solid rgba(217,25,25,.16);
+    border-radius: 999px;
+    padding: 2px 7px;
+    background: linear-gradient(135deg, #fff7ed, #fff);
+    color: #9a3412;
+    font-size: 10.5px;
+    font-weight: 900;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+
+  .guide-level-chip.high {
+    border-color: rgba(22,163,74,.24);
+    background: linear-gradient(135deg, #ecfdf5, #fff7ed);
+    color: #047857;
+  }
+
+  .guide-level-intro {
+    width: min(calc(100% - 24px), 860px);
+    margin: 0 auto 12px;
+    border: 1.5px solid #f7d08b;
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #fffaf1, #fff);
+    box-shadow: 0 8px 20px rgba(80,34,15,.06);
+  }
+
+  .guide-level-intro-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--red-dark);
+    font-size: 15px;
+    font-weight: 950;
+  }
+
+  .guide-level-intro p {
+    margin: 7px 0 0;
+    color: var(--ink-light);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .guide-level-track {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .guide-level-track::-webkit-scrollbar { display: none; }
+
+  .guide-level-step {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    padding: 4px 8px;
+    background: #fff4dc;
+    color: #8a4b00;
+    font-size: 11px;
+    font-weight: 900;
+  }
+
   .listing-share {
     position: absolute;
     right: 10px;
@@ -2214,6 +2283,10 @@
       font-size: 10px;
       padding: 3px 7px;
     }
+    .guide-level-chip {
+      font-size: 9.5px;
+      padding: 2px 6px;
+    }
     .listing-share {
       top: auto;
       right: 7px;
@@ -2530,6 +2603,26 @@
         <div id="heroReferralCard" class="hero-referral-card" aria-live="polite"></div>
       </div>
     </details>
+  </div>
+</div>
+
+<div class="guide-level-intro" id="guideLevelIntro">
+  <div class="guide-level-intro-title">
+    <span data-i18n="guide.title">🧭 贡献向导等级</span>
+    <span class="guide-level-chip high">L1-L10</span>
+  </div>
+  <p data-i18n="guide.desc">注册用户按已发布信息数量自动升级。发布越多、等级越高，信息在首页和欧圈推荐里越容易获得曝光；这是免费贡献等级，不是付费排名。</p>
+  <div class="guide-level-track" aria-label="贡献向导等级">
+    <span class="guide-level-step">L1 0条</span>
+    <span class="guide-level-step">L2 1条</span>
+    <span class="guide-level-step">L3 3条</span>
+    <span class="guide-level-step">L4 6条</span>
+    <span class="guide-level-step">L5 10条</span>
+    <span class="guide-level-step">L6 20条</span>
+    <span class="guide-level-step">L7 35条</span>
+    <span class="guide-level-step">L8 60条</span>
+    <span class="guide-level-step">L9 100条</span>
+    <span class="guide-level-step">L10 150条</span>
   </div>
 </div>
 
@@ -3103,6 +3196,8 @@ const I18N = {
     'hero.desc': '西班牙生活通当前主推免费使用。注册后即可免费发布信息、浏览最新内容、管理自己的信息，并享受VIP标识和更多曝光。',
     'hero.step1': '1. 注册账号', 'hero.step2': '2. 自动成为VIP', 'hero.step3': '3. 免费发布信息', 'hero.step4': '4. 免费浏览转发',
     'hero.register': '立即免费注册', 'hero.referral': '分享本站', 'hero.latest': '最新信息',
+    'guide.title': '🧭 贡献向导等级',
+    'guide.desc': '注册用户按已发布信息数量自动升级。发布越多、等级越高，信息在首页和欧圈推荐里越容易获得曝光；这是免费贡献等级，不是付费排名。',
     'wechat.title': '微信里下次找不到？先收藏本站',
     'wechat.text': '看右上角绿色箭头，点微信浏览器的 <strong>...</strong>，选择 <strong>添加到收藏</strong>；想放到手机桌面，就选 <strong>添加到桌面</strong>。',
     'merchant.title': '商家服务筛选', 'merchant.allLink': '商家黄页 →', 'merchant.expand': '展开商家目录', 'merchant.collapse': '收起商家目录',
@@ -3167,6 +3262,8 @@ const I18N = {
     'hero.desc': 'España Life está en fase gratuita. Al registrarte puedes publicar anuncios, ver información reciente, gestionar tus anuncios y recibir distintivo VIP sin pagar.',
     'hero.step1': '1. Crea tu cuenta', 'hero.step2': '2. VIP incluido', 'hero.step3': '3. Publica gratis', 'hero.step4': '4. Comparte gratis',
     'hero.register': 'Registrarme gratis', 'hero.referral': 'Compartir web', 'hero.latest': 'Anuncios recientes',
+    'guide.title': '🧭 Niveles de guía',
+    'guide.desc': 'Los usuarios registrados suben de nivel según el número de anuncios publicados. Cuanto más alto sea el nivel, más prioridad tendrá el anuncio en Inicio y 欧圈. Es una contribución gratuita, no un ranking de pago.',
     'wechat.title': '¿Lo abriste desde WeChat? Guarda la web',
     'wechat.text': 'Toca los <strong>...</strong> de arriba a la derecha en WeChat y elige <strong>Guardar en favoritos</strong>. Para acceso rápido, usa <strong>Añadir a pantalla de inicio</strong>.',
     'merchant.title': 'Servicios y comercios', 'merchant.allLink': 'Directorio →', 'merchant.expand': 'Ver directorio', 'merchant.collapse': 'Ocultar directorio',
@@ -3514,16 +3611,43 @@ function dedupeListingRows(rows) {
   });
 }
 
+function listingFromRow(row, authorCountMap = new Map()) {
+  const importedMerchant = isImportedMerchantListing(row);
+  const displayCategory = getListingDisplayCategory(row);
+  const authorPostCount = rowAuthorPostCount(row, authorCountMap);
+  return {
+    id: row.id,
+    cat: importedMerchant ? 'merchant' : (uiCatMap[row.category] || 'goods'),
+    city: normalizeProvinceName(row.city),
+    icon: catIcons[displayCategory] || catIcons[row.category] || '📋',
+    badge: badgeLabel(displayCategory, importedMerchant ? '商家' : (catBadge[row.category] || '信息')),
+    badgeType: row.is_pinned ? 'gold' : '',
+    title: row.title,
+    price: row.price || '面议',
+    address: row.address || '',
+    description: row.description || '',
+    isMerchant: importedMerchant,
+    isPinned: Boolean(row.is_pinned),
+    userId: row.user_id || '',
+    authorPostCount,
+    createdAt: row.created_at,
+    images: normalizeListingImages(row.images),
+    unit: '',
+    tags: [displayCategory, normalizeProvinceName(row.city)],
+    time: timeAgo(row.created_at)
+  };
+}
+
 // ===== 从 Supabase 加载信息 =====
 async function loadListings() {
   showLoading(true);
   try {
     let query = sb.from('listings')
-      .select('id, title, description, category, city, price, address, images, created_at, is_pinned, user_id')
+      .select('id, title, description, category, city, price, address, images, created_at, is_pinned, user_id, profiles(post_count,nickname)')
       .eq('status', 'approved')
       .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false })
-      .limit(40);
+      .limit(100);
 
     if (currentCat !== 'all') {
       // 批发市场大分类：包含所有子分类
@@ -3549,27 +3673,8 @@ async function loadListings() {
     if (data && data.length > 0) {
       const uniqueRows = dedupeListingRows(data)
         .filter(r => currentCat !== 'business' || isBusinessTransferListing(r));
-      allListings = uniqueRows.map(r => {
-        const importedMerchant = isImportedMerchantListing(r);
-        const displayCategory = getListingDisplayCategory(r);
-        return {
-          id: r.id,
-          cat: importedMerchant ? 'merchant' : (uiCatMap[r.category] || 'goods'),
-          city: normalizeProvinceName(r.city),
-          icon: catIcons[displayCategory] || catIcons[r.category] || '📋',
-          badge: badgeLabel(displayCategory, importedMerchant ? '商家' : (catBadge[r.category] || '信息')),
-          badgeType: r.is_pinned ? 'gold' : '',
-          title: r.title,
-          price: r.price || '面议',
-          address: r.address || '',
-          description: r.description || '',
-          isMerchant: importedMerchant,
-          images: normalizeListingImages(r.images),
-          unit: '',
-          tags: [displayCategory, normalizeProvinceName(r.city)],
-          time: timeAgo(r.created_at)
-        };
-      });
+      const authorCountMap = makeAuthorCountMap(uniqueRows);
+      allListings = rankListingsForRecommendation(uniqueRows.map(row => listingFromRow(row, authorCountMap)));
     }
   } catch(e) {
     console.warn('加载失败，使用备用数据', e.message);
@@ -3598,6 +3703,102 @@ function escapeHTML(value) {
     '"': '&quot;',
     "'": '&#39;'
   }[ch]));
+}
+
+const CONTRIBUTOR_LEVELS = [
+  { level: 1, min: 0, title: '新手向导', esTitle: 'Guia nuevo' },
+  { level: 2, min: 1, title: '本地向导', esTitle: 'Guia local' },
+  { level: 3, min: 3, title: '活跃向导', esTitle: 'Guia activo' },
+  { level: 4, min: 6, title: '热心向导', esTitle: 'Guia frecuente' },
+  { level: 5, min: 10, title: '社区向导', esTitle: 'Guia comunidad' },
+  { level: 6, min: 20, title: '资深向导', esTitle: 'Guia experto' },
+  { level: 7, min: 35, title: '城市向导', esTitle: 'Guia ciudad' },
+  { level: 8, min: 60, title: '明星向导', esTitle: 'Guia destacado' },
+  { level: 9, min: 100, title: '金牌向导', esTitle: 'Guia oro' },
+  { level: 10, min: 150, title: '欧圈向导', esTitle: 'Guia Europa' }
+];
+
+function guideLevelFromPostCount(value = 0) {
+  const count = Math.max(0, Number(value || 0));
+  let current = CONTRIBUTOR_LEVELS[0];
+  for (const item of CONTRIBUTOR_LEVELS) {
+    if (count >= item.min) current = item;
+  }
+  const next = CONTRIBUTOR_LEVELS.find(item => item.min > count) || null;
+  return {
+    ...current,
+    postCount: count,
+    nextMin: next?.min || null,
+    nextLevel: next?.level || null,
+    remaining: next ? Math.max(0, next.min - count) : 0,
+    boost: current.level * 90 + Math.min(count, 240) * 2
+  };
+}
+
+function guideLevelName(level) {
+  return (typeof currentLang !== 'undefined' && currentLang === 'es') ? (level.esTitle || level.title) : level.title;
+}
+
+function guideLevelChipHtml(count, userId = '') {
+  if (!userId) return '';
+  const level = guideLevelFromPostCount(count);
+  const high = level.level >= 5 ? ' high' : '';
+  const isEs = typeof currentLang !== 'undefined' && currentLang === 'es';
+  const title = isEs
+    ? `${level.postCount} publicaciones, mas nivel = mas recomendacion`
+    : `已发布 ${level.postCount} 条，等级越高越容易被推荐`;
+  return `<span class="guide-level-chip${high}" title="${escapeHTML(title)}">${isEs ? 'Guia' : '向导'} L${level.level} · ${escapeHTML(guideLevelName(level))}</span>`;
+}
+
+function guideLevelDetailHtml(count, userId = '') {
+  if (!userId) return '';
+  const level = guideLevelFromPostCount(count);
+  const isEs = typeof currentLang !== 'undefined' && currentLang === 'es';
+  const nextText = level.nextMin
+    ? (isEs ? `faltan ${level.remaining} anuncios para L${level.nextLevel}` : `距离 L${level.nextLevel} 还差 ${level.remaining} 条`)
+    : (isEs ? 'nivel maximo alcanzado' : '已达到最高等级');
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;padding:10px 12px;margin-bottom:14px;color:#7c2d12">
+      <div style="min-width:0">
+        <div style="font-size:13px;font-weight:950">${isEs ? 'Guia' : '贡献向导'} L${level.level} · ${escapeHTML(guideLevelName(level))}</div>
+        <div style="font-size:11px;color:#9a3412;margin-top:3px">${isEs ? `${level.postCount} anuncios publicados, ${nextText}. Mas nivel, mas recomendacion.` : `已发布 ${level.postCount} 条，${nextText}。等级越高，推荐权重越高。`}</div>
+      </div>
+      <span class="guide-level-chip${level.level >= 5 ? ' high' : ''}">L${level.level}</span>
+    </div>`;
+}
+
+function makeAuthorCountMap(rows = []) {
+  const map = new Map();
+  rows.forEach(row => {
+    if (!row?.user_id) return;
+    const key = String(row.user_id);
+    map.set(key, (map.get(key) || 0) + 1);
+  });
+  return map;
+}
+
+function rowAuthorPostCount(row, authorCountMap = new Map()) {
+  if (!row?.user_id) return 0;
+  const profileCount = Number(row.profiles?.post_count || 0);
+  const visibleCount = authorCountMap.get(String(row.user_id)) || 0;
+  return Math.max(profileCount, visibleCount);
+}
+
+function listingRecommendationScore(listing, index = 0) {
+  const level = guideLevelFromPostCount(listing.authorPostCount || 0);
+  const created = new Date(listing.createdAt || 0).getTime();
+  const ageDays = Number.isFinite(created) && created > 0 ? Math.max(0, (Date.now() - created) / 86400000) : 365;
+  const recencyBoost = Math.max(0, 45 - ageDays) * 5;
+  const viewBoost = Math.min(getPublicViewCount(listing), 900) / 12;
+  const guideBoost = listing.userId ? level.boost : 0;
+  return (listing.isPinned ? 100000 : 0) + guideBoost + recencyBoost + viewBoost - index * 0.01;
+}
+
+function rankListingsForRecommendation(listings = []) {
+  return [...listings]
+    .map((listing, index) => ({ listing, score: listingRecommendationScore(listing, index), index }))
+    .sort((a, b) => (b.score - a.score) || (a.index - b.index))
+    .map(item => item.listing);
 }
 
 function extractWhatsAppNumber(value) {
@@ -4290,6 +4491,7 @@ function renderListings() {
   }
   if(currentCity !== '全部') filtered = filtered.filter(l => normalizeProvinceName(l.city) === currentCity);
   if(currentMerchant) filtered = filtered.filter(matchesMerchantFilter);
+  filtered = rankListingsForRecommendation(filtered);
 
   if(filtered.length === 0) {
     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--ink-light)"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="font-size:16px">${tr('list.emptyTitle')}</div><div style="font-size:13px;margin-top:8px">${tr('list.emptyText')}</div>${publishEntryCardHtml('empty-publish-entry')}</div>`;
@@ -4313,6 +4515,7 @@ function renderListings() {
       <div class="listing-body">
         <div class="listing-title">${escapeHTML(l.title)}</div>
         <div class="listing-tags">
+          ${guideLevelChipHtml(l.authorPostCount, l.userId)}
           ${l.tags.map(t=>`<span class="tag">${escapeHTML(categoryLabel(normalizeProvinceName(t)))}</span>`).join('')}
           ${l.address ? `<span class="listing-map-chip">${tr('list.map')}</span>` : ''}
         </div>
@@ -4409,7 +4612,7 @@ async function viewListing(id) {
 
   try {
     const { data, error } = await sb.from('listings')
-      .select('id, title, description, category, city, price, address, contact, images, created_at, is_pinned, view_count, user_id')
+      .select('id, title, description, category, city, price, address, contact, images, created_at, is_pinned, view_count, user_id, profiles(post_count,nickname)')
       .eq('id', id)
       .eq('status', 'approved')
       .single();
@@ -4432,6 +4635,7 @@ async function viewListing(id) {
     const safeContact = escapeHTML(data.contact || tr('common.notFilled'));
     const publicViews = getPublicViewCount(data, 1);
     const whatsappUrl = whatsappUrlFor(data.contact, whatsappSourceMessage(data.title));
+    const guideHtml = guideLevelDetailHtml(Number(data.profiles?.post_count || 0), data.user_id);
     const contactHtml = whatsappUrl
       ? `<a class="whatsapp-contact-link" href="${escapeHTML(whatsappUrl)}" target="_blank" rel="noopener">📱 ${safeContact}</a>`
       : `<div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">${safeContact}</div>`;
@@ -4439,7 +4643,7 @@ async function viewListing(id) {
     updateDocumentShareMeta(data);
 
     document.getElementById('detailContent').innerHTML = `
-      <div>
+        <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
           <span style="font-size:36px">${escapeHTML(icon)}</span>
           <div>
@@ -4447,6 +4651,7 @@ async function viewListing(id) {
             <h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">${safeTitle}</h3>
           </div>
         </div>
+        ${guideHtml}
         ${renderDetailPhotos(data.images)}
         ${renderBusinessMap(data.address, data.city)}
         ${renderMerchantClaimBox(data)}
@@ -4501,25 +4706,15 @@ async function doSearch() {
   showLoading(true);
   try {
     const { data, error } = await sb.from('listings')
-      .select('id, title, description, category, city, price, address, images, created_at, is_pinned, user_id')
+      .select('id, title, description, category, city, price, address, images, created_at, is_pinned, user_id, profiles(post_count,nickname)')
       .eq('status', 'approved')
       .ilike('title', `%${q}%`)
-      .limit(40);
+      .limit(80);
     if(error) throw error;
     if(data && data.length > 0) {
       const uniqueRows = dedupeListingRows(data);
-      allListings = uniqueRows.map(r => {
-        const importedMerchant = isImportedMerchantListing(r);
-        const displayCategory = getListingDisplayCategory(r);
-        return {
-          id: r.id, cat: importedMerchant ? 'merchant' : 'all', city: normalizeProvinceName(r.city),
-          icon: catIcons[displayCategory] || catIcons[r.category] || '📋',
-          badge: badgeLabel(displayCategory, importedMerchant ? '商家' : (catBadge[r.category] || '信息')),
-          badgeType: r.is_pinned ? 'gold' : '',
-          title: r.title, price: r.price || '面议', address: r.address || '', description: r.description || '', isMerchant: importedMerchant, images: normalizeListingImages(r.images), unit: '',
-          tags: [displayCategory, normalizeProvinceName(r.city)], time: timeAgo(r.created_at)
-        };
-      });
+      const authorCountMap = makeAuthorCountMap(uniqueRows);
+      allListings = rankListingsForRecommendation(uniqueRows.map(row => listingFromRow(row, authorCountMap)));
       currentCat = 'all'; currentCity = '全部'; currentMerchant = ''; populateProvinceControls(); updateMerchantFilterUI();
       showLoading(false); renderListings();
       showToast(`"${q}" ${tr('search.toastFound')} ${uniqueRows.length} ${tr('search.toastItems')}`);
@@ -5865,7 +6060,7 @@ if (window.MutationObserver) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js?v=20260606-free-vip').catch(function() {});
+    navigator.serviceWorker.register('/sw.js?v=20260606-guide-levels').catch(function() {});
   });
 }
 window.addEventListener('load', function() {
@@ -6033,11 +6228,24 @@ window.addEventListener('load', function() {
       btn.style.background = '';
     }
 
-    setText('#vipStatusTitle', text.profileTitle);
-    setText('#vipStatusSub', text.profileSub);
+    const postCountText = document.getElementById('statPostCount')?.textContent || '0';
+    const currentPostCount = Number(String(postCountText).replace(/\D/g, '')) || 0;
+    const currentGuide = typeof guideLevelFromPostCount === 'function'
+      ? guideLevelFromPostCount(currentPostCount)
+      : { level: 1, title: '新手向导', esTitle: 'Guia nuevo', postCount: currentPostCount, nextLevel: 2, remaining: 1, nextMin: 1 };
+    const currentGuideName = typeof guideLevelName === 'function'
+      ? guideLevelName(currentGuide)
+      : (isSpanish() ? (currentGuide.esTitle || currentGuide.title) : currentGuide.title);
+    const nextGuideText = currentGuide.nextMin
+      ? (isSpanish() ? `faltan ${currentGuide.remaining} anuncios para L${currentGuide.nextLevel}` : `距离 L${currentGuide.nextLevel} 还差 ${currentGuide.remaining} 条`)
+      : (isSpanish() ? 'nivel maximo alcanzado' : '已达到最高等级');
+    setText('#vipStatusTitle', `${text.profileTitle} · ${isSpanish() ? 'Guia' : '向导'}L${currentGuide.level}`);
+    setText('#vipStatusSub', isSpanish()
+      ? `${currentGuide.postCount} anuncios publicados, ${currentGuideName}. ${nextGuideText}; mas nivel, mas recomendacion.`
+      : `已发布 ${currentGuide.postCount} 条，${currentGuideName}。${nextGuideText}，等级越高越容易被推荐。`);
     const badge = document.getElementById('vipBadge');
     if (badge) {
-      badge.textContent = text.badge;
+      badge.textContent = `${text.badge}·L${currentGuide.level}`;
       badge.style.background = 'linear-gradient(135deg,#16a34a,#f5c842)';
       badge.style.color = '#fff';
     }
@@ -6126,7 +6334,13 @@ window.addEventListener('load', function() {
     return result;
   };
 
-  document.addEventListener('DOMContentLoaded', applyFreeVipMode);
+  document.addEventListener('DOMContentLoaded', function() {
+    applyFreeVipMode();
+    const stat = document.getElementById('statPostCount');
+    if (stat && window.MutationObserver) {
+      new MutationObserver(applyFreeVipMode).observe(stat, { childList: true, characterData: true, subtree: true });
+    }
+  });
   window.addEventListener('load', applyFreeVipMode);
   setTimeout(applyFreeVipMode, 250);
   setTimeout(applyFreeVipMode, 1200);

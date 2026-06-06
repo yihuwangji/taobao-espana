@@ -312,6 +312,56 @@ function avatarText(name) {
   return String(name || '欧').trim().slice(0, 1).toUpperCase();
 }
 
+const GUIDE_LEVELS = [
+  { level: 1, min: 0, title: '新手向导' },
+  { level: 2, min: 1, title: '本地向导' },
+  { level: 3, min: 3, title: '活跃向导' },
+  { level: 4, min: 6, title: '热心向导' },
+  { level: 5, min: 10, title: '社区向导' },
+  { level: 6, min: 20, title: '资深向导' },
+  { level: 7, min: 35, title: '城市向导' },
+  { level: 8, min: 60, title: '明星向导' },
+  { level: 9, min: 100, title: '金牌向导' },
+  { level: 10, min: 150, title: '欧圈向导' }
+];
+
+function guideLevelFromPostCount(value = 0) {
+  const count = Math.max(0, Number(value || 0));
+  let current = GUIDE_LEVELS[0];
+  for (const item of GUIDE_LEVELS) {
+    if (count >= item.min) current = item;
+  }
+  const next = GUIDE_LEVELS.find(item => item.min > count) || null;
+  return {
+    ...current,
+    postCount: count,
+    nextLevel: next?.level || null,
+    remaining: next ? Math.max(0, next.min - count) : 0
+  };
+}
+
+function authorPostCount(post) {
+  return Math.max(
+    Number(post?.author_post_count || 0),
+    Number(post?.profiles?.post_count || 0)
+  );
+}
+
+function guideBoost(post) {
+  const level = guideLevelFromPostCount(authorPostCount(post));
+  return post?.user_id
+    ? level.level * 18 + Math.min(level.postCount, 240) * 0.6
+    : 0;
+}
+
+function guideChipHtml(post) {
+  if (!post?.user_id) return '';
+  const level = guideLevelFromPostCount(authorPostCount(post));
+  const high = level.level >= 5 ? ' high' : '';
+  const title = `已发布 ${level.postCount} 条，等级越高越容易被推荐`;
+  return `<span class="guide-chip${high}" title="${escapeHTML(title)}">向导 L${level.level}</span>`;
+}
+
 function timeAgo(iso) {
   const diff = Math.max(1, Date.now() - new Date(iso || Date.now()).getTime());
   const minutes = Math.floor(diff / 60000);
@@ -468,10 +518,12 @@ function listingToFeedPost(row) {
   const category = listingFeedCategory(row);
   const originalCategory = String(row?.category || '').trim();
   const images = normalizeListingImages(row.images);
+  const authorPostCount = Number(row.profiles?.post_count || 0);
   return {
     id: `listing-${row.id}`,
     source: 'listing',
     source_listing_id: row.id,
+    user_id: row.user_id || null,
     title: row.title || '西班牙生活通信息',
     description: row.description || row.address || '来自西班牙生活通的同步信息',
     city: row.city || '西班牙',
@@ -479,7 +531,9 @@ function listingToFeedPost(row) {
     category,
     tags: ensureCategoryTag([originalCategory, row.city, row.price].filter(Boolean), category),
     is_anonymous: !row.user_id,
-    author_name: row.user_id ? '西班牙生活通用户' : '游客发布',
+    author_name: row.profiles?.nickname || (row.user_id ? '西班牙生活通用户' : '游客发布'),
+    profiles: row.profiles || null,
+    author_post_count: authorPostCount,
     like_count: stableNumber(`listing-${row.id}-like`, 12, 188),
     comment_count: stableNumber(`listing-${row.id}-comment`, 0, 16),
     save_count: stableNumber(`listing-${row.id}-save`, 5, 66),
@@ -509,7 +563,7 @@ async function loadCurrentProfile() {
   if (!sb || !currentUser?.id) return null;
   const query = sb
     .from('profiles')
-    .select('nickname, phone, city')
+    .select('nickname, phone, city, post_count')
     .eq('id', currentUser.id)
     .maybeSingle();
   const timeout = new Promise(resolve => setTimeout(() => resolve({ data: null }), 1500));
@@ -622,7 +676,7 @@ async function registerFeedAccount() {
       return;
     }
     currentUser = data?.user || null;
-    currentProfile = { nickname, phone, city };
+    currentProfile = { nickname, phone, city, post_count: 0 };
     updateFeedAuthUI();
     showToast('注册成功，已自动登录欧圈');
   } catch (error) {
@@ -663,7 +717,7 @@ async function loadListingsAsFeedPosts() {
   if (!sb) return;
   const query = sb
     .from('listings')
-    .select('id,title,category,city,contact,address,description,images,price,created_at,user_id')
+    .select('id,title,category,city,contact,address,description,images,price,created_at,user_id,profiles(post_count,nickname)')
     .eq('status', 'approved')
     .order('created_at', { ascending: false })
     .limit(140);
@@ -747,7 +801,7 @@ function filteredPosts() {
       const heatB = (b.like_count || 0) * 2 + (b.comment_count || 0) + (b.save_count || 0);
       const dateA = new Date(a.created_at || 0).getTime() / 100000000000;
       const dateB = new Date(b.created_at || 0).getTime() / 100000000000;
-      return (heatB + dateB) - (heatA + dateA);
+      return (heatB + dateB + guideBoost(b)) - (heatA + dateA + guideBoost(a));
     }
     return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
   });
@@ -786,7 +840,9 @@ function renderPosts() {
     }
     card.id = `post-${post.id}`;
     card.querySelector('h2').textContent = title;
-    card.querySelector('.author').textContent = author;
+    const authorNode = card.querySelector('.author');
+    authorNode.textContent = author;
+    authorNode.insertAdjacentHTML('afterend', guideChipHtml(post));
     card.querySelector('.avatar').textContent = avatarText(author);
     card.querySelector('.city').textContent = post.city || '欧洲';
     card.querySelector('.like-count').textContent = `♡ ${post.like_count || 0}`;
@@ -825,7 +881,10 @@ async function openDetail(post) {
   const postId = String(post.id);
   renderDetailMedia(post);
   document.getElementById('detailAvatar').textContent = avatarText(author);
-  document.getElementById('detailAuthor').textContent = author;
+  const detailAuthor = document.getElementById('detailAuthor');
+  detailAuthor.textContent = author;
+  detailAuthor.parentElement?.querySelector('.guide-chip')?.remove();
+  detailAuthor.insertAdjacentHTML('afterend', guideChipHtml(post));
   document.getElementById('detailMeta').textContent = `${post.city || '欧洲'} · ${displayCategory(post) || '动态'} · ${timeAgo(post.created_at)}`;
   document.getElementById('detailTitle').textContent = titleOf(post);
   document.getElementById('detailText').textContent = post.description || '';
@@ -1182,6 +1241,17 @@ async function submitPost(event) {
         created_at: new Date().toISOString(),
         feed_media: await uploadMedia(`local-${Date.now()}`)
       };
+    }
+    if (currentUser && !post.is_anonymous) {
+      const nextPostCount = Math.max(1, Number(currentProfile?.post_count || 0) + 1);
+      post.user_id = currentUser.id;
+      post.author_name = currentProfile?.nickname || post.author_name || '欧圈用户';
+      post.profiles = {
+        nickname: currentProfile?.nickname || '',
+        post_count: nextPostCount
+      };
+      post.author_post_count = nextPostCount;
+      if (currentProfile) currentProfile.post_count = Math.max(Number(currentProfile.post_count || 0), nextPostCount);
     }
     allPosts = [post, ...allPosts];
     document.getElementById('feedPostForm').reset();
