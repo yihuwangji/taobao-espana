@@ -204,6 +204,10 @@ a {
   object-fit: cover;
 }
 
+.default-feed-cover {
+  object-position: center;
+}
+
 .card-media video {
   aspect-ratio: 4 / 5;
 }
@@ -511,6 +515,11 @@ a {
   max-height: 70svh;
   object-fit: contain;
   background: #08080a;
+}
+
+.detail-media .default-feed-cover {
+  max-height: 68svh;
+  object-fit: cover;
 }
 
 .detail-media.multi {

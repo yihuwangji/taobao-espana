@@ -139,6 +139,11 @@ const LISTING_FEED_CATEGORY = {
   教育: '商家'
 };
 const DEFAULT_WORKER_COVER = '/assets/feed/worker-service-bazaar-20260606.jpg';
+const DEFAULT_SUPPLY_COVERS = [
+  '/assets/feed/supply-wholesale-racks-20260606-1.jpg',
+  '/assets/feed/supply-wholesale-racks-20260606-2.jpg',
+  '/assets/feed/supply-wholesale-racks-20260606-3.jpg'
+];
 
 function escapeHTML(value) {
   return String(value || '').replace(/[&<>"']/g, char => ({
@@ -360,6 +365,14 @@ function extractPhone(value) {
   return match ? match[1].replace(/[^\d+]/g, '') : '';
 }
 
+function isSupplyLikeText(...values) {
+  return /货源|批发|百元店|到仓|清仓|供应|mayorista|mayoreo|mayoristas|wholesale|bazar|multiprecio/i.test(values.join(' '));
+}
+
+function isGenericStockUrl(url) {
+  return /images\.unsplash\.com/i.test(String(url || ''));
+}
+
 function stableNumber(value, min, max) {
   const text = String(value || '');
   const seed = text.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
@@ -367,7 +380,29 @@ function stableNumber(value, min, max) {
 }
 
 function defaultCoverForPost(post) {
-  return displayCategory(post) === '招工' ? DEFAULT_WORKER_COVER : '';
+  const category = displayCategory(post);
+  if (category === '招工') return DEFAULT_WORKER_COVER;
+  if (category === '货源') {
+    const index = stableNumber(`${post?.id || ''}|${post?.title || ''}|${post?.city || ''}`, 0, DEFAULT_SUPPLY_COVERS.length - 1);
+    return DEFAULT_SUPPLY_COVERS[index];
+  }
+  return '';
+}
+
+function defaultCoverAlt(post) {
+  const category = displayCategory(post);
+  if (category === '货源') return '货源照片';
+  if (category === '招工') return '招聘照片';
+  return titleOf(post);
+}
+
+function shouldUseDefaultCover(post, mediaList) {
+  const category = displayCategory(post);
+  if (!mediaList.length) return Boolean(defaultCoverForPost(post));
+  if (category === '货源') {
+    return mediaList.every(item => isGenericStockUrl(item.thumbnail_url || item.url));
+  }
+  return false;
 }
 
 function isFeedPostId(id) {
@@ -382,7 +417,7 @@ function isImportedMerchantListing(row) {
 function listingFeedCategory(row) {
   const category = String(row?.category || '').trim();
   const text = `${row?.title || ''} ${row?.description || ''}`;
-  if (/货源|批发|百元店|到仓|清仓|供应|mayorista|bazar/i.test(text)) return '货源';
+  if (isSupplyLikeText(text)) return '货源';
   return LISTING_FEED_CATEGORY[category] || '商家';
 }
 
@@ -613,6 +648,7 @@ async function loadMerchants() {
   if (error || !data?.length) return;
   merchantPosts = data.map(merchant => {
     const images = normalizeListingImages(merchant.images);
+    const merchantKind = isSupplyLikeText(merchant.title, merchant.description, merchant.address, merchant.category) ? '货源' : '商家';
     return {
       id: `merchant-${merchant.id}`,
       source_listing_id: merchant.id,
@@ -620,8 +656,8 @@ async function loadMerchants() {
       description: merchant.description || merchant.address || '欧圈商家资料',
       city: merchant.city || '西班牙',
       whatsapp: extractPhone(merchant.contact),
-      category: '商家',
-      tags: ['商家', merchant.category || '黄页', merchant.city || '西班牙'],
+      category: merchantKind,
+      tags: [merchantKind, merchant.category || '黄页', merchant.city || '西班牙'],
       is_anonymous: false,
       author_name: '欧圈商家',
       like_count: stableNumber(merchant.id, 18, 168),
@@ -688,7 +724,8 @@ function renderPosts() {
     const author = authorOf(post);
     const height = randomHeight(post);
     const defaultCover = defaultCoverForPost(post);
-    if (firstMedia?.url) {
+    const useDefaultCover = defaultCover && shouldUseDefaultCover(post, mediaList);
+    if (!useDefaultCover && firstMedia?.url) {
       if (isVideo(firstMedia)) {
         mediaWrap.innerHTML = `<video src="${escapeHTML(firstMedia.url)}" poster="${escapeHTML(firstMedia.thumbnail_url || '')}" muted playsinline preload="metadata" style="height:${height}px"></video><span class="media-badge">视频</span>`;
       } else {
@@ -696,7 +733,7 @@ function renderPosts() {
       }
       if (mediaList.length > 1) mediaWrap.insertAdjacentHTML('beforeend', `<span class="media-badge">${mediaList.length}图</span>`);
     } else if (defaultCover) {
-      mediaWrap.innerHTML = `<img class="default-worker-cover" src="${escapeHTML(defaultCover)}" alt="招聘" loading="lazy" style="height:${height}px">`;
+      mediaWrap.innerHTML = `<img class="default-feed-cover" src="${escapeHTML(defaultCover)}" alt="${escapeHTML(defaultCoverAlt(post))}" loading="lazy" style="height:${height}px">`;
     } else {
       mediaWrap.innerHTML = `<div class="placeholder-cover" style="height:${height}px">${escapeHTML(displayCategory(post) || '欧圈')}</div>`;
     }
@@ -717,10 +754,10 @@ function renderDetailMedia(post) {
   const media = getMedia(post);
   const wrap = document.getElementById('detailMedia');
   wrap.classList.toggle('multi', media.length > 1);
-  if (!media.length) {
-    const defaultCover = defaultCoverForPost(post);
+  const defaultCover = defaultCoverForPost(post);
+  if (!media.length || (defaultCover && shouldUseDefaultCover(post, media))) {
     if (defaultCover) {
-      wrap.innerHTML = `<img class="default-worker-cover" src="${escapeHTML(defaultCover)}" alt="招聘">`;
+      wrap.innerHTML = `<img class="default-feed-cover" src="${escapeHTML(defaultCover)}" alt="${escapeHTML(defaultCoverAlt(post))}">`;
       return;
     }
     wrap.innerHTML = `<div class="placeholder-cover" style="height:330px">${escapeHTML(displayCategory(post) || '欧圈')}</div>`;
