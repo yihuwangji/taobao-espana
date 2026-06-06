@@ -4,83 +4,100 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#D42B2B">
-<title>隐私政策 - 西班牙生活通</title>
+<title>隐私政策 / Política de Privacidad - 西班牙生活通</title>
 <style>
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: #fdf6ec;
-    color: #1a0a00;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    line-height: 1.75;
-  }
-  header {
-    background: #d42b2b;
-    color: #fff;
-    padding: 28px 18px;
-  }
-  main {
-    width: min(860px, 100%);
-    margin: 0 auto;
-    padding: 26px 18px 48px;
-  }
-  h1 { margin: 0 0 8px; font-size: 28px; }
-  h2 { margin: 28px 0 8px; font-size: 19px; color: #9e1c1c; }
+  body { margin: 0; background: #fdf6ec; color: #1a0a00; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.76; }
+  header { background: #d42b2b; color: #fff; padding: 28px 18px; }
+  main { width: min(960px, 100%); margin: 0 auto; padding: 26px 18px 48px; }
+  h1 { margin: 0 0 8px; font-size: clamp(24px, 5vw, 34px); }
+  h2 { margin: 28px 0 8px; font-size: 20px; color: #9e1c1c; }
+  h3 { margin: 20px 0 6px; font-size: 16px; color: #3d2010; }
   p, li { color: #3d2010; }
-  a { color: #d42b2b; }
-  .updated { color: rgba(255,255,255,0.78); font-size: 13px; }
-  .card {
-    background: #fff;
-    border: 1px solid rgba(158,28,28,0.12);
-    border-radius: 10px;
-    padding: 22px;
-    box-shadow: 0 10px 28px rgba(80,34,15,0.08);
-  }
+  a { color: #d42b2b; font-weight: 700; }
+  .updated { color: rgba(255,255,255,0.82); font-size: 13px; }
+  .card { background: #fff; border: 1px solid rgba(158,28,28,0.12); border-radius: 10px; padding: clamp(18px, 4vw, 26px); box-shadow: 0 10px 28px rgba(80,34,15,0.08); }
+  .notice { border-left: 5px solid #16a34a; background: #f0fdf4; padding: 12px 14px; border-radius: 8px; color: #14532d; }
+  .meta { display: grid; gap: 8px; margin: 18px 0; padding: 14px; border-radius: 8px; background: #fff7ed; border: 1px solid #fed7aa; }
+  .lang-block { margin-top: 30px; padding-top: 24px; border-top: 1px solid #eadfce; }
+  ul { padding-left: 22px; }
 </style>
 </head>
 <body>
 <header>
   <h1>西班牙生活通隐私政策</h1>
-  <div class="updated">最后更新：2026年6月6日</div>
+  <div class="updated">最后更新：2026年6月6日 · Última actualización: 6 de junio de 2026</div>
 </header>
 <main>
-  <div class="card">
-    <p>西班牙生活通（espanalife.app）重视用户隐私。本政策说明我们在提供分类信息发布、浏览、搜索、账号登录、举报、欧圈社区和后台审核服务时如何收集、使用和保护信息。</p>
+  <article class="card">
+    <p class="notice">本政策按照欧盟《通用数据保护条例》（GDPR）和西班牙数据保护实践编写，用于说明 espanalife.app、西班牙生活通 App 和欧圈社区如何处理个人数据。本文不是律师出具的法律意见，正式商业运营前建议由西班牙本地律师复核。</p>
 
-    <h2>一、我们收集的信息</h2>
+    <div class="meta">
+      <div><strong>数据控制者 / Responsable:</strong> 西班牙生活通（España Life / espanalife.app）</div>
+      <div><strong>联系邮箱 / Contacto:</strong> <a href="mailto:aladaya@gmail.com">aladaya@gmail.com</a></div>
+      <div><strong>适用范围:</strong> 网站、PWA、Android App、欧圈社区、后台审核和客服沟通。</div>
+    </div>
+
+    <h2>一、我们处理哪些个人数据</h2>
     <ul>
-      <li>账号信息：邮箱、昵称、手机号、所在城市等注册或登录信息。</li>
-      <li>发布信息：标题、分类、城市、描述、价格、联系方式、图片或其他用户主动填写的内容。</li>
-      <li>举报信息：举报类型、说明、联系方式以及被举报内容线索。</li>
-      <li>使用数据：页面访问、设备和浏览器信息、基础日志、浏览量、点赞收藏评论、审核和管理操作记录。</li>
+      <li>账号资料：手机号、邮箱（如用户提供）、昵称、密码凭证、所在城市或省份。</li>
+      <li>发布内容：标题、分类、正文、价格、地址或城市、联系方式、图片、视频、地图位置、标签。</li>
+      <li>欧圈互动：点赞、收藏、评论、关注、分享、草稿、举报、推荐好友和积分记录。</li>
+      <li>商家目录：商家名称、行业、地址、公开联系方式、公开图片，以及商家认领或修改时提交的信息。</li>
+      <li>客服与举报：微信/WhatsApp/电话/邮箱、举报原因、处理记录、后台管理员操作日志。</li>
+      <li>技术数据：IP 地址、浏览器和设备信息、访问时间、页面、会话标识、必要的安全日志、应用通知令牌（如启用）。</li>
     </ul>
 
-    <h2>二、信息用途</h2>
+    <h2>二、处理目的和法律依据</h2>
     <ul>
-      <li>展示、审核和管理用户发布的本地分类信息。</li>
-      <li>提供登录、找回密码、个人信息管理和客服支持。</li>
-      <li>处理违规举报、减少欺诈信息和重复广告。</li>
-      <li>维护平台安全、统计访问情况并改善产品体验。</li>
+      <li>提供账号注册、登录、发布、浏览、搜索、信息管理和客服功能。法律依据：履行用户请求的服务或合同。</li>
+      <li>审核发布内容、处理举报、防止诈骗、垃圾广告和平台滥用。法律依据：平台和用户的合法利益，以及必要时履行法律义务。</li>
+      <li>展示公开发布的信息、商家目录、欧圈内容和互动数据。法律依据：用户主动发布或同意展示。</li>
+      <li>发送与账号、审核、发布成功、举报处理相关的服务通知。法律依据：履行服务和合法利益。</li>
+      <li>统计访问、优化页面、改进推荐和等级/积分功能。法律依据：合法利益；如使用非必要追踪 Cookie，将另行取得同意。</li>
+      <li>保存账务、争议、违规证据或依法配合主管机关要求。法律依据：法律义务和合法利益。</li>
     </ul>
 
-    <h2>三、信息共享</h2>
-    <p>我们不会出售用户个人信息。仅在法律法规要求、用户明确授权、处理安全风控或为提供必要服务的情况下，才会与必要的服务提供方共享相关信息。</p>
+    <h2>三、公开展示和用户责任</h2>
+    <p>用户主动发布的标题、描述、城市、价格、图片、联系方式和评论可能公开展示。请不要在公开信息里填写身份证件、银行账号、完整住址、儿童信息、医疗信息或其他敏感资料。线下交易、招聘、租房和服务联系由用户自行判断风险。</p>
 
-    <h2>四、数据存储与安全</h2>
-    <p>平台使用 Supabase 等云服务存储数据，并通过权限控制、登录校验和审核机制保护数据。请不要在公开信息中发布身份证件、银行账号、住址等敏感信息。</p>
+    <h2>四、数据保存期限</h2>
+    <ul>
+      <li>账号资料保存至账号删除或用户请求删除后合理期限内。</li>
+      <li>发布信息保存至用户删除、管理员下架，或平台运营不再需要时。</li>
+      <li>举报、审核、安全日志通常保存 12 至 24 个月；涉及争议、欺诈或法律义务的，可保存更长时间。</li>
+      <li>备份数据会在技术备份周期内逐步覆盖或删除。</li>
+    </ul>
 
-    <h2>五、用户权利</h2>
-    <p>用户可申请查看、修改或删除个人信息及发布内容。注册用户可在“我的信息”中管理发布记录，游客发布内容如需修改或删除可联系客服处理。账号删除、数据删除或隐私权利请求可发送邮件至 <a href="mailto:aladaya@gmail.com">aladaya@gmail.com</a>。</p>
+    <h2>五、第三方服务和数据处理者</h2>
+    <p>为提供服务，我们可能使用以下服务商作为数据处理者或基础设施提供方：Supabase（数据库、认证、存储）、Vercel（网站托管、函数、日志）、浏览器/系统推送服务、邮件或客服通讯工具。我们不会出售个人数据。</p>
 
-    <h2>六、未成年人</h2>
-    <p>本平台不面向儿童提供服务。未成年人使用本平台应获得监护人同意。</p>
+    <h2>六、国际数据传输</h2>
+    <p>部分云服务可能在欧盟以外处理或备份数据。我们会优先选择提供 GDPR 合规机制的服务商，并在需要时依赖标准合同条款、等效保护措施或服务商公开的数据保护条款。</p>
 
-    <h2>七、联系我们</h2>
-    <p>如需行使隐私权利或咨询本政策，请联系：<a href="mailto:aladaya@gmail.com">aladaya@gmail.com</a>。</p>
+    <h2>七、Cookie、本地存储和类似技术</h2>
+    <p>网站会使用必要的本地存储或会话标识来维持登录、语言选择、草稿、收藏、PWA 安装和安全功能。详情见 <a href="/cookies">Cookie 与本地存储政策</a>。如以后加入广告、跨站追踪或非必要分析 Cookie，将提供同意选择。</p>
 
-    <h2>Resumen en español</h2>
-    <p>España Life recopila la información necesaria para registrar cuentas, publicar anuncios, mostrar contenido comunitario, revisar reportes y mantener la seguridad del servicio. Puede solicitar acceso, corrección o eliminación de sus datos escribiendo a <a href="mailto:aladaya@gmail.com">aladaya@gmail.com</a>.</p>
-  </div>
+    <h2>八、用户权利</h2>
+    <p>在 GDPR 下，用户可以依法行使访问、更正、删除、限制处理、反对处理、数据可携带、撤回同意等权利。请发送邮件至 <a href="mailto:aladaya@gmail.com">aladaya@gmail.com</a>，并说明手机号/账号、请求内容和必要的身份验证信息。我们通常会在 30 天内回复；复杂请求可能依法延长。</p>
+    <p>如认为个人数据处理不当，也可以向西班牙数据保护机构 AEPD 投诉：<a href="https://www.aepd.es/" target="_blank" rel="noopener">www.aepd.es</a>。</p>
+
+    <h2>九、未成年人</h2>
+    <p>本平台主要面向成年人及有工作、租房、生活服务需求的用户，不面向儿童提供服务。未成年人使用平台应获得监护人同意，且不得发布不适合公开的信息。</p>
+
+    <h2>十、安全措施</h2>
+    <p>我们通过 HTTPS、访问权限、后台管理员权限区分、审核日志和云服务安全机制保护数据。互联网服务无法保证绝对安全，如发现安全问题，请立即联系 <a href="mailto:aladaya@gmail.com">aladaya@gmail.com</a>。</p>
+
+    <h2>十一、政策更新</h2>
+    <p>功能、法律或服务商变化时，我们可能更新本政策。重大变化会通过网站或 App 页面提示。继续使用服务表示您已知悉更新后的政策。</p>
+
+    <section class="lang-block" lang="es">
+      <h2>Resumen en español</h2>
+      <p>España Life / espanalife.app trata datos personales para permitir el registro, publicación de anuncios, comunidad Ouquan, directorio de comercios, moderación, soporte y seguridad. Los datos pueden incluir teléfono, correo si se facilita, apodo, ciudad, contenido publicado, imágenes, comentarios, reportes, registros técnicos y datos de interacción.</p>
+      <p>Las bases jurídicas principales son la ejecución del servicio solicitado, el interés legítimo en mantener la seguridad y moderación de la plataforma, el consentimiento cuando corresponda y el cumplimiento de obligaciones legales. Los usuarios pueden solicitar acceso, rectificación, supresión, limitación, oposición, portabilidad o retirada del consentimiento escribiendo a <a href="mailto:aladaya@gmail.com">aladaya@gmail.com</a>.</p>
+      <p>También puede presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD): <a href="https://www.aepd.es/" target="_blank" rel="noopener">www.aepd.es</a>.</p>
+    </section>
+  </article>
 </main>
 </body>
 </html>

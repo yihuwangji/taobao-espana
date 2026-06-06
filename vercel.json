@@ -65,6 +65,7 @@
     { "src": "/publish", "dest": "/index.html" },
     { "src": "/privacy", "dest": "/privacy.html" },
     { "src": "/terms", "dest": "/terms.html" },
+    { "src": "/cookies", "dest": "/cookies.html" },
     { "src": "/api/register", "dest": "/api/register.js" },
     { "src": "/api/referral", "dest": "/api/referral.js" },
     { "src": "/api/admin-delete", "dest": "/api/admin-delete.js" },
