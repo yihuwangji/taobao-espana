@@ -4280,7 +4280,7 @@ async function loadRewardsStatus() {
       if (panel) panel.remove();
       return null;
     }
-    const response = await fetch('/api/rewards', { headers });
+    const response = await fetch('/api/referral?feature=rewards', { headers });
     const data = await response.json().catch(() => ({}));
     if (response.ok) {
       renderRewardsPanel(data);
@@ -4296,7 +4296,7 @@ async function awardShareCoins(sourceType, sourceId, title = '') {
   try {
     const headers = await getAuthHeader();
     if (!headers.Authorization) return null;
-    const response = await fetch('/api/rewards', {
+    const response = await fetch('/api/referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers },
       body: JSON.stringify({ action: 'share_reward', sourceType, sourceId, title })
@@ -4328,7 +4328,7 @@ async function redeemPlatformReward(rewardId) {
     openModal('login');
     return;
   }
-  const response = await fetch('/api/rewards', {
+  const response = await fetch('/api/referral', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...headers },
     body: JSON.stringify({

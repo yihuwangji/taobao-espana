@@ -649,7 +649,7 @@ async function loadFeedRewardsStatus() {
   try {
     const headers = await getFeedAuthHeader();
     if (!headers.Authorization) return null;
-    const response = await fetch('/api/rewards', { headers });
+    const response = await fetch('/api/referral?feature=rewards', { headers });
     const data = await response.json().catch(() => ({}));
     if (response.ok) {
       renderFeedCoinPanel(data);
@@ -665,7 +665,7 @@ async function awardFeedShareCoins(sourceType, sourceId, title = '') {
   try {
     const headers = await getFeedAuthHeader();
     if (!headers.Authorization) return null;
-    const response = await fetch('/api/rewards', {
+    const response = await fetch('/api/referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers },
       body: JSON.stringify({ action: 'share_reward', sourceType, sourceId, title })
@@ -692,7 +692,7 @@ async function redeemFeedReward(rewardId) {
   if (!confirm(`确认使用 ${reward.coin_cost} 平台币兑换「${reward.title}」？客服会联系你确认领取方式。`)) return;
   const headers = await getFeedAuthHeader();
   if (!headers.Authorization) return showToast('请先登录后再兑换');
-  const response = await fetch('/api/rewards', {
+  const response = await fetch('/api/referral', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...headers },
     body: JSON.stringify({
