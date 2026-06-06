@@ -144,6 +144,18 @@ const DEFAULT_SUPPLY_COVERS = [
   '/assets/feed/supply-wholesale-racks-20260606-2.jpg',
   '/assets/feed/supply-wholesale-racks-20260606-3.jpg'
 ];
+const DEFAULT_MERCHANT_COVERS = {
+  fashion: [
+    '/assets/feed/merchant-fashion-clothes-20260606-1.jpg',
+    '/assets/feed/merchant-fashion-bags-20260606-2.jpg',
+    '/assets/feed/merchant-fashion-shoes-bags-20260606-3.jpg'
+  ],
+  supply: DEFAULT_SUPPLY_COVERS
+};
+const MERCHANT_INDUSTRY_LABELS = {
+  fashion: '服装箱包',
+  supply: '货源批发'
+};
 
 function escapeHTML(value) {
   return String(value || '').replace(/[&<>"']/g, char => ({
@@ -369,6 +381,15 @@ function isSupplyLikeText(...values) {
   return /货源|批发|百元店|到仓|清仓|供应|mayorista|mayoreo|mayoristas|wholesale|bazar|multiprecio/i.test(values.join(' '));
 }
 
+function merchantIndustryFromText(...values) {
+  const text = values.join(' ');
+  if (/服装|衣服|女装|男装|童装|鞋|鞋子|包|箱包|手袋|行李箱|皮具|饰品|首饰|配饰|帽|袜|纺织|textil|ropa|moda|bolso|bolsos|bag|bags|maleta|maletas|calzado|zapato|zapatos|shoe|shoes|bisuter[ií]a|joyer|complement|accesor|fashion|sport/i.test(text)) {
+    return 'fashion';
+  }
+  if (isSupplyLikeText(text)) return 'supply';
+  return '';
+}
+
 function isGenericStockUrl(url) {
   return /images\.unsplash\.com/i.test(String(url || ''));
 }
@@ -382,14 +403,18 @@ function stableNumber(value, min, max) {
 function defaultCoverForPost(post) {
   const category = displayCategory(post);
   if (category === '招工') return DEFAULT_WORKER_COVER;
-  if (category === '货源') {
-    const index = stableNumber(`${post?.id || ''}|${post?.title || ''}|${post?.city || ''}`, 0, DEFAULT_SUPPLY_COVERS.length - 1);
-    return DEFAULT_SUPPLY_COVERS[index];
+  const industry = post?.merchant_industry || merchantIndustryFromText(post?.title, post?.description, normalizeTags(post?.tags).join(' '));
+  const coverPool = DEFAULT_MERCHANT_COVERS[industry] || (category === '货源' ? DEFAULT_SUPPLY_COVERS : []);
+  if (coverPool.length) {
+    const index = stableNumber(`${post?.id || ''}|${post?.title || ''}|${post?.city || ''}`, 0, coverPool.length - 1);
+    return coverPool[index];
   }
   return '';
 }
 
 function defaultCoverAlt(post) {
+  const industry = post?.merchant_industry || merchantIndustryFromText(post?.title, post?.description, normalizeTags(post?.tags).join(' '));
+  if (industry === 'fashion') return '服装箱包照片';
   const category = displayCategory(post);
   if (category === '货源') return '货源照片';
   if (category === '招工') return '招聘照片';
@@ -399,7 +424,8 @@ function defaultCoverAlt(post) {
 function shouldUseDefaultCover(post, mediaList) {
   const category = displayCategory(post);
   if (!mediaList.length) return Boolean(defaultCoverForPost(post));
-  if (category === '货源') {
+  const industry = post?.merchant_industry || merchantIndustryFromText(post?.title, post?.description, normalizeTags(post?.tags).join(' '));
+  if (industry || category === '货源') {
     return mediaList.every(item => isGenericStockUrl(item.thumbnail_url || item.url));
   }
   return false;
@@ -648,16 +674,20 @@ async function loadMerchants() {
   if (error || !data?.length) return;
   merchantPosts = data.map(merchant => {
     const images = normalizeListingImages(merchant.images);
+    const merchantIndustry = merchantIndustryFromText(merchant.title, merchant.description, merchant.address, merchant.category);
     const merchantKind = isSupplyLikeText(merchant.title, merchant.description, merchant.address, merchant.category) ? '货源' : '商家';
+    const industryLabel = MERCHANT_INDUSTRY_LABELS[merchantIndustry] || '';
     return {
       id: `merchant-${merchant.id}`,
+      source: 'merchant',
       source_listing_id: merchant.id,
       title: merchant.title || '商家资料',
       description: merchant.description || merchant.address || '欧圈商家资料',
       city: merchant.city || '西班牙',
       whatsapp: extractPhone(merchant.contact),
       category: merchantKind,
-      tags: [merchantKind, merchant.category || '黄页', merchant.city || '西班牙'],
+      merchant_industry: merchantIndustry,
+      tags: [merchantKind, '商家', industryLabel, merchant.category || '黄页', merchant.city || '西班牙'].filter(Boolean),
       is_anonymous: false,
       author_name: '欧圈商家',
       like_count: stableNumber(merchant.id, 18, 168),
