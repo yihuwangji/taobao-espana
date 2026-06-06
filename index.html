@@ -1327,6 +1327,44 @@
     color: var(--ink-light);
   }
 
+  .photo-upload-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .photo-upload-btn {
+    display: flex;
+    min-width: 0;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1.5px solid #eadfce;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .photo-upload-btn.primary {
+    border-color: rgba(215, 25, 32, 0.22);
+    background: #fff1f1;
+    color: var(--red);
+  }
+
+  .photo-upload-btn input {
+    display: none;
+  }
+
+  .photo-upload-btn span {
+    font-size: 17px;
+    line-height: 1;
+  }
+
   .photo-preview-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -2801,7 +2839,18 @@
           <div class="photo-upload-title" data-i18n="post.photos">照片</div>
           <div class="photo-upload-tip" data-i18n="post.photosTip">最多6张，每张不超过5MB</div>
         </div>
-        <input type="file" id="postImages" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="previewPostImages()">
+        <div class="photo-upload-actions">
+          <label class="photo-upload-btn primary">
+            <input type="file" id="postCameraImage" accept="image/*" capture="environment" onchange="previewPostImagesFromInput(this,{append:true})">
+            <span>📷</span>
+            <b data-i18n="post.cameraUpload">拍照上传</b>
+          </label>
+          <label class="photo-upload-btn">
+            <input type="file" id="postImages" accept="image/jpeg,image/png,image/webp,image/gif" multiple onchange="previewPostImagesFromInput(this,{append:false})">
+            <span>🖼</span>
+            <b data-i18n="post.albumUpload">从相册选择</b>
+          </label>
+        </div>
         <div class="photo-upload-tip" style="margin-top:8px" data-i18n="post.photosCategoryTip">除招工外，其他分类都可以发布照片，方便以后做广告展示。</div>
         <div id="postImagePreview" class="photo-preview-grid"></div>
       </div>
@@ -3089,7 +3138,7 @@ const I18N = {
     'post.province': '省份/地区', 'post.price': '价格/薪资（€）', 'post.pricePlaceholder': '例：1200€/月 或 面议',
     'post.address': '店铺地址 / 地图位置（可选）', 'post.addressPlaceholder': '例：Carrer de Mallorca 123, Barcelona',
     'post.addressTip': '填写后详情页会显示地图入口，适合店铺、生意、服务和培训机构。',
-    'post.photos': '照片', 'post.photosTip': '最多6张，每张不超过5MB', 'post.photosCategoryTip': '除招工外，其他分类都可以发布照片，方便以后做广告展示。',
+    'post.photos': '照片', 'post.photosTip': '最多6张，每张不超过5MB', 'post.cameraUpload': '拍照上传', 'post.albumUpload': '从相册选择', 'post.photosCategoryTip': '除招工外，其他分类都可以发布照片，方便以后做广告展示。',
     'post.contact': '联系方式（微信/手机/WhatsApp）*', 'post.contactPlaceholder': '+34 6XX XXX XXX 或 微信号',
     'post.submit': '🚀 立即发布（限时免费）', 'post.agree': '发布即表示同意 <a href="#" onclick="openModal(\'userAgreement\');return false;" style="color:var(--red)">用户协议</a> 及 <a href="#" onclick="openModal(\'privacyPolicy\');return false;" style="color:var(--red)">隐私政策</a>',
     'post.jobTitlePlaceholder': '例如：马德里女生求餐馆/百元店工作，可马上上班',
@@ -3153,7 +3202,7 @@ const I18N = {
     'post.province': 'Provincia/zona', 'post.price': 'Precio/salario (€)', 'post.pricePlaceholder': 'Ej.: 1200€/mes o a negociar',
     'post.address': 'Dirección / ubicación en mapa (opcional)', 'post.addressPlaceholder': 'Ej.: Carrer de Mallorca 123, Barcelona',
     'post.addressTip': 'Si rellenas la dirección, el detalle mostrará acceso al mapa. Útil para tiendas, negocios, servicios y centros de formación.',
-    'post.photos': 'Fotos', 'post.photosTip': 'Máximo 6 fotos, hasta 5 MB cada una', 'post.photosCategoryTip': 'Todas las categorías excepto empleo pueden publicar fotos.',
+    'post.photos': 'Fotos', 'post.photosTip': 'Máximo 6 fotos, hasta 5 MB cada una', 'post.cameraUpload': 'Hacer foto', 'post.albumUpload': 'Elegir galería', 'post.photosCategoryTip': 'Todas las categorías excepto empleo pueden publicar fotos.',
     'post.contact': 'Contacto (WeChat / móvil / WhatsApp) *', 'post.contactPlaceholder': '+34 6XX XXX XXX o WeChat',
     'post.submit': '🚀 Publicar ahora (gratis por tiempo limitado)', 'post.agree': 'Al publicar, aceptas el <a href="#" onclick="openModal(\'userAgreement\');return false;" style="color:var(--red)">Acuerdo de Usuario</a> y la <a href="#" onclick="openModal(\'privacyPolicy\');return false;" style="color:var(--red)">Política de Privacidad</a>.',
     'post.jobTitlePlaceholder': 'Ej.: Se busca personal para restaurante o bazar en Madrid',
@@ -3643,10 +3692,15 @@ function buildPostDescription(category, desc) {
   ].filter(Boolean).join('\n\n');
 }
 
+let selectedPostImageFiles = [];
+
 function clearPostImages() {
   const input = document.getElementById('postImages');
+  const cameraInput = document.getElementById('postCameraImage');
   const preview = document.getElementById('postImagePreview');
+  selectedPostImageFiles = [];
   if (input) input.value = '';
+  if (cameraInput) cameraInput.value = '';
   if (preview) preview.innerHTML = '';
 }
 
@@ -3662,11 +3716,10 @@ function clearJobIntro() {
   });
 }
 
-function previewPostImages() {
-  const input = document.getElementById('postImages');
+function renderPostImagePreview() {
   const preview = document.getElementById('postImagePreview');
-  if (!input || !preview) return;
-  const files = [...input.files].slice(0, 6);
+  if (!preview) return;
+  const files = selectedPostImageFiles.slice(0, 6);
   preview.innerHTML = '';
   files.forEach(file => {
     const img = document.createElement('img');
@@ -3675,13 +3728,36 @@ function previewPostImages() {
     img.onload = () => URL.revokeObjectURL(img.src);
     preview.appendChild(img);
   });
-  if (input.files.length > 6) showToast('最多上传6张照片，已保留前6张', true);
+}
+
+function previewPostImagesFromInput(input, options = {}) {
+  const append = Boolean(options.append);
+  if (!input) return;
+  const files = [...(input.files || [])].filter(file => file.type.startsWith('image/'));
+  if (!files.length) return;
+  const merged = append ? [...selectedPostImageFiles, ...files] : files;
+  const seen = new Set();
+  selectedPostImageFiles = merged.filter(file => {
+    const key = `${file.name}-${file.size}-${file.lastModified}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 6);
+  input.value = '';
+  renderPostImagePreview();
+  if (merged.length > 6) showToast('最多上传6张照片，已保留前6张', true);
+}
+
+function previewPostImages() {
+  previewPostImagesFromInput(document.getElementById('postImages'), { append: false });
 }
 
 async function uploadPostImages(category) {
   if (!isPhotoCategory(category)) return [];
   const input = document.getElementById('postImages');
-  const files = input ? [...input.files].slice(0, 6) : [];
+  const files = selectedPostImageFiles.length
+    ? selectedPostImageFiles.slice(0, 6)
+    : (input ? [...input.files].slice(0, 6) : []);
   if (!files.length) return [];
   const maxSize = 5 * 1024 * 1024;
   const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];

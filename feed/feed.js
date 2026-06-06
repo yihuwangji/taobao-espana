@@ -925,9 +925,11 @@ function getVideoDuration(file) {
 }
 
 async function handleMediaInput(event) {
+  const appendImages = event.target?.dataset?.appendImages === 'true';
   const files = [...event.target.files];
   const videos = files.filter(file => file.type.startsWith('video/'));
   const images = files.filter(file => file.type.startsWith('image/'));
+  if (!files.length) return;
   if (videos.length && images.length) {
     event.target.value = '';
     selectedMedia = [];
@@ -951,8 +953,13 @@ async function handleMediaInput(event) {
     }
     selectedMedia = [{ file: videos[0], media_type: 'video', duration_seconds: Math.round(duration) }];
   } else {
-    selectedMedia = images.slice(0, MAX_IMAGES).map(file => ({ file, media_type: 'image', duration_seconds: null }));
+    const nextImages = images.map(file => ({ file, media_type: 'image', duration_seconds: null }));
+    const canAppend = appendImages && selectedMedia.every(item => item.media_type === 'image');
+    const mergedImages = canAppend ? [...selectedMedia, ...nextImages] : nextImages;
+    selectedMedia = mergedImages.slice(0, MAX_IMAGES);
+    if (mergedImages.length > MAX_IMAGES) showToast('图片最多9张，已保留前9张');
   }
+  event.target.value = '';
   renderMediaPreview();
 }
 
@@ -1189,6 +1196,7 @@ function bindEvents() {
     });
   });
   document.getElementById('feedMediaInput').addEventListener('change', handleMediaInput);
+  document.getElementById('feedCameraInput')?.addEventListener('change', handleMediaInput);
   document.getElementById('feedPostForm').addEventListener('submit', submitPost);
   document.getElementById('saveDraftBtn').addEventListener('click', saveDraft);
   document.getElementById('restoreDraftBtn').addEventListener('click', restoreDraft);
