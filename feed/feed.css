@@ -427,6 +427,79 @@ a {
   color: white;
 }
 
+.draft-notice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 12px 0;
+  border: 1px solid #ffe0a7;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff8e9;
+  color: #6d4500;
+}
+
+.draft-notice[hidden] {
+  display: none;
+}
+
+.draft-notice b,
+.draft-notice span {
+  display: block;
+}
+
+.draft-notice b {
+  font-size: 13px;
+}
+
+.draft-notice span {
+  margin-top: 2px;
+  color: #9a6a12;
+  font-size: 11px;
+}
+
+.draft-notice button,
+.draft-actions button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 12px;
+  cursor: pointer;
+  font-weight: 850;
+}
+
+#restoreDraftBtn {
+  background: var(--red);
+  color: white;
+}
+
+#deleteDraftBtn {
+  background: #f0e5d2;
+  color: #6d4500;
+}
+
+.draft-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  padding: 10px;
+  background: #f7f7f9;
+}
+
+.draft-actions button {
+  background: #222226;
+  color: white;
+}
+
+.draft-actions small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
 .detail-media {
   background: #08080a;
 }

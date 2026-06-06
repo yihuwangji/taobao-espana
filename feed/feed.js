@@ -1,6 +1,7 @@
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Co4jbBX8M1I_fJCgoceoDA_PUTyhNta';
 const FEED_MEDIA_BUCKET = 'feed-media';
+const FEED_DRAFT_KEY = 'oqFeedPostDraftV1';
 const MAX_IMAGES = 9;
 const MAX_VIDEO_SECONDS = 30;
 const CHANNELS = ['推荐', '附近', '货源', '招工', '租房', '二手', '吐槽', '商家'];
@@ -150,6 +151,79 @@ function showToast(message) {
   toast.classList.add('show');
   clearTimeout(showToast.timer);
   showToast.timer = setTimeout(() => toast.classList.remove('show'), 2400);
+}
+
+function getDraft() {
+  try {
+    return JSON.parse(localStorage.getItem(FEED_DRAFT_KEY) || 'null');
+  } catch (error) {
+    return null;
+  }
+}
+
+function draftFormValues() {
+  return {
+    title: document.getElementById('feedTitle')?.value.trim() || '',
+    description: document.getElementById('feedDescription')?.value.trim() || '',
+    city: document.getElementById('feedCity')?.value || 'Madrid',
+    whatsapp: document.getElementById('feedWhatsapp')?.value.trim() || '',
+    category: document.getElementById('feedCategory')?.value || '货源',
+    tags: document.getElementById('feedTags')?.value.trim() || '',
+    isAnonymous: Boolean(document.getElementById('feedAnonymous')?.checked),
+    hadMedia: selectedMedia.length > 0,
+    savedAt: new Date().toISOString()
+  };
+}
+
+function hasDraftableContent(values = draftFormValues()) {
+  return Boolean(values.title || values.description || values.whatsapp || values.tags || selectedMedia.length);
+}
+
+function updateDraftNotice() {
+  const notice = document.getElementById('feedDraftNotice');
+  if (!notice) return;
+  const draft = getDraft();
+  notice.hidden = !draft;
+  if (!draft) return;
+  const time = document.getElementById('feedDraftTime');
+  if (time) {
+    const label = draft.savedAt ? `保存于 ${timeAgo(draft.savedAt)}` : '稍后可继续编辑';
+    time.textContent = draft.hadMedia ? `${label}，图片/视频需重新选择` : label;
+  }
+}
+
+function saveDraft() {
+  const values = draftFormValues();
+  if (!hasDraftableContent(values)) {
+    showToast('先填写一点内容，再保存草稿');
+    return;
+  }
+  localStorage.setItem(FEED_DRAFT_KEY, JSON.stringify(values));
+  updateDraftNotice();
+  showToast(values.hadMedia ? '草稿已保存，图片/视频稍后需重新选择' : '草稿已保存');
+}
+
+function restoreDraft() {
+  const draft = getDraft();
+  if (!draft) return showToast('暂无草稿');
+  document.getElementById('feedTitle').value = draft.title || '';
+  document.getElementById('feedDescription').value = draft.description || '';
+  document.getElementById('feedCity').value = draft.city || 'Madrid';
+  document.getElementById('feedWhatsapp').value = draft.whatsapp || '';
+  document.getElementById('feedCategory').value = draft.category || '货源';
+  document.getElementById('feedTags').value = draft.tags || '';
+  document.getElementById('feedAnonymous').checked = Boolean(draft.isAnonymous);
+  selectedMedia = [];
+  const mediaInput = document.getElementById('feedMediaInput');
+  if (mediaInput) mediaInput.value = '';
+  renderMediaPreview();
+  showToast(draft.hadMedia ? '草稿已恢复，请重新选择图片/视频' : '草稿已恢复');
+}
+
+function deleteDraft({ silent = false } = {}) {
+  localStorage.removeItem(FEED_DRAFT_KEY);
+  updateDraftNotice();
+  if (!silent) showToast('草稿已删除');
 }
 
 function saveLocalState() {
@@ -663,6 +737,7 @@ async function shareActivePost() {
 function openCompose() {
   document.getElementById('composeSheet').classList.add('open');
   document.getElementById('composeSheet').setAttribute('aria-hidden', 'false');
+  updateDraftNotice();
 }
 
 function closeCompose() {
@@ -856,6 +931,7 @@ async function submitPost(event) {
     document.getElementById('feedPostForm').reset();
     selectedMedia = [];
     renderMediaPreview();
+    deleteDraft({ silent: true });
     closeCompose();
     activeChannel = '推荐';
     syncChannelButtons();
@@ -936,7 +1012,11 @@ function bindEvents() {
   });
   document.getElementById('feedMediaInput').addEventListener('change', handleMediaInput);
   document.getElementById('feedPostForm').addEventListener('submit', submitPost);
+  document.getElementById('saveDraftBtn').addEventListener('click', saveDraft);
+  document.getElementById('restoreDraftBtn').addEventListener('click', restoreDraft);
+  document.getElementById('deleteDraftBtn').addEventListener('click', () => deleteDraft());
   window.addEventListener('hashchange', openInitialPostFromHash);
+  updateDraftNotice();
 }
 
 function openInitialPostFromHash() {

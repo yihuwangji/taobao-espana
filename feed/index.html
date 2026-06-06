@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/assets/icons/icon-192.png?v=20260521" sizes="192x192">
-<link rel="stylesheet" href="/feed/feed.css?v=20260601-ouquan">
+<link rel="stylesheet" href="/feed/feed.css?v=20260606-drafts">
 </head>
 <body>
 <div class="app-shell">
@@ -94,6 +94,14 @@
       <strong>发布到欧圈</strong>
       <button type="submit" form="feedPostForm" id="feedSubmitBtn">发布</button>
     </div>
+    <div class="draft-notice" id="feedDraftNotice" hidden>
+      <div>
+        <b>有未发布草稿</b>
+        <span id="feedDraftTime">稍后可继续编辑</span>
+      </div>
+      <button type="button" id="restoreDraftBtn">恢复</button>
+      <button type="button" id="deleteDraftBtn">删除</button>
+    </div>
     <form id="feedPostForm" class="compose-form">
       <label class="upload-box">
         <input id="feedMediaInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple>
@@ -153,6 +161,10 @@
         <input id="feedAnonymous" type="checkbox">
         <span>匿名发布，前台显示“匿名用户”</span>
       </label>
+      <div class="draft-actions">
+        <button type="button" id="saveDraftBtn">保存草稿</button>
+        <small>稍后打开发布页可继续编辑。图片/视频需要重新选择。</small>
+      </div>
       <p class="publish-note">请勿发布违法、诈骗、仇恨、人身攻击、假货侵权等内容。违规内容会被删除。</p>
     </form>
   </div>
@@ -209,6 +221,6 @@
 </template>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/feed/feed.js?v=20260606-worker-cover"></script>
+<script src="/feed/feed.js?v=20260606-drafts"></script>
 </body>
 </html>
