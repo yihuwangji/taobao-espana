@@ -1,4 +1,5 @@
 const SUPABASE_URL = 'https://jfhpsxfnbpsvvtqsdvco.supabase.co';
+const FREE_VIP_UNTIL = '2099-12-31T23:59:59.000Z';
 
 function json(res, status, body) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -118,10 +119,13 @@ module.exports = async function handler(req, res) {
         nickname: metadata.nickname,
         city: metadata.city,
         phone: metadata.phone,
+        vip_until: FREE_VIP_UNTIL,
+        vip_source: 'registration_free_vip',
+        vip_granted_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
     }).catch(() => null);
   }
 
-  return json(res, 200, { email, phone, userId });
+  return json(res, 200, { email, phone, userId, vipUntil: FREE_VIP_UNTIL });
 };

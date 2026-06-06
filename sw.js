@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v32-stable-public-views';
+const CACHE_NAME = 'espana-life-v33-free-vip';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
@@ -14,7 +14,7 @@ self.addEventListener('activate', (event) => {
       try {
         const url = new URL(client.url);
         if (url.origin === self.location.origin && !url.searchParams.has('fresh')) {
-          url.searchParams.set('fresh', '32');
+          url.searchParams.set('fresh', '33');
           await client.navigate(url.toString());
         }
       } catch (error) {}
