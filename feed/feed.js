@@ -146,14 +146,23 @@ const DEFAULT_SUPPLY_COVERS = [
 ];
 const DEFAULT_MERCHANT_COVERS = {
   fashion: [
-    '/assets/feed/merchant-fashion-clothes-20260606-1.jpg',
+    '/assets/feed/merchant-fashion-clothes-clear-20260606-1.jpg',
+    '/assets/feed/merchant-fashion-clothes-clear-20260606-2.jpg'
+  ],
+  accessories: [
+    '/assets/feed/merchant-accessories-bags-20260606-1.jpg',
     '/assets/feed/merchant-fashion-bags-20260606-2.jpg',
+    '/assets/feed/merchant-fashion-shoes-bags-20260606-3.jpg'
+  ],
+  shoes: [
     '/assets/feed/merchant-fashion-shoes-bags-20260606-3.jpg'
   ],
   supply: DEFAULT_SUPPLY_COVERS
 };
 const MERCHANT_INDUSTRY_LABELS = {
-  fashion: '服装箱包',
+  fashion: '服装',
+  accessories: '箱包饰品',
+  shoes: '鞋类',
   supply: '货源批发'
 };
 
@@ -383,7 +392,13 @@ function isSupplyLikeText(...values) {
 
 function merchantIndustryFromText(...values) {
   const text = values.join(' ');
-  if (/服装|衣服|女装|男装|童装|鞋|鞋子|包|箱包|手袋|行李箱|皮具|饰品|首饰|配饰|帽|袜|纺织|textil|ropa|moda|bolso|bolsos|bag|bags|maleta|maletas|calzado|zapato|zapatos|shoe|shoes|bisuter[ií]a|joyer|complement|accesor|fashion|sport/i.test(text)) {
+  if (/包|箱包|手袋|行李箱|皮具|饰品|首饰|配饰|bolso|bolsos|bag|bags|maleta|maletas|bisuter[ií]a|joyer|complement|accesor/i.test(text)) {
+    return 'accessories';
+  }
+  if (/鞋|鞋子|calzado|zapato|zapatos|shoe|shoes/i.test(text)) {
+    return 'shoes';
+  }
+  if (/服装|衣服|女装|男装|童装|帽|袜|纺织|textil|ropa|moda|fashion|sport/i.test(text)) {
     return 'fashion';
   }
   if (isSupplyLikeText(text)) return 'supply';
@@ -414,7 +429,9 @@ function defaultCoverForPost(post) {
 
 function defaultCoverAlt(post) {
   const industry = post?.merchant_industry || merchantIndustryFromText(post?.title, post?.description, normalizeTags(post?.tags).join(' '));
-  if (industry === 'fashion') return '服装箱包照片';
+  if (industry === 'fashion') return '服装照片';
+  if (industry === 'accessories') return '箱包饰品照片';
+  if (industry === 'shoes') return '鞋类照片';
   const category = displayCategory(post);
   if (category === '货源') return '货源照片';
   if (category === '招工') return '招聘照片';
