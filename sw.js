@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v36-hide-mobile-auth';
+const CACHE_NAME = 'espana-life-v37-light-home-header';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
@@ -14,7 +14,7 @@ self.addEventListener('activate', (event) => {
       try {
         const url = new URL(client.url);
         if (url.origin === self.location.origin && !url.searchParams.has('fresh')) {
-          url.searchParams.set('fresh', '36');
+          url.searchParams.set('fresh', '37');
           await client.navigate(url.toString());
         }
       } catch (error) {}
@@ -52,8 +52,8 @@ async function withUiPatch(response) {
   }
 
   .header-main .header-lang .lang-btn.active {
-    background: #d92727 !important;
-    color: #fff !important;
+    background: #f5a623 !important;
+    color: #1a0a00 !important;
   }
 </style>
 <script id="listingCountRecovery20260529">
