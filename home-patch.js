@@ -56,18 +56,7 @@
   }
 
   function addMobileAuth() {
-    if ($('.mobile-auth-shortcuts')) return;
-    const header = $('.header-main');
-    if (!header) return;
-    header.insertAdjacentHTML('afterend', `
-      <div class="mobile-auth-shortcuts">
-        <a href="#" class="mobile-auth-link primary" onclick="openModal('login');return false;">登录</a>
-        <a href="#" class="mobile-auth-link" onclick="openModal('register');return false;">注册</a>
-        <a href="/feed/" class="mobile-auth-link primary">生活圈</a>
-        <a href="#" class="mobile-auth-link primary" onclick="openModal('profile');return false;">我的信息</a>
-        <a href="#" class="mobile-auth-link" onclick="openModal('post');return false;">＋ 发布信息</a>
-      </div>
-    `);
+    $$('.mobile-auth-shortcuts').forEach((node) => node.remove());
   }
 
   function removePublicAdminLinks(scope = document) {
