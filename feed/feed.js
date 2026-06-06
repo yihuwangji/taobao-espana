@@ -4,6 +4,25 @@ const FEED_MEDIA_BUCKET = 'feed-media';
 const MAX_IMAGES = 9;
 const MAX_VIDEO_SECONDS = 30;
 const CHANNELS = ['推荐', '附近', '货源', '招工', '租房', '二手', '吐槽', '商家'];
+const USER_FEED_CATEGORIES = ['货源', '招工', '租房', '二手', '吐槽', '商家', '生活'];
+const LEGACY_FEED_CATEGORY_BY_UI = {
+  货源: '货源动态',
+  招工: '招工信息',
+  租房: '生意经验',
+  二手: '生意经验',
+  吐槽: '华人吐槽',
+  商家: '生意经验',
+  生活: '生意经验'
+};
+const FEED_CATEGORY_LABELS = {
+  货源动态: '货源',
+  新品到仓: '货源',
+  清仓特价: '货源',
+  华人吐槽: '吐槽',
+  生意经验: '生活',
+  招工信息: '招工',
+  店铺转让: '商家'
+};
 const BLOCKED_KEYWORDS = ['赌博', '博彩', '色情', '诈骗', '骗钱', '仇恨', '假货', '侵权', '刷屏', '人身攻击'];
 
 const sb = window.supabase
@@ -131,6 +150,28 @@ function normalizeTags(raw) {
     .map(tag => tag.trim())
     .filter(Boolean)
     .slice(0, 8);
+}
+
+function ensureCategoryTag(tags, category) {
+  const next = normalizeTags(tags);
+  if (category && !next.includes(category)) next.unshift(category);
+  return next.slice(0, 8);
+}
+
+function displayCategory(post) {
+  const category = post?.category || '';
+  if (USER_FEED_CATEGORIES.includes(category)) return category;
+  const taggedCategory = normalizeTags(post?.tags).find(tag => USER_FEED_CATEGORIES.includes(tag));
+  return taggedCategory || FEED_CATEGORY_LABELS[category] || category || '动态';
+}
+
+function legacyFeedCategory(category) {
+  return LEGACY_FEED_CATEGORY_BY_UI[category] || category;
+}
+
+function isFeedCategoryConstraintError(error) {
+  const text = [error?.message, error?.details, error?.hint, error?.code].filter(Boolean).join(' ');
+  return /feed_posts_category_check|category_check|23514/.test(text);
 }
 
 function getMedia(post) {
@@ -280,7 +321,7 @@ async function loadMerchants() {
 }
 
 function postMatchesChannel(post) {
-  const text = [post.category, post.title, post.description, normalizeTags(post.tags).join(' ')].join(' ').toLowerCase();
+  const text = [displayCategory(post), post.category, post.title, post.description, normalizeTags(post.tags).join(' ')].join(' ').toLowerCase();
   if (activeChannel === '推荐') return true;
   if (activeChannel === '附近') {
     const city = localStorage.getItem('oqCityHint') || '';
@@ -295,7 +336,7 @@ function filteredPosts() {
   return allFeedItems().filter(post => {
     const inChannel = postMatchesChannel(post);
     const inSearch = !keyword || [
-      post.title, post.description, post.city, post.whatsapp, post.category, normalizeTags(post.tags).join(' ')
+      post.title, post.description, post.city, post.whatsapp, displayCategory(post), post.category, normalizeTags(post.tags).join(' ')
     ].join(' ').toLowerCase().includes(keyword);
     return inChannel && inSearch;
   }).sort((a, b) => {
@@ -335,7 +376,7 @@ function renderPosts() {
       }
       if (mediaList.length > 1) mediaWrap.insertAdjacentHTML('beforeend', `<span class="media-badge">${mediaList.length}图</span>`);
     } else {
-      mediaWrap.innerHTML = `<div class="placeholder-cover" style="height:${height}px">${escapeHTML(post.category || '欧圈')}</div>`;
+      mediaWrap.innerHTML = `<div class="placeholder-cover" style="height:${height}px">${escapeHTML(displayCategory(post) || '欧圈')}</div>`;
     }
     card.id = `post-${post.id}`;
     card.querySelector('h2').textContent = title;
@@ -355,7 +396,7 @@ function renderDetailMedia(post) {
   const wrap = document.getElementById('detailMedia');
   wrap.classList.toggle('multi', media.length > 1);
   if (!media.length) {
-    wrap.innerHTML = `<div class="placeholder-cover" style="height:330px">${escapeHTML(post.category || '欧圈')}</div>`;
+    wrap.innerHTML = `<div class="placeholder-cover" style="height:330px">${escapeHTML(displayCategory(post) || '欧圈')}</div>`;
     return;
   }
   wrap.innerHTML = media.map(item => {
@@ -374,7 +415,7 @@ async function openDetail(post) {
   renderDetailMedia(post);
   document.getElementById('detailAvatar').textContent = avatarText(author);
   document.getElementById('detailAuthor').textContent = author;
-  document.getElementById('detailMeta').textContent = `${post.city || '欧洲'} · ${post.category || '动态'} · ${timeAgo(post.created_at)}`;
+  document.getElementById('detailMeta').textContent = `${post.city || '欧洲'} · ${displayCategory(post) || '动态'} · ${timeAgo(post.created_at)}`;
   document.getElementById('detailTitle').textContent = titleOf(post);
   document.getElementById('detailText').textContent = post.description || '';
   document.getElementById('detailTags').innerHTML = normalizeTags(post.tags).map(tag => `<span>#${escapeHTML(tag)}</span>`).join('');
@@ -519,7 +560,7 @@ async function sendComment() {
 async function shareActivePost() {
   if (!activePost) return;
   const url = `${location.origin}/feed/#post-${activePost.id}`;
-  const text = `我在欧圈看到：${titleOf(activePost)}\n${activePost.city || ''} ${activePost.category || ''}`;
+  const text = `我在欧圈看到：${titleOf(activePost)}\n${activePost.city || ''} ${displayCategory(activePost) || ''}`;
   if (navigator.share) {
     await navigator.share({ title: '欧圈', text, url }).catch(() => {});
   } else {
@@ -648,7 +689,7 @@ async function submitPost(event) {
   const city = document.getElementById('feedCity').value.trim();
   const whatsapp = document.getElementById('feedWhatsapp').value.trim();
   const category = document.getElementById('feedCategory').value;
-  const tags = normalizeTags(document.getElementById('feedTags').value);
+  const tags = ensureCategoryTag(document.getElementById('feedTags').value, category);
   const isAnonymous = document.getElementById('feedAnonymous').checked;
   if (!title) return showToast('请填写标题');
   if (!description) return showToast('请填写正文');
@@ -668,17 +709,33 @@ async function submitPost(event) {
         btn.textContent = '发布';
         return showToast('请先在主站登录后再发布');
       }
-      const { data, error } = await sb.from('feed_posts').insert({
+      const basePayload = {
         user_id: session.user.id,
         title,
         description,
         city,
         whatsapp,
-        category,
         tags,
         is_anonymous: isAnonymous,
         status: 'approved'
+      };
+      let { data, error } = await sb.from('feed_posts').insert({
+        ...basePayload,
+        category
       }).select().single();
+      if (error && isFeedCategoryConstraintError(error)) {
+        const retryCategory = legacyFeedCategory(category);
+        if (retryCategory !== category) {
+          ({ data, error } = await sb.from('feed_posts').insert({
+            ...basePayload,
+            category: retryCategory
+          }).select().single());
+          if (!error && data) {
+            data.db_category = retryCategory;
+            data.category = category;
+          }
+        }
+      }
       if (error) throw error;
       const mediaRows = await uploadMedia(data.id);
       if (mediaRows.length) {
