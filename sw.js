@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v34-guide-levels';
+const CACHE_NAME = 'espana-life-v35-platform-coins';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
@@ -14,7 +14,7 @@ self.addEventListener('activate', (event) => {
       try {
         const url = new URL(client.url);
         if (url.origin === self.location.origin && !url.searchParams.has('fresh')) {
-          url.searchParams.set('fresh', '34');
+          url.searchParams.set('fresh', '35');
           await client.navigate(url.toString());
         }
       } catch (error) {}

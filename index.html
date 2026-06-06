@@ -4226,6 +4226,127 @@ async function loadReferralStatus() {
   }
 }
 
+function renderRewardsPanel(status) {
+  window._rewardsStatus = status || window._rewardsStatus || null;
+  const vipBar = document.getElementById('vipStatusBar');
+  if (!vipBar || !status) return;
+  let panel = document.getElementById('platformCoinPanel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'platformCoinPanel';
+    const referralPanel = document.getElementById('referralPromoPanel');
+    (referralPanel || vipBar).insertAdjacentElement('afterend', panel);
+  }
+  const balance = Math.max(0, Number(status.balance || 0));
+  const dailyLimit = Math.max(1, Number(status.dailyShareLimit || 10));
+  const remaining = Math.max(0, Number(status.todayRemaining ?? dailyLimit));
+  const rewards = Array.isArray(status.rewards) ? status.rewards : [];
+  const redemptions = Array.isArray(status.redemptions) ? status.redemptions : [];
+  panel.style.cssText = 'background:#fff;border:1.5px solid #fde68a;border-left:5px solid #f59e0b;border-radius:12px;padding:12px 14px;margin:-4px 0 16px;box-shadow:0 8px 18px rgba(245,158,11,.10);';
+  panel.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+      <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#facc15);display:grid;place-items:center;color:white;font-size:24px;box-shadow:0 8px 18px rgba(245,158,11,.25)">币</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:950;color:#92400e">我的平台币：<span style="font-size:24px;color:#b45309">${balance}</span></div>
+        <div style="font-size:12px;color:#9a3412;line-height:1.55;margin-top:2px">转发信息可获得 ${Number(status.shareRewardCoins || 2)} 平台币。今天还可奖励 ${remaining}/${dailyLimit} 次，可兑换礼物或曝光权益。</div>
+      </div>
+      <button onclick="loadRewardsStatus()" style="border:0;border-radius:999px;background:#fff7ed;color:#b45309;font-weight:900;padding:7px 10px;cursor:pointer">刷新</button>
+    </div>
+    <div style="display:grid;gap:8px">
+      ${rewards.map(reward => `
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid #fed7aa;border-radius:10px;padding:10px;background:#fffbeb">
+          <div style="min-width:0">
+            <div style="font-size:13px;font-weight:950;color:#7c2d12">${escapeHTML(reward.title)}</div>
+            <div style="font-size:11px;color:#9a3412;line-height:1.45;margin-top:2px">${escapeHTML(reward.description || '')}</div>
+          </div>
+          <button onclick="redeemPlatformReward('${escapeHTML(reward.id)}')" style="border:0;border-radius:9px;background:${balance >= Number(reward.coin_cost || 0) ? 'linear-gradient(135deg,#d71920,#f59e0b)' : '#e5e7eb'};color:${balance >= Number(reward.coin_cost || 0) ? 'white' : '#777'};font-weight:950;padding:8px 10px;cursor:pointer;white-space:nowrap">${Number(reward.coin_cost || 0)}币兑换</button>
+        </div>
+      `).join('')}
+    </div>
+    ${redemptions.length ? `
+      <div style="margin-top:10px;border-top:1px dashed #fed7aa;padding-top:9px;font-size:12px;color:#7c2d12">
+        <strong>最近兑换：</strong>
+        ${redemptions.slice(0, 3).map(item => `<span style="display:inline-block;margin:4px 6px 0 0;background:white;border:1px solid #fed7aa;border-radius:999px;padding:3px 8px">${escapeHTML(item.reward_id)} · ${escapeHTML(item.status)}</span>`).join('')}
+      </div>
+    ` : ''}
+  `;
+}
+
+async function loadRewardsStatus() {
+  try {
+    const headers = await getAuthHeader();
+    if (!headers.Authorization) {
+      const panel = document.getElementById('platformCoinPanel');
+      if (panel) panel.remove();
+      return null;
+    }
+    const response = await fetch('/api/rewards', { headers });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) {
+      renderRewardsPanel(data);
+      return data;
+    }
+  } catch(e) {
+    console.warn('平台币状态加载失败', e.message);
+  }
+  return null;
+}
+
+async function awardShareCoins(sourceType, sourceId, title = '') {
+  try {
+    const headers = await getAuthHeader();
+    if (!headers.Authorization) return null;
+    const response = await fetch('/api/rewards', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body: JSON.stringify({ action: 'share_reward', sourceType, sourceId, title })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) {
+      renderRewardsPanel(data);
+      if (data.awarded) showToast(`🎁 转发成功，获得 ${data.coinsAwarded || data.shareRewardCoins || 2} 平台币`);
+      else if (data.reason === 'daily_limit') showToast(data.message || '今天平台币奖励已达上限');
+      return data;
+    }
+  } catch(e) {
+    console.warn('平台币奖励失败', e.message);
+  }
+  return null;
+}
+
+async function redeemPlatformReward(rewardId) {
+  const status = window._rewardsStatus;
+  const reward = status?.rewards?.find(item => item.id === rewardId);
+  if (!reward) return showToast('礼物信息不存在，请刷新后重试', true);
+  const balance = Number(status.balance || 0);
+  if (balance < Number(reward.coin_cost || 0)) return showToast('平台币不足，继续转发信息赚平台币');
+  const ok = confirm(`确认使用 ${reward.coin_cost} 平台币兑换「${reward.title}」？客服会联系你确认领取方式。`);
+  if (!ok) return;
+  const headers = await getAuthHeader().catch(() => ({}));
+  if (!headers.Authorization) {
+    showToast('请先登录后再兑换礼物');
+    openModal('login');
+    return;
+  }
+  const response = await fetch('/api/rewards', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body: JSON.stringify({
+      action: 'redeem',
+      rewardId,
+      contactName: document.getElementById('accNickname')?.value || document.getElementById('profileName')?.textContent || '',
+      contactPhone: document.getElementById('accPhone')?.value || ''
+    })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (response.ok) {
+    renderRewardsPanel(data);
+    showToast(data.message || '兑换申请已提交');
+  } else {
+    showToast(data.message || '兑换失败，请稍后重试', true);
+  }
+}
+
 function getReferralInviteUrl() {
   return window._referralStatus?.inviteUrl || document.getElementById('referralInviteUrl')?.value || '';
 }
@@ -4235,6 +4356,7 @@ async function copyReferralInvite() {
   if (!inviteUrl) return;
   await copyText(inviteUrl);
   showToast('✅ 专属邀请链接已复制，发给微信好友即可');
+  await awardShareCoins('referral', window._referralStatus?.referralCode || 'invite', '专属邀请链接');
 }
 
 async function copyReferralCode() {
@@ -4256,6 +4378,7 @@ async function shareReferralInvite() {
   if (navigator.share && !isWeChatBrowser()) {
     try {
       await navigator.share({ title: '西班牙生活通', text, url: inviteUrl });
+      await awardShareCoins('referral', code || 'invite', '专属邀请链接');
       return;
     } catch(e) {
       if (e && e.name === 'AbortError') return;
@@ -4263,6 +4386,7 @@ async function shareReferralInvite() {
   }
   await copyText(text);
   showToast(isWeChatBrowser() ? '已复制分享文案，去微信聊天粘贴发送' : '已复制邀请文案和链接');
+  await awardShareCoins('referral', code || 'invite', '专属邀请链接');
 }
 
 function closeRegisterSuccess() {
@@ -4460,6 +4584,7 @@ async function shareListing(id, event) {
   if (navigator.share && !isWeChatBrowser()) {
     try {
       await navigator.share({ title: listing.title, text, url });
+      await awardShareCoins('listing', String(id), listing.title);
       return;
     } catch(e) {
       if (e && e.name === 'AbortError') return;
@@ -4467,6 +4592,7 @@ async function shareListing(id, event) {
   }
   await copyText(text);
   showToast(isWeChatBrowser() ? '已复制分享文案，去微信聊天粘贴发送' : '已复制分享文案和链接');
+  await awardShareCoins('listing', String(id), listing.title);
 }
 
 window.shareListing = shareListing;
@@ -4476,6 +4602,8 @@ window.copyReferralInvite = copyReferralInvite;
 window.copyReferralCode = copyReferralCode;
 window.shareReferralInvite = shareReferralInvite;
 window.openReferralCenter = openReferralCenter;
+window.loadRewardsStatus = loadRewardsStatus;
+window.redeemPlatformReward = redeemPlatformReward;
 
 function renderListings() {
   const grid = document.getElementById('listingsGrid');
@@ -6060,7 +6188,7 @@ if (window.MutationObserver) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js?v=20260606-guide-levels').catch(function() {});
+    navigator.serviceWorker.register('/sw.js?v=20260606-platform-coins').catch(function() {});
   });
 }
 window.addEventListener('load', function() {
@@ -6316,6 +6444,7 @@ window.addEventListener('load', function() {
   window.refreshProfile = async function() {
     const result = previousRefreshProfile ? await previousRefreshProfile.apply(this, arguments) : undefined;
     applyFreeVipMode();
+    if (window.loadRewardsStatus) window.loadRewardsStatus();
     return result;
   };
 

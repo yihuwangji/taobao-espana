@@ -603,6 +603,112 @@ function updateFeedAuthUI() {
   const accountCity = document.getElementById('feedAccountCity');
   if (accountPhone) accountPhone.textContent = loggedIn ? publicAccountLabel(currentUser?.email, phone) : '手机号账号';
   if (accountCity) accountCity.textContent = city;
+  const coinPanel = document.getElementById('feedCoinPanel');
+  if (coinPanel) coinPanel.hidden = !loggedIn;
+  if (loggedIn) loadFeedRewardsStatus();
+}
+
+async function getFeedAuthHeader() {
+  if (!sb) return {};
+  const session = (await sb.auth.getSession()).data.session;
+  return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+}
+
+function renderFeedCoinPanel(status) {
+  const panel = document.getElementById('feedCoinPanel');
+  if (!panel || !status) return;
+  const balance = Math.max(0, Number(status.balance || 0));
+  const dailyLimit = Math.max(1, Number(status.dailyShareLimit || 10));
+  const remaining = Math.max(0, Number(status.todayRemaining ?? dailyLimit));
+  const rewards = Array.isArray(status.rewards) ? status.rewards : [];
+  window._feedRewardsStatus = status;
+  panel.hidden = false;
+  panel.innerHTML = `
+    <div class="coin-head">
+      <div class="coin-icon">币</div>
+      <div>
+        <div class="coin-title">我的平台币：<b>${balance}</b></div>
+        <p>转发欧圈或西班牙生活通信息可得 ${Number(status.shareRewardCoins || 2)} 平台币。今天还可奖励 ${remaining}/${dailyLimit} 次。</p>
+      </div>
+    </div>
+    <div class="coin-rewards">
+      ${rewards.map(reward => `
+        <div class="coin-reward">
+          <div>
+            <strong>${escapeHTML(reward.title)}</strong>
+            <small>${escapeHTML(reward.description || '')}</small>
+          </div>
+          <button type="button" ${balance < Number(reward.coin_cost || 0) ? 'disabled' : ''} onclick="redeemFeedReward('${escapeHTML(reward.id)}')">${Number(reward.coin_cost || 0)}币</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+async function loadFeedRewardsStatus() {
+  try {
+    const headers = await getFeedAuthHeader();
+    if (!headers.Authorization) return null;
+    const response = await fetch('/api/rewards', { headers });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) {
+      renderFeedCoinPanel(data);
+      return data;
+    }
+  } catch (error) {
+    console.warn('平台币状态加载失败', error.message);
+  }
+  return null;
+}
+
+async function awardFeedShareCoins(sourceType, sourceId, title = '') {
+  try {
+    const headers = await getFeedAuthHeader();
+    if (!headers.Authorization) return null;
+    const response = await fetch('/api/rewards', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body: JSON.stringify({ action: 'share_reward', sourceType, sourceId, title })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) {
+      renderFeedCoinPanel(data);
+      if (data.awarded) showToast(`转发成功，获得 ${data.coinsAwarded || data.shareRewardCoins || 2} 平台币`);
+      else if (data.reason === 'daily_limit') showToast(data.message || '今天平台币奖励已达上限');
+      return data;
+    }
+  } catch (error) {
+    console.warn('平台币奖励失败', error.message);
+  }
+  return null;
+}
+
+async function redeemFeedReward(rewardId) {
+  const status = window._feedRewardsStatus;
+  const reward = status?.rewards?.find(item => item.id === rewardId);
+  if (!reward) return showToast('礼物信息不存在，请刷新后重试');
+  const balance = Number(status.balance || 0);
+  if (balance < Number(reward.coin_cost || 0)) return showToast('平台币不足，继续转发信息赚平台币');
+  if (!confirm(`确认使用 ${reward.coin_cost} 平台币兑换「${reward.title}」？客服会联系你确认领取方式。`)) return;
+  const headers = await getFeedAuthHeader();
+  if (!headers.Authorization) return showToast('请先登录后再兑换');
+  const response = await fetch('/api/rewards', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body: JSON.stringify({
+      action: 'redeem',
+      rewardId,
+      contactName: currentProfile?.nickname || currentUser?.user_metadata?.nickname || '',
+      contactPhone: currentProfile?.phone || currentUser?.user_metadata?.phone || ''
+    })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (response.ok) {
+    renderFeedCoinPanel(data);
+    showToast(data.message || '兑换申请已提交');
+  } else {
+    showToast(data.message || '兑换失败，请稍后重试');
+  }
 }
 
 function setButtonLoading(button, loadingText) {
@@ -1032,10 +1138,14 @@ async function shareActivePost() {
   const url = `${location.origin}/feed/#post-${activePost.id}`;
   const text = `我在欧圈看到：${titleOf(activePost)}\n${activePost.city || ''} ${displayCategory(activePost) || ''}`;
   if (navigator.share) {
-    await navigator.share({ title: '欧圈', text, url }).catch(() => {});
+    try {
+      await navigator.share({ title: '欧圈', text, url });
+      await awardFeedShareCoins('feed', String(activePost.id), titleOf(activePost));
+    } catch {}
   } else {
     await navigator.clipboard.writeText(`${text}\n${url}`).catch(() => {});
     showToast('分享链接已复制');
+    await awardFeedShareCoins('feed', String(activePost.id), titleOf(activePost));
   }
 }
 
