@@ -61,9 +61,9 @@ android {
     defaultConfig {
         applicationId twaManifest.applicationId
         minSdkVersion 23
-        targetSdkVersion 35
-        versionCode isAdminApk ? 2 : 6
-        versionName isAdminApk ? "1.0.1-admin" : "1.0.5"
+        targetSdkVersion 36
+        versionCode isAdminApk ? 2 : 7
+        versionName isAdminApk ? "1.0.1-admin" : "1.0.6"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name

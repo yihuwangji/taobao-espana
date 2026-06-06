@@ -2,6 +2,9 @@ tmp-chrome-live/
 .vercel/output/
 .env*
 android-release/
+android/
+android-twa/
 android-twa/build/
 android-twa/.gradle/
+store-listing/
 tools/phone-inviter-extension/icons/
