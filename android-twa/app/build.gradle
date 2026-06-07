@@ -50,7 +50,7 @@ def twaManifest = [
     generatorApp: 'bubblewrap-cli', // Application that generated the Android Project
     // The fallback strategy for when Trusted Web Activity is not available. Possible values are
     // 'customtabs' and 'webview'.
-    fallbackType: 'customtabs',
+    fallbackType: 'webview',
     enableSiteSettingsShortcut: 'true',
     orientation: 'portrait-primary',
 ]
@@ -62,8 +62,8 @@ android {
         applicationId twaManifest.applicationId
         minSdkVersion 23
         targetSdkVersion 36
-        versionCode isAdminApk ? 2 : 8
-        versionName isAdminApk ? "1.0.1-admin" : "1.0.7"
+        versionCode isAdminApk ? 2 : 9
+        versionName isAdminApk ? "1.0.1-admin" : "1.0.8"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
