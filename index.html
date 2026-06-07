@@ -1351,6 +1351,69 @@
     color: #04783d;
   }
 
+  .detail-action.moments {
+    border-color: #8ccf18;
+    background: #f2ffe8;
+    color: #3f7d00;
+  }
+
+  .moments-guide-card {
+    text-align: center;
+    color: var(--ink);
+  }
+
+  .moments-guide-icons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 12px 0 16px;
+  }
+
+  .moments-guide-icon {
+    border: 1.5px solid #d7eadf;
+    border-radius: 14px;
+    padding: 14px 10px;
+    background: #f8fff7;
+  }
+
+  .moments-guide-symbol {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 8px;
+    border-radius: 17px;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 30px;
+    font-weight: 900;
+    box-shadow: 0 10px 22px rgba(22,163,74,0.18);
+  }
+
+  .moments-guide-symbol.wechat { background: #07c160; }
+  .moments-guide-symbol.moments { background: #8ccf18; }
+
+  .moments-guide-steps {
+    text-align: left;
+    background: #fff8ec;
+    border: 1.5px solid #f3dfbb;
+    border-radius: 12px;
+    padding: 12px 14px;
+    line-height: 1.8;
+    font-size: 14px;
+    color: #7c2d12;
+  }
+
+  .moments-guide-steps strong {
+    color: #04783d;
+  }
+
+  .moments-guide-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
   .merchant-claim-card {
     border: 1.5px solid #bbf7d0;
     border-radius: 10px;
@@ -3286,7 +3349,7 @@ const I18N = {
     'detail.loading': '加载中…', 'detail.failed': '信息加载失败', 'detail.error': '加载出错：',
     'detail.description': '📝 详细描述', 'detail.price': '💰 价格', 'detail.area': '📍 省份/地区',
     'detail.contact': '📞 联系方式', 'detail.contactHint': '可通过微信 / 手机 / WhatsApp 联系',
-    'detail.share': '微信分享这条信息', 'detail.map': '打开地图导航', 'detail.copy': '复制联系方式', 'detail.copied': '联系方式已复制', 'detail.whatsapp': 'WhatsApp联系', 'detail.views': '次浏览',
+    'detail.share': '微信分享这条信息', 'detail.moments': '分享到朋友圈', 'detail.map': '打开地图导航', 'detail.copy': '复制联系方式', 'detail.copied': '联系方式已复制', 'detail.whatsapp': 'WhatsApp联系', 'detail.views': '次浏览',
     'common.negotiable': '面议', 'common.notFilled': '未填写',
     'search.noResults': '未找到', 'search.resultSuffix': '相关信息', 'search.toastFound': '找到', 'search.toastItems': '条结果', 'search.failed': '搜索失败，请重试',
     'post.title': '📢 发布信息', 'post.memberMode': '🔑 已登录发布', 'post.guestMode': '👤 游客快速发布',
@@ -3352,7 +3415,7 @@ const I18N = {
     'detail.loading': 'Cargando…', 'detail.failed': 'No se pudo cargar el anuncio', 'detail.error': 'Error al cargar: ',
     'detail.description': '📝 Descripción', 'detail.price': '💰 Precio', 'detail.area': '📍 Provincia/zona',
     'detail.contact': '📞 Contacto', 'detail.contactHint': 'Puedes contactar por WeChat / móvil / WhatsApp',
-    'detail.share': 'Compartir este anuncio', 'detail.map': 'Abrir mapa', 'detail.copy': 'Copiar contacto', 'detail.copied': 'Contacto copiado', 'detail.whatsapp': 'Contactar por WhatsApp', 'detail.views': 'vistas',
+    'detail.share': 'Compartir este anuncio', 'detail.moments': 'Momentos WeChat', 'detail.map': 'Abrir mapa', 'detail.copy': 'Copiar contacto', 'detail.copied': 'Contacto copiado', 'detail.whatsapp': 'Contactar por WhatsApp', 'detail.views': 'vistas',
     'common.negotiable': 'A negociar', 'common.notFilled': 'Sin indicar',
     'search.noResults': 'No se encontraron anuncios para', 'search.resultSuffix': '', 'search.toastFound': 'encontrados', 'search.toastItems': 'resultados', 'search.failed': 'Error al buscar, inténtalo de nuevo',
     'post.title': '📢 Publicar anuncio', 'post.memberMode': '🔑 Publicar con cuenta', 'post.guestMode': '👤 Publicar como visitante',
@@ -4639,6 +4702,91 @@ function buildListingShareText(listing, url) {
   return parts.join('\n');
 }
 
+let currentMomentsText = '';
+
+function buildMomentsShareText(listing, url) {
+  const category = getListingDisplayCategory(listing);
+  const city = normalizeProvinceName(listing.city);
+  const price = listing.price ? ` · ${listing.price}${String(listing.price).includes('€') ? '' : ' €'}` : '';
+  const desc = listing.description ? `\n${String(listing.description).slice(0, 86)}` : '';
+  return `西班牙生活通｜${category} ${city || ''}${price}\n${listing.title}${desc}\n查看详情：${url}`;
+}
+
+function updateWeChatTimelineShareData(listing, url) {
+  updateDocumentShareMeta({ ...listing, id: listing.id });
+  try {
+    if (!window.wx) return;
+    const shareData = {
+      title: `西班牙生活通｜${listing.title}`,
+      link: url,
+      imgUrl: new URL('/assets/icons/wechat-share-logo-20260521.jpg', window.location.origin).toString(),
+      desc: [getListingDisplayCategory(listing), normalizeProvinceName(listing.city), listing.price || '面议'].filter(Boolean).join(' · ')
+    };
+    if (typeof wx.ready === 'function') {
+      wx.ready(() => {
+        if (typeof wx.updateTimelineShareData === 'function') wx.updateTimelineShareData(shareData);
+        if (typeof wx.updateAppMessageShareData === 'function') wx.updateAppMessageShareData(shareData);
+        if (typeof wx.onMenuShareTimeline === 'function') wx.onMenuShareTimeline(shareData);
+      });
+    }
+  } catch (error) {}
+}
+
+function renderMomentsGuide() {
+  const isEs = currentLang === 'es';
+  const title = document.getElementById('momentsGuideTitle');
+  const sub = document.getElementById('momentsGuideSub');
+  const steps = document.getElementById('momentsGuideSteps');
+  if (title) title.textContent = isEs ? 'Compartir en Momentos' : '分享到朋友圈';
+  if (sub) sub.textContent = isEs
+    ? 'El texto se ha copiado. En WeChat, usa el menu de arriba a la derecha.'
+    : '朋友圈文案已复制，按下面步骤发布。';
+  if (steps) steps.innerHTML = isEs
+    ? '1. Toca <strong>...</strong> arriba a la derecha en WeChat<br>2. Elige <strong>Compartir en Momentos</strong><br>3. Pega el texto copiado y publica'
+    : '1. 点微信右上角 <strong>...</strong><br>2. 选择 <strong>分享到朋友圈</strong><br>3. 粘贴刚复制的文字，确认发布';
+}
+
+async function copyCurrentMomentsText() {
+  if (!currentMomentsText) return;
+  await copyText(currentMomentsText);
+  showToast(currentLang === 'es' ? 'Texto copiado' : '朋友圈文案已复制');
+}
+
+async function shareListingToMoments(id, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const listing = await getListingForShare(id);
+  if (!listing) {
+    showToast('分享失败：信息不存在或尚未通过审核', true);
+    return;
+  }
+  const url = getListingShareUrl(id);
+  const text = buildMomentsShareText(listing, url);
+  currentMomentsText = text;
+  updateWeChatTimelineShareData(listing, url);
+
+  if (!isWeChatBrowser() && navigator.share) {
+    try {
+      await navigator.share({ title: listing.title, text, url });
+      await awardShareCoins('moments', String(id), listing.title);
+      return;
+    } catch (error) {
+      if (error && error.name === 'AbortError') return;
+    }
+  }
+
+  await copyText(text);
+  if (isWeChatBrowser()) {
+    renderMomentsGuide();
+    openModal('momentsGuide');
+  } else {
+    showToast(currentLang === 'es' ? 'Texto y enlace copiados' : '已复制朋友圈文案和链接');
+  }
+  await awardShareCoins('moments', String(id), listing.title);
+}
+
 async function shareListing(id, event) {
   if (event) {
     event.preventDefault();
@@ -4666,6 +4814,8 @@ async function shareListing(id, event) {
 }
 
 window.shareListing = shareListing;
+window.shareListingToMoments = shareListingToMoments;
+window.copyCurrentMomentsText = copyCurrentMomentsText;
 window.copyText = copyText;
 window.getListingShareUrl = getListingShareUrl;
 window.copyReferralInvite = copyReferralInvite;
@@ -4880,6 +5030,7 @@ async function viewListing(id) {
         </div>
         <div class="detail-actions">
           <button class="detail-action primary" onclick="shareListing(${escapeHTML(jsString(data.id))}, event)">${tr('detail.share')}</button>
+          <button class="detail-action moments" onclick="shareListingToMoments(${escapeHTML(jsString(data.id))}, event)">${tr('detail.moments')}</button>
           ${whatsappUrl ? `<a class="detail-action whatsapp" href="${escapeHTML(whatsappUrl)}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">📱 ${tr('detail.whatsapp')}</a>` : ''}
           ${data.address ? `<a class="detail-action" href="${escapeHTML(getMapUrl(data.address, data.city))}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">${tr('detail.map')}</a>` : ''}
           <button class="detail-action" onclick="copyText(${escapeHTML(jsString(data.contact || ''))}).then(()=>showToast(tr('detail.copied')))">${tr('detail.copy')}</button>
@@ -5829,10 +5980,41 @@ loadListings().then(handleInitialDeepLink);
     }
   })();
   </script>
-  <div class="modal-overlay" id="detailModal">
+<div class="modal-overlay" id="detailModal">
   <div class="modal relative" style="max-width:560px">
     <button class="modal-close" onclick="closeModal('detail')">✕</button>
     <div id="detailContent">加载中…</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="momentsGuideModal">
+  <div class="modal relative" style="max-width:460px">
+    <button class="modal-close" onclick="closeModal('momentsGuide')">✕</button>
+    <div class="moments-guide-card">
+      <h3 id="momentsGuideTitle" style="font-size:21px;font-weight:900;color:#04783d;margin-bottom:8px">分享到朋友圈</h3>
+      <p id="momentsGuideSub" style="font-size:13px;color:#666;line-height:1.7;margin-bottom:10px">朋友圈文案已复制，按下面步骤发布。</p>
+      <div class="moments-guide-icons">
+        <div class="moments-guide-icon">
+          <div class="moments-guide-symbol wechat">微</div>
+          <div style="font-weight:900">微信</div>
+          <div style="font-size:12px;color:#888;margin-top:3px">当前聊天分享</div>
+        </div>
+        <div class="moments-guide-icon">
+          <div class="moments-guide-symbol moments">◎</div>
+          <div style="font-weight:900">朋友圈</div>
+          <div style="font-size:12px;color:#888;margin-top:3px">右上角选择</div>
+        </div>
+      </div>
+      <div class="moments-guide-steps" id="momentsGuideSteps">
+        1. 点微信右上角 <strong>...</strong><br>
+        2. 选择 <strong>分享到朋友圈</strong><br>
+        3. 粘贴刚复制的文字，确认发布
+      </div>
+      <div class="moments-guide-actions">
+        <button class="detail-action primary" type="button" onclick="closeModal('momentsGuide')">我知道了</button>
+        <button class="detail-action moments" type="button" onclick="copyCurrentMomentsText()">再复制一次</button>
+      </div>
+    </div>
   </div>
 </div>
 
