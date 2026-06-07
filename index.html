@@ -1156,6 +1156,11 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
   }
 
+  .listing-card.homepage-ad-card {
+    box-shadow: 0 6px 16px rgba(80,34,15,0.08);
+    border-color: #f0ddbd;
+  }
+
   .listing-img {
     width: 100%;
     height: 106px;
@@ -1166,6 +1171,12 @@
     justify-content: center;
     font-size: 36px;
     position: relative;
+  }
+
+  .listing-card.homepage-ad-card .listing-img {
+    height: 82px;
+    min-height: 82px;
+    font-size: 28px;
   }
 
   .listing-img.placeholder-worker {
@@ -1615,6 +1626,7 @@
   }
 
   .listing-body { padding: 11px 12px 12px; }
+  .listing-card.homepage-ad-card .listing-body { padding: 9px 10px 10px; }
 
   .listing-title {
     font-size: 13.5px;
@@ -1626,6 +1638,12 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  .listing-card.homepage-ad-card .listing-title {
+    font-size: 13px;
+    line-height: 1.28;
+    margin-bottom: 4px;
   }
 
   .listing-meta {
@@ -1657,6 +1675,10 @@
     gap: 5px;
     margin-top: 6px;
     flex-wrap: wrap;
+  }
+
+  .listing-card.homepage-ad-card .listing-tags {
+    margin-top: 4px;
   }
 
   .tag {
@@ -2373,6 +2395,16 @@
       font-size: 28px;
       flex: 0 0 112px;
     }
+    .listing-card.homepage-ad-card {
+      height: 188px;
+      min-height: 188px;
+      box-shadow: 0 5px 14px rgba(80,34,15,0.08);
+    }
+    .listing-card.homepage-ad-card .listing-img {
+      height: 78px;
+      min-height: 78px;
+      flex: 0 0 78px;
+    }
     .listing-badge {
       top: 7px;
       left: 7px;
@@ -2401,11 +2433,20 @@
       flex-direction: column;
       overflow: hidden;
     }
+    .listing-card.homepage-ad-card .listing-body {
+      height: 110px;
+      padding: 8px 8px 7px;
+    }
     .listing-title {
       margin-bottom: 4px;
       font-size: 12.5px;
       line-height: 1.35;
       -webkit-line-clamp: 2;
+    }
+    .listing-card.homepage-ad-card .listing-title {
+      font-size: 12px;
+      line-height: 1.28;
+      margin-bottom: 3px;
     }
     .listing-meta {
       align-items: flex-start;
@@ -2597,6 +2638,9 @@
     .listing-card { height: 226px; min-height: 226px; }
     .listing-img { height: 108px; min-height: 108px; flex-basis: 108px; }
     .listing-body { height: 118px; }
+    .listing-card.homepage-ad-card { height: 182px; min-height: 182px; }
+    .listing-card.homepage-ad-card .listing-img { height: 74px; min-height: 74px; flex-basis: 74px; }
+    .listing-card.homepage-ad-card .listing-body { height: 108px; }
     .footer-grid { grid-template-columns: 1fr; }
   }
 
@@ -3766,6 +3810,16 @@ function listingFromRow(row, authorCountMap = new Map()) {
   };
 }
 
+function isHomepageAdListing(listing, displayCategory = '') {
+  const text = [
+    listing?.cat,
+    listing?.badge,
+    displayCategory,
+    ...(listing?.tags || [])
+  ].filter(Boolean).join(' ');
+  return /merchant_ad|商家广告|今日热卖|Publicidad comercial/i.test(text);
+}
+
 // ===== 从 Supabase 加载信息 =====
 async function loadListings() {
   showLoading(true);
@@ -4878,8 +4932,9 @@ function renderListings() {
     const displayBadge = currentLang === 'es' ? badgeLabel(displayCat, l.badge) : l.badge;
     const publicViews = getPublicViewCount(l);
     const placeholderClass = photos.length ? 'has-photo' : listingPlaceholderClass(l, displayCat);
+    const adClass = isHomepageAdListing(l, displayCat) ? ' homepage-ad-card' : '';
     return `
-    <div class="listing-card" style="animation-delay:${i*0.07}s" data-listing-id="${escapeHTML(l.id)}">
+    <div class="listing-card${adClass}" style="animation-delay:${i*0.07}s" data-listing-id="${escapeHTML(l.id)}">
       <div class="listing-img ${placeholderClass}">
         ${photos.length ? `<img src="${escapeHTML(photos[0])}" alt="" loading="lazy">` : listingPlaceholderHtml(l, displayCat)}
         <div class="listing-badge ${escapeHTML(l.badgeType)}">${escapeHTML(displayBadge)}</div>
@@ -6466,7 +6521,7 @@ if (window.MutationObserver) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js?v=20260607-detail-modal').catch(function() {});
+    navigator.serviceWorker.register('/sw.js?v=20260607-compact-home-ads').catch(function() {});
   });
 }
 window.addEventListener('load', function() {

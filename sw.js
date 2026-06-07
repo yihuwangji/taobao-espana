@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v41-detail-modal-fix';
+const CACHE_NAME = 'espana-life-v42-compact-home-ads';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
@@ -14,7 +14,7 @@ self.addEventListener('activate', (event) => {
       try {
         const url = new URL(client.url);
         if (url.origin === self.location.origin && !url.searchParams.has('fresh')) {
-          url.searchParams.set('fresh', '41');
+          url.searchParams.set('fresh', '42');
           await client.navigate(url.toString());
         }
       } catch (error) {}
