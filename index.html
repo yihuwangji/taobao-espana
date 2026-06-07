@@ -4176,6 +4176,26 @@ function isWeChatBrowser() {
   return /MicroMessenger/i.test(navigator.userAgent);
 }
 
+function isAndroidAppShell() {
+  const params = new URLSearchParams(window.location.search);
+  return /Android/i.test(navigator.userAgent) && params.get('source') === 'twa';
+}
+
+function buildNativeMomentsShareUrl(listing, url, text) {
+  const params = new URLSearchParams({
+    title: listing.title || '西班牙生活通',
+    url,
+    text
+  });
+  return `xibanyalife://share-moments?${params.toString()}`;
+}
+
+function openNativeMomentsShare(listing, url, text) {
+  if (!isAndroidAppShell()) return false;
+  window.location.href = buildNativeMomentsShareUrl(listing, url, text);
+  return true;
+}
+
 function applyWeChatBrowserHints() {
   const forceGuide = new URLSearchParams(window.location.search).has('wechat_guide');
   document.body.classList.toggle('is-wechat', isWeChatBrowser() || forceGuide);
@@ -4766,6 +4786,12 @@ async function shareListingToMoments(id, event) {
   const text = buildMomentsShareText(listing, url);
   currentMomentsText = text;
   updateWeChatTimelineShareData(listing, url);
+
+  if (openNativeMomentsShare(listing, url, text)) {
+    showToast(currentLang === 'es' ? 'Abriendo WeChat para compartir...' : '正在打开微信分享...');
+    await awardShareCoins('moments', String(id), listing.title);
+    return;
+  }
 
   if (!isWeChatBrowser() && navigator.share) {
     try {

@@ -62,8 +62,8 @@ android {
         applicationId twaManifest.applicationId
         minSdkVersion 23
         targetSdkVersion 36
-        versionCode isAdminApk ? 2 : 7
-        versionName isAdminApk ? "1.0.1-admin" : "1.0.6"
+        versionCode isAdminApk ? 2 : 8
+        versionName isAdminApk ? "1.0.1-admin" : "1.0.7"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name

@@ -1133,10 +1133,35 @@ async function sendComment() {
   });
 }
 
+function isAndroidAppShell() {
+  const params = new URLSearchParams(window.location.search);
+  return /Android/i.test(navigator.userAgent) && params.get('source') === 'twa';
+}
+
+function buildNativeMomentsShareUrl(post, url, text) {
+  const params = new URLSearchParams({
+    title: titleOf(post) || '欧圈',
+    url,
+    text
+  });
+  return `xibanyalife://share-moments?${params.toString()}`;
+}
+
+function openNativeMomentsShare(post, url, text) {
+  if (!isAndroidAppShell()) return false;
+  window.location.href = buildNativeMomentsShareUrl(post, url, text);
+  return true;
+}
+
 async function shareActivePost() {
   if (!activePost) return;
   const url = `${location.origin}/feed/#post-${activePost.id}`;
   const text = `我在欧圈看到：${titleOf(activePost)}\n${activePost.city || ''} ${displayCategory(activePost) || ''}`;
+  if (openNativeMomentsShare(activePost, url, text)) {
+    showToast('正在打开微信分享...');
+    await awardFeedShareCoins('feed', String(activePost.id), titleOf(activePost));
+    return;
+  }
   if (navigator.share) {
     try {
       await navigator.share({ title: '欧圈', text, url });

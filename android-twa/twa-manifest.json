@@ -21,8 +21,8 @@
     "path": "../android-release/xibanyalife-upload.keystore",
     "alias": "android"
   },
-  "appVersion": "1.0.6",
-  "appVersionCode": 7,
+  "appVersion": "1.0.7",
+  "appVersionCode": 8,
   "shortcuts": [
     {
       "name": "发布信息",
