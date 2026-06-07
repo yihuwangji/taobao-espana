@@ -16,15 +16,26 @@
 package com.xibanyalife.app;
 
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class LauncherActivity
         extends com.google.androidbrowserhelper.trusted.LauncherActivity {
@@ -100,8 +111,19 @@ public class LauncherActivity
     }
 
     private boolean tryShareToWeChatTimeline(String title, String text) {
-        Intent intent = buildTextShareIntent(title, text);
+        Uri imageUri = createShareImage(title, text);
+        if (imageUri == null) return false;
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("image/png");
+        intent.putExtra(Intent.EXTRA_SUBJECT, title);
+        intent.putExtra(Intent.EXTRA_TITLE, title);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        intent.putExtra(Intent.EXTRA_STREAM, imageUri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.setClipData(ClipData.newUri(getContentResolver(), "Espana Life", imageUri));
         intent.setComponent(new ComponentName(WECHAT_PACKAGE, WECHAT_TIMELINE_ACTIVITY));
+        grantUriPermission(WECHAT_PACKAGE, imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         return startShareIntent(intent);
     }
 
@@ -118,6 +140,100 @@ public class LauncherActivity
         intent.putExtra(Intent.EXTRA_TITLE, title);
         intent.putExtra(Intent.EXTRA_TEXT, text);
         return intent;
+    }
+
+    private Uri createShareImage(String title, String text) {
+        int width = 1080;
+        int height = 1440;
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        canvas.drawColor(Color.rgb(255, 248, 237));
+
+        paint.setColor(Color.rgb(212, 43, 43));
+        canvas.drawRoundRect(new RectF(54, 54, width - 54, 290), 36, 36, paint);
+
+        paint.setColor(Color.WHITE);
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint.setTextSize(64);
+        canvas.drawText("\u897f\u73ed\u7259\u751f\u6d3b\u901a", 96, 150, paint);
+
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint.setTextSize(36);
+        paint.setColor(Color.rgb(255, 228, 154));
+        canvas.drawText("espanalife.app", 96, 220, paint);
+
+        paint.setColor(Color.WHITE);
+        canvas.drawRoundRect(new RectF(54, 330, width - 54, height - 90), 34, 34, paint);
+
+        paint.setColor(Color.rgb(33, 24, 18));
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint.setTextSize(58);
+        float y = drawWrappedText(canvas, safeText(title, "\u897f\u73ed\u7259\u751f\u6d3b\u901a"), paint, 96, 430, width - 192, 74, 5);
+
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+        paint.setTextSize(38);
+        paint.setColor(Color.rgb(88, 72, 62));
+        y = drawWrappedText(canvas, safeText(text, title), paint, 96, y + 38, width - 192, 54, 12);
+
+        paint.setColor(Color.rgb(212, 43, 43));
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint.setTextSize(42);
+        canvas.drawText("https://espanalife.app", 96, height - 190, paint);
+
+        paint.setColor(Color.rgb(122, 99, 80));
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+        paint.setTextSize(30);
+        canvas.drawText("Abrir en Espana Life / \u626b\u7801\u6216\u590d\u5236\u94fe\u63a5\u67e5\u770b\u8be6\u60c5", 96, height - 135, paint);
+
+        File dir = new File(getCacheDir(), "share");
+        if (!dir.exists() && !dir.mkdirs()) return null;
+        File file = new File(dir, "moments-share.png");
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 92, out);
+            out.flush();
+            return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+        } catch (IOException | IllegalArgumentException error) {
+            return null;
+        } finally {
+            bitmap.recycle();
+        }
+    }
+
+    private float drawWrappedText(Canvas canvas, String text, Paint paint, float x, float y, float maxWidth, float lineHeight, int maxLines) {
+        if (text == null) return y;
+        String clean = text.replace("\r", " ").replace("\n", " ").trim();
+        StringBuilder line = new StringBuilder();
+        int lines = 0;
+        for (int i = 0; i < clean.length(); i++) {
+            char c = clean.charAt(i);
+            String next = line.toString() + c;
+            if (paint.measureText(next) > maxWidth && line.length() > 0) {
+                lines++;
+                if (lines >= maxLines) {
+                    canvas.drawText(ellipsize(line.toString(), paint, maxWidth), x, y, paint);
+                    return y + lineHeight;
+                }
+                canvas.drawText(line.toString(), x, y, paint);
+                y += lineHeight;
+                line.setLength(0);
+            }
+            line.append(c);
+        }
+        if (line.length() > 0 && lines < maxLines) {
+            canvas.drawText(line.toString(), x, y, paint);
+            y += lineHeight;
+        }
+        return y;
+    }
+
+    private String ellipsize(String text, Paint paint, float maxWidth) {
+        String suffix = "...";
+        while (text.length() > 0 && paint.measureText(text + suffix) > maxWidth) {
+            text = text.substring(0, text.length() - 1);
+        }
+        return text + suffix;
     }
 
     private boolean startShareIntent(Intent intent) {
