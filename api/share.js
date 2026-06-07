@@ -209,13 +209,13 @@ module.exports = async function handler(req, res) {
 
   const siteUrl = getRequestSiteUrl(req);
   const siteLogoUrl = `${siteUrl}/assets/icons/wechat-share-logo-20260521.jpg`;
-  const numericId = id.match(/^\d+$/) ? id : '';
+  const listingId = id;
   let listing = null;
 
-  if (numericId) {
+  if (listingId) {
     const params = new URLSearchParams({
       select: 'id,title,description,category,city,price,address,images,created_at,user_id',
-      id: `eq.${numericId}`,
+      id: `eq.${listingId}`,
       status: 'eq.approved',
       limit: '1'
     });
@@ -239,9 +239,9 @@ module.exports = async function handler(req, res) {
     : `${SITE_NAME}｜西班牙华人生活服务平台`;
   const description = listingDescription(listing);
   const shareImageUrl = firstListingImage(listing) || siteLogoUrl;
-  const targetUrl = numericId ? `${siteUrl}/?listing=${encodeURIComponent(numericId)}` : siteUrl;
-  const shareUrl = numericId ? `${siteUrl}/s/${encodeURIComponent(numericId)}` : siteUrl;
-  const ogType = numericId ? 'article' : 'website';
+  const targetUrl = listingId ? `${siteUrl}/?listing=${encodeURIComponent(listingId)}` : siteUrl;
+  const shareUrl = listingId ? `${siteUrl}/s/${encodeURIComponent(listingId)}` : siteUrl;
+  const ogType = listingId ? 'article' : 'website';
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=300');

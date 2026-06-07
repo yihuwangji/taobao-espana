@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espana-life-v37-light-home-header';
+const CACHE_NAME = 'espana-life-v38-listing-detail-click';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
@@ -14,7 +14,7 @@ self.addEventListener('activate', (event) => {
       try {
         const url = new URL(client.url);
         if (url.origin === self.location.origin && !url.searchParams.has('fresh')) {
-          url.searchParams.set('fresh', '37');
+          url.searchParams.set('fresh', '38');
           await client.navigate(url.toString());
         }
       } catch (error) {}

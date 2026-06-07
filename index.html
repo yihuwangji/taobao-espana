@@ -3688,6 +3688,7 @@ function listingFromRow(row, authorCountMap = new Map()) {
     badgeType: row.is_pinned ? 'gold' : '',
     title: row.title,
     price: row.price || '面议',
+    contact: row.contact || '',
     address: row.address || '',
     description: row.description || '',
     isMerchant: importedMerchant,
@@ -3707,7 +3708,7 @@ async function loadListings() {
   showLoading(true);
   try {
     let query = sb.from('listings')
-      .select('id, title, description, category, city, price, address, images, created_at, is_pinned, user_id, profiles(post_count,nickname)')
+      .select('id, title, description, category, city, price, address, contact, images, created_at, is_pinned, user_id, profiles(post_count,nickname)')
       .eq('status', 'approved')
       .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false })
@@ -3767,6 +3768,10 @@ function escapeHTML(value) {
     '"': '&quot;',
     "'": '&#39;'
   }[ch]));
+}
+
+function jsString(value) {
+  return JSON.stringify(String(value ?? ''));
 }
 
 const CONTRIBUTOR_LEVELS = [
@@ -4698,12 +4703,12 @@ function renderListings() {
     const publicViews = getPublicViewCount(l);
     const placeholderClass = photos.length ? 'has-photo' : listingPlaceholderClass(l, displayCat);
     return `
-    <div class="listing-card" style="animation-delay:${i*0.07}s" onclick="viewListing(${l.id})">
+    <div class="listing-card" style="animation-delay:${i*0.07}s" data-listing-id="${escapeHTML(l.id)}">
       <div class="listing-img ${placeholderClass}">
         ${photos.length ? `<img src="${escapeHTML(photos[0])}" alt="" loading="lazy">` : listingPlaceholderHtml(l, displayCat)}
         <div class="listing-badge ${escapeHTML(l.badgeType)}">${escapeHTML(displayBadge)}</div>
         ${photos.length > 1 ? `<div class="listing-photo-count">📷 ${photos.length}</div>` : ''}
-        <button class="listing-share" onclick="shareListing(${l.id}, event)">${listingShareLabel()}</button>
+        <button class="listing-share" onclick="shareListing(${escapeHTML(jsString(l.id))}, event)">${listingShareLabel()}</button>
       </div>
       <div class="listing-body">
         <div class="listing-title">${escapeHTML(l.title)}</div>
@@ -4795,6 +4800,7 @@ function getPublicViewCount(listing, extraView = 0) {
 
 async function viewListing(id) {
   if (!id) return;
+  id = String(id);
   // 打开弹窗，先显示加载中
   document.getElementById('detailContent').innerHTML = `
     <div style="text-align:center;padding:40px 0;color:#999">
@@ -4804,11 +4810,16 @@ async function viewListing(id) {
   openModal('detail');
 
   try {
-    const { data, error } = await sb.from('listings')
+    const localListing = allListings.find(item => String(item.id) === id);
+    let { data, error } = await sb.from('listings')
       .select('id, title, description, category, city, price, address, contact, images, created_at, is_pinned, view_count, user_id, profiles(post_count,nickname)')
       .eq('id', id)
       .eq('status', 'approved')
       .single();
+    if ((error || !data) && localListing) {
+      data = detailDataFromLocalListing(localListing);
+      error = null;
+    }
 
     if (error || !data) {
       document.getElementById('detailContent').innerHTML =
@@ -4868,10 +4879,10 @@ async function viewListing(id) {
           <div style="font-size:11px;color:#999;margin-top:6px">${tr('detail.contactHint')}</div>
         </div>
         <div class="detail-actions">
-          <button class="detail-action primary" onclick="shareListing(${data.id}, event)">${tr('detail.share')}</button>
+          <button class="detail-action primary" onclick="shareListing(${escapeHTML(jsString(data.id))}, event)">${tr('detail.share')}</button>
           ${whatsappUrl ? `<a class="detail-action whatsapp" href="${escapeHTML(whatsappUrl)}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">📱 ${tr('detail.whatsapp')}</a>` : ''}
           ${data.address ? `<a class="detail-action" href="${escapeHTML(getMapUrl(data.address, data.city))}" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">${tr('detail.map')}</a>` : ''}
-          <button class="detail-action" onclick="copyText('${escapeHTML(data.contact || '')}').then(()=>showToast(tr('detail.copied')))">${tr('detail.copy')}</button>
+          <button class="detail-action" onclick="copyText(${escapeHTML(jsString(data.contact || ''))}).then(()=>showToast(tr('detail.copied')))">${tr('detail.copy')}</button>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px;color:#999;padding-top:10px;border-top:1px solid #f0f0f0">
           <span>🕐 ${timeStr}</span>
@@ -4899,7 +4910,7 @@ async function doSearch() {
   showLoading(true);
   try {
     const { data, error } = await sb.from('listings')
-      .select('id, title, description, category, city, price, address, images, created_at, is_pinned, user_id, profiles(post_count,nickname)')
+      .select('id, title, description, category, city, price, address, contact, images, created_at, is_pinned, user_id, profiles(post_count,nickname)')
       .eq('status', 'approved')
       .ilike('title', `%${q}%`)
       .limit(80);
@@ -5330,6 +5341,37 @@ async function submitRegister() {
   showToast('🎉 注册成功，已自动成为免费VIP');
 }
 
+function detailDataFromLocalListing(listing) {
+  if (!listing) return null;
+  return {
+    id: listing.id,
+    title: listing.title,
+    description: listing.description || '',
+    category: listing.tags?.[0] || listing.badge || '',
+    city: listing.city || '',
+    price: listing.price || '',
+    address: listing.address || '',
+    contact: listing.contact || '',
+    images: normalizeListingImages(listing.images),
+    created_at: listing.createdAt || new Date().toISOString(),
+    is_pinned: Boolean(listing.isPinned),
+    view_count: 0,
+    user_id: listing.userId || '',
+    profiles: {
+      post_count: Number(listing.authorPostCount || 0),
+      nickname: ''
+    }
+  };
+}
+
+document.getElementById('listingsGrid')?.addEventListener('click', (event) => {
+  if (event.target.closest('.listing-share')) return;
+  const card = event.target.closest('.listing-card[data-listing-id]');
+  if (!card) return;
+  const id = card.dataset.listingId;
+  if (id) viewListing(id);
+});
+
 // ===== 用户登录 =====
 async function submitLogin() {
   const loginId  = document.getElementById('loginEmail')?.value.trim();
@@ -5644,7 +5686,7 @@ sb.channel('public-listings')
 // ===== 初始化 =====
 async function handleInitialDeepLink() {
   const params = new URLSearchParams(window.location.search);
-  const listingId = params.get('listing') || (location.pathname.match(/^\/s\/(\d+)/)?.[1] || '');
+  const listingId = params.get('listing') || (location.pathname.match(/^\/s\/([^/?#]+)/)?.[1] || '');
   if (listingId) {
     await viewListing(listingId);
     const canonicalPath = '/?listing=' + encodeURIComponent(listingId);
