@@ -4974,11 +4974,43 @@ function getPublicViewCount(listing, extraView = 0) {
   return baseline;
 }
 
+function ensureDetailModal() {
+  let modal = document.getElementById('detailModal');
+  let content = document.getElementById('detailContent');
+  if (modal && content) {
+    ensureModalRoot(modal);
+    return content;
+  }
+  if (modal) modal.remove();
+  modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'detailModal';
+  modal.innerHTML = `
+    <div class="modal relative" style="max-width:560px">
+      <button class="modal-close" onclick="closeModal('detail')">✕</button>
+      <div id="detailContent">加载中…</div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === this) closeModal('detail');
+  });
+  ensureModalRoot(modal);
+  content = document.getElementById('detailContent');
+  return content;
+}
+
+window.ensureDetailModal = ensureDetailModal;
+
 async function viewListing(id) {
   if (!id) return;
   id = String(id);
+  const detailContent = ensureDetailModal();
+  if (!detailContent) {
+    showToast(tr('detail.failed'), true);
+    return;
+  }
   // 打开弹窗，先显示加载中
-  document.getElementById('detailContent').innerHTML = `
+  detailContent.innerHTML = `
     <div style="text-align:center;padding:40px 0;color:#999">
       <div style="font-size:32px;margin-bottom:10px">⏳</div>
       <div>${tr('detail.loading')}</div>
@@ -4998,7 +5030,7 @@ async function viewListing(id) {
     }
 
     if (error || !data) {
-      document.getElementById('detailContent').innerHTML =
+      detailContent.innerHTML =
         `<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">😕</div><div style="margin-top:10px">${tr('detail.failed')}</div></div>`;
       return;
     }
@@ -5022,7 +5054,7 @@ async function viewListing(id) {
     currentClaimListing = data;
     updateDocumentShareMeta(data);
 
-    document.getElementById('detailContent').innerHTML = `
+    detailContent.innerHTML = `
         <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
           <span style="font-size:36px">${escapeHTML(icon)}</span>
@@ -5076,7 +5108,7 @@ async function viewListing(id) {
     }).catch(() => {});
 
   } catch(e) {
-    document.getElementById('detailContent').innerHTML =
+    detailContent.innerHTML =
       `<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px">⚠️</div><div>${tr('detail.error')}${escapeHTML(e.message)}</div></div>`;
   }
 }
@@ -5546,7 +5578,10 @@ document.getElementById('listingsGrid')?.addEventListener('click', (event) => {
   const card = event.target.closest('.listing-card[data-listing-id]');
   if (!card) return;
   const id = card.dataset.listingId;
-  if (id) viewListing(id);
+  if (id) viewListing(id).catch(error => {
+    console.error('viewListing failed', error);
+    showToast(tr('detail.failed'), true);
+  });
 });
 
 // ===== 用户登录 =====
@@ -5923,7 +5958,7 @@ loadListings().then(handleInitialDeepLink);
   window.confirmVipUpgrade=function(){var p=window._selectedVipPlan,pr=p==='yearly'?'€68.8/年':'€9.9/月';navigator.clipboard&&navigator.clipboard.writeText('espana_life').catch(function(){});var v=document.getElementById('vipUpgradeModal');if(v)v.style.display='none';var t=document.getElementById('toast');if(t){t.textContent='客服微信espana_life已复制，请添加后完成'+pr+'付款';t.style.display='block';setTimeout(function(){t.style.display='none';},4000);}};
   window.switchProfileTab=function(tab,btn){document.querySelectorAll('#profileTabBar button').forEach(function(b){b.style.color='#888';b.style.borderBottom='none';});if(btn){btn.style.color='#e09518';btn.style.borderBottom='2px solid #e09518';}var lp=document.getElementById('myListingsPanel'),ep=document.getElementById('editListingPanel'),ap=document.getElementById('accountPanel');if(lp)lp.style.display=tab==='listings'?'block':'none';if(ep)ep.style.display='none';if(ap)ap.style.display=tab==='account'?'block':'none';if(tab==='listings')window.loadMyListings&&window.loadMyListings();};
   window.loadMyListings=async function(){var sb=window.getSb();if(!sb)return;var sess=(await sb.auth.getSession()).data.session;if(!sess)return;var panel=document.getElementById('myListingsPanel');if(!panel)return;panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">⏳ 加载中…</div>';var r=await sb.from('listings').select('*').eq('user_id',sess.user.id).order('created_at',{ascending:false});if(r.error){panel.innerHTML='<div style="color:#c62828;padding:20px;">❌ '+r.error.message+'</div>';return;}if(!r.data||!r.data.length){panel.innerHTML='<div style="text-align:center;padding:30px;color:#aaa;">📭 暂无发布记录</div>';return;}var tv=r.data.reduce(function(s,d){return s+getPublicViewCount(d);},0);['statPostCount','statViewCount'].forEach(function(id,i){var el=document.getElementById(id);if(el)el.textContent=i===0?r.data.length:tv;});var cn={worker:'招工',house:'租房',business:'生意转让',merchant_ad:'商家广告',wholesale:'批发',dating:'交友',goods:'二手',service:'生活',edu:'教育','求职':'招工求职','商家广告':'商家广告'};var sm={approved:{l:'已上线',c:'approved'},pending:{l:'审核中',c:'pending'},rejected:{l:'已拒绝',c:'rejected'}};panel.innerHTML=r.data.map(function(item){var s=sm[item.status]||{l:item.status,c:'pending'};var dt=new Date(item.created_at).toLocaleDateString('zh-CN');var pv=getPublicViewCount(item);return '<div class="my-listing-card"><div class="mlc-title">'+item.title+(item.is_pinned?' 📌':'')+'</div><div class="mlc-meta"><span>'+(cn[item.category]||item.category)+'</span><span>📍'+(normalizeProvinceName(item.city)||'')+'</span><span>👁'+pv+'</span><span>'+dt+'</span><span class="mlc-status '+s.c+'">'+s.l+'</span>'+(item.reject_reason?'<span style="color:#c62828;">拒绝:'+item.reject_reason+'</span>':'')+'</div><div class="mlc-actions"><button class="mlc-btn view" onclick="viewMyListing('+item.id+')">查看详情</button><button class="mlc-btn edit" onclick="startEdit('+item.id+')">✏️ 编辑</button>'+(!item.is_pinned?'<button class="mlc-btn pin" onclick="pinListing('+item.id+',this)">📌 置顶</button>':'<button class="mlc-btn pin" disabled>已置顶</button>')+'<button class="mlc-btn del" onclick="deleteListing('+item.id+',this)">🗑 删除</button></div></div>';}).join('');};
-  window.viewMyListing=async function(id){var sb=window.getSb();var content=document.getElementById('detailContent');if(!content)return;content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px;margin-bottom:10px">⏳</div><div>加载中…</div></div>';openModal('detail');var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999">信息加载失败</div>';return;}var d=r.data;var safe=function(v){return escapeHTML(v||'')};var sm={approved:'已上线',pending:'审核中',rejected:'已拒绝',offline:'已下线'};content.innerHTML='<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="font-size:34px">📋</span><div><span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">'+safe(d.category)+'</span><h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">'+safe(d.title)+'</h3></div></div><div style="background:#fff8e1;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:#8a5a00;font-size:13px;font-weight:700">状态：'+(sm[d.status]||safe(d.status))+(d.reject_reason?' · 原因：'+safe(d.reject_reason):'')+'</div><div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">详细描述</div><div style="font-size:14px;line-height:1.7;color:#333;white-space:pre-wrap">'+safe(d.description||'暂无描述')+'</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:#fef3f2;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">价格</div><div style="font-size:16px;font-weight:700;color:#c0392b">'+safe(d.price||'面议')+' €</div></div><div style="background:#f0fdf4;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">省份/地区</div><div style="font-size:15px;font-weight:600;color:#166534">'+safe(normalizeProvinceName(d.city))+'</div></div></div><div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px"><div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">联系方式</div><div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">'+safe(d.contact||'未填写')+'</div></div><div class="detail-actions"><button class="detail-action" onclick="startEdit('+d.id+');closeModal(&quot;detail&quot;)">编辑这条信息</button></div></div>';};
+  window.viewMyListing=async function(id){var sb=window.getSb();var content=(window.ensureDetailModal?window.ensureDetailModal():document.getElementById('detailContent'));if(!content)return;content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999"><div style="font-size:32px;margin-bottom:10px">⏳</div><div>加载中…</div></div>';openModal('detail');var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){content.innerHTML='<div style="text-align:center;padding:40px 0;color:#999">信息加载失败</div>';return;}var d=r.data;var safe=function(v){return escapeHTML(v||'')};var sm={approved:'已上线',pending:'审核中',rejected:'已拒绝',offline:'已下线'};content.innerHTML='<div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="font-size:34px">📋</span><div><span style="background:#c0392b;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">'+safe(d.category)+'</span><h3 style="margin:6px 0 0;font-size:18px;color:#1a1a1a">'+safe(d.title)+'</h3></div></div><div style="background:#fff8e1;border-radius:8px;padding:10px 12px;margin-bottom:12px;color:#8a5a00;font-size:13px;font-weight:700">状态：'+(sm[d.status]||safe(d.status))+(d.reject_reason?' · 原因：'+safe(d.reject_reason):'')+'</div><div style="background:#fafafa;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-size:12px;color:#999;margin-bottom:6px;font-weight:600">详细描述</div><div style="font-size:14px;line-height:1.7;color:#333;white-space:pre-wrap">'+safe(d.description||'暂无描述')+'</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:#fef3f2;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">价格</div><div style="font-size:16px;font-weight:700;color:#c0392b">'+safe(d.price||'面议')+' €</div></div><div style="background:#f0fdf4;border-radius:8px;padding:12px 14px"><div style="font-size:11px;color:#999;margin-bottom:4px">省份/地区</div><div style="font-size:15px;font-weight:600;color:#166534">'+safe(normalizeProvinceName(d.city))+'</div></div></div><div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:14px"><div style="font-size:12px;color:#92400e;margin-bottom:8px;font-weight:700">联系方式</div><div style="font-size:17px;font-weight:700;color:#1a1a1a;letter-spacing:1px">'+safe(d.contact||'未填写')+'</div></div><div class="detail-actions"><button class="detail-action" onclick="startEdit('+d.id+');closeModal(&quot;detail&quot;)">编辑这条信息</button></div></div>';};
   window.startEdit=async function(id){var sb=window.getSb();var r=await sb.from('listings').select('*').eq('id',id).single();if(r.error||!r.data){alert('加载失败');return;}populateProvinceControls();document.getElementById('myListingsPanel').style.display='none';document.getElementById('editListingPanel').style.display='block';['editListingId','editCat','editTitle','editDesc','editCity','editPrice','editContact'].forEach(function(eid){var el=document.getElementById(eid);if(!el)return;var key={editListingId:'id',editCat:'category',editTitle:'title',editDesc:'description',editCity:'city',editPrice:'price',editContact:'contact'}[eid];if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=r.data[key]||'';else if(el.tagName==='SELECT'){if(eid==='editCity')el.value=normalizeProvinceName(r.data[key])||'Barcelona';else el.value=r.data[key]||'';}});};
   window.cancelEdit=function(){document.getElementById('editListingPanel').style.display='none';document.getElementById('myListingsPanel').style.display='block';};
   window.saveEdit=async function(){var sb=window.getSb();var id=document.getElementById('editListingId').value;var btn=document.getElementById('editSaveBtn');btn.disabled=true;btn.textContent='保存中…';var u={category:document.getElementById('editCat').value,title:document.getElementById('editTitle').value,description:document.getElementById('editDesc').value,city:normalizeProvinceName(document.getElementById('editCity').value)||'Barcelona',price:document.getElementById('editPrice').value,contact:document.getElementById('editContact').value,status:'pending',updated_at:new Date().toISOString()};if(!u.title||!u.contact){alert('标题和联系方式不能为空');btn.disabled=false;btn.textContent='💾 保存';return;}var r=await sb.from('listings').update(u).eq('id',id);btn.disabled=false;btn.textContent='💾 保存';if(r.error){alert('保存失败');return;}var t=document.getElementById('toast');if(t){t.textContent='✅ 已保存，等待审核';t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}window.cancelEdit();window.loadMyListings();};
@@ -6006,13 +6041,6 @@ loadListings().then(handleInitialDeepLink);
     }
   })();
   </script>
-<div class="modal-overlay" id="detailModal">
-  <div class="modal relative" style="max-width:560px">
-    <button class="modal-close" onclick="closeModal('detail')">✕</button>
-    <div id="detailContent">加载中…</div>
-  </div>
-</div>
-
 <div class="modal-overlay" id="momentsGuideModal">
   <div class="modal relative" style="max-width:460px">
     <button class="modal-close" onclick="closeModal('momentsGuide')">✕</button>
@@ -6438,7 +6466,7 @@ if (window.MutationObserver) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js?v=20260606-platform-coins').catch(function() {});
+    navigator.serviceWorker.register('/sw.js?v=20260607-detail-modal').catch(function() {});
   });
 }
 window.addEventListener('load', function() {
@@ -6727,3 +6755,4 @@ window.addEventListener('load', function() {
 </script>
 </body>
 </html>
+
