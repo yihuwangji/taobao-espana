@@ -18,6 +18,7 @@ package com.xibanyalife.app;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -29,13 +30,11 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.Toast;
 
-import androidx.core.content.FileProvider;
-
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class LauncherActivity
         extends com.google.androidbrowserhelper.trusted.LauncherActivity {
@@ -115,7 +114,7 @@ public class LauncherActivity
         if (imageUri == null) return false;
 
         Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("image/png");
+        intent.setType("image/jpeg");
         intent.putExtra(Intent.EXTRA_SUBJECT, title);
         intent.putExtra(Intent.EXTRA_TITLE, title);
         intent.putExtra(Intent.EXTRA_TEXT, text);
@@ -187,18 +186,41 @@ public class LauncherActivity
         paint.setTextSize(30);
         canvas.drawText("Abrir en Espana Life / \u626b\u7801\u6216\u590d\u5236\u94fe\u63a5\u67e5\u770b\u8be6\u60c5", 96, height - 135, paint);
 
-        File dir = new File(getCacheDir(), "share");
-        if (!dir.exists() && !dir.mkdirs()) return null;
-        File file = new File(dir, "moments-share.png");
-        try (FileOutputStream out = new FileOutputStream(file)) {
-            bitmap.compress(Bitmap.CompressFormat.PNG, 92, out);
-            out.flush();
-            return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+        try {
+            return saveShareImageToMediaStore(bitmap);
         } catch (IOException | IllegalArgumentException error) {
             return null;
         } finally {
             bitmap.recycle();
         }
+    }
+
+    private Uri saveShareImageToMediaStore(Bitmap bitmap) throws IOException {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, "espana-life-share-" + System.currentTimeMillis() + ".jpg");
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.TITLE, "Espana Life");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/EspanaLifeShare");
+            values.put(MediaStore.Images.Media.IS_PENDING, 1);
+        }
+
+        Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        if (uri == null) return null;
+
+        try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+            if (out == null || !bitmap.compress(Bitmap.CompressFormat.JPEG, 92, out)) {
+                getContentResolver().delete(uri, null, null);
+                return null;
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentValues published = new ContentValues();
+            published.put(MediaStore.Images.Media.IS_PENDING, 0);
+            getContentResolver().update(uri, published, null, null);
+        }
+        return uri;
     }
 
     private float drawWrappedText(Canvas canvas, String text, Paint paint, float x, float y, float maxWidth, float lineHeight, int maxLines) {
