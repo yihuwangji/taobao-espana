@@ -43,6 +43,8 @@ let likedIds = new Set(JSON.parse(localStorage.getItem('oqLikedIds') || '[]'));
 let savedIds = new Set(JSON.parse(localStorage.getItem('oqSavedIds') || '[]'));
 let followedAuthors = new Set(JSON.parse(localStorage.getItem('oqFollowedAuthors') || '[]'));
 let localComments = JSON.parse(localStorage.getItem('oqLocalComments') || '{}');
+let detailImageUrls = [];
+let feedPhotoLightboxIndex = 0;
 
 const fallbackPosts = [
   {
@@ -966,18 +968,65 @@ function renderDetailMedia(post) {
   const defaultCover = defaultCoverForPost(post);
   if (!media.length || (defaultCover && shouldUseDefaultCover(post, media))) {
     if (defaultCover) {
-      wrap.innerHTML = `<img class="default-feed-cover" src="${escapeHTML(defaultCover)}" alt="${escapeHTML(defaultCoverAlt(post))}">`;
+      detailImageUrls = [defaultCover];
+      wrap.innerHTML = `<img class="default-feed-cover" src="${escapeHTML(defaultCover)}" alt="${escapeHTML(defaultCoverAlt(post))}" data-photo-index="0">`;
       return;
     }
+    detailImageUrls = [];
     wrap.innerHTML = `<div class="placeholder-cover" style="height:330px">${escapeHTML(displayCategory(post) || '欧圈')}</div>`;
     return;
   }
+  detailImageUrls = media.filter(item => !isVideo(item) && item.url).map(item => item.url);
+  let imageIndex = 0;
   wrap.innerHTML = media.map(item => {
     if (isVideo(item)) {
       return `<video src="${escapeHTML(item.url)}" poster="${escapeHTML(item.thumbnail_url || '')}" controls playsinline></video>`;
     }
-    return `<img src="${escapeHTML(item.url)}" alt="${escapeHTML(titleOf(post))}">`;
+    return `<img src="${escapeHTML(item.url)}" alt="${escapeHTML(titleOf(post))}" data-photo-index="${imageIndex++}">`;
   }).join('');
+}
+
+function ensureFeedPhotoLightbox() {
+  let box = document.getElementById('feedPhotoLightbox');
+  if (box) return box;
+  box = document.createElement('div');
+  box.id = 'feedPhotoLightbox';
+  box.className = 'feed-photo-lightbox';
+  box.innerHTML = `
+    <button class="feed-photo-close" type="button" aria-label="关闭">×</button>
+    <button class="feed-photo-prev" type="button" aria-label="上一张">‹</button>
+    <img id="feedPhotoLightboxImg" alt="放大图片">
+    <button class="feed-photo-next" type="button" aria-label="下一张">›</button>
+    <div class="feed-photo-counter" id="feedPhotoLightboxCounter"></div>`;
+  document.body.appendChild(box);
+  box.addEventListener('click', event => {
+    if (event.target === box || event.target.closest('.feed-photo-close')) closeFeedPhotoLightbox();
+    if (event.target.closest('.feed-photo-prev')) showFeedPhotoAt(feedPhotoLightboxIndex - 1);
+    if (event.target.closest('.feed-photo-next')) showFeedPhotoAt(feedPhotoLightboxIndex + 1);
+  });
+  return box;
+}
+
+function showFeedPhotoAt(index) {
+  if (!detailImageUrls.length) return;
+  feedPhotoLightboxIndex = (index + detailImageUrls.length) % detailImageUrls.length;
+  document.getElementById('feedPhotoLightboxImg').src = detailImageUrls[feedPhotoLightboxIndex];
+  document.getElementById('feedPhotoLightboxCounter').textContent = `${feedPhotoLightboxIndex + 1} / ${detailImageUrls.length}`;
+  const multiple = detailImageUrls.length > 1;
+  document.querySelector('.feed-photo-prev').style.display = multiple ? '' : 'none';
+  document.querySelector('.feed-photo-next').style.display = multiple ? '' : 'none';
+}
+
+function openFeedPhotoLightbox(index = 0) {
+  if (!detailImageUrls.length) return;
+  ensureFeedPhotoLightbox().classList.add('open');
+  document.body.style.overflow = 'hidden';
+  showFeedPhotoAt(index);
+}
+
+function closeFeedPhotoLightbox() {
+  document.getElementById('feedPhotoLightbox')?.classList.remove('open');
+  document.body.style.overflow = document.getElementById('detailView')?.classList.contains('open') ? 'hidden' : '';
 }
 
 async function openDetail(post) {
@@ -1462,6 +1511,12 @@ function bindEvents() {
     });
   });
   document.getElementById('detailClose').addEventListener('click', closeDetail);
+  document.getElementById('detailMedia').addEventListener('click', event => {
+    const img = event.target.closest('img[data-photo-index]');
+    if (!img) return;
+    event.preventDefault();
+    openFeedPhotoLightbox(Number(img.dataset.photoIndex || 0));
+  });
   document.getElementById('detailLike').addEventListener('click', () => toggleReaction('like'));
   document.getElementById('detailSave').addEventListener('click', () => toggleReaction('save'));
   document.getElementById('detailComment').addEventListener('click', () => document.getElementById('commentInput').focus());
@@ -1504,6 +1559,13 @@ function bindEvents() {
     });
   });
   window.addEventListener('hashchange', openInitialPostFromHash);
+  document.addEventListener('keydown', event => {
+    const box = document.getElementById('feedPhotoLightbox');
+    if (!box?.classList.contains('open')) return;
+    if (event.key === 'Escape') closeFeedPhotoLightbox();
+    if (event.key === 'ArrowLeft') showFeedPhotoAt(feedPhotoLightboxIndex - 1);
+    if (event.key === 'ArrowRight') showFeedPhotoAt(feedPhotoLightboxIndex + 1);
+  });
   updateDraftNotice();
 }
 

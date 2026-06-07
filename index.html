@@ -1546,12 +1546,92 @@
     margin-bottom: 14px;
   }
 
-  .detail-photo-grid img {
+  .detail-photo-button {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: zoom-in;
+  }
+
+  .detail-photo-grid img,
+  .detail-photo-button img {
     width: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
     border-radius: 8px;
     background: #f4eee6;
+    display: block;
+  }
+
+  .photo-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,.92);
+    padding: max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+  }
+
+  .photo-lightbox.open { display: flex; }
+
+  .photo-lightbox img {
+    max-width: 100%;
+    max-height: 82svh;
+    object-fit: contain;
+    border-radius: 10px;
+    background: #111;
+    box-shadow: 0 18px 50px rgba(0,0,0,.4);
+  }
+
+  .photo-lightbox-close,
+  .photo-lightbox-nav {
+    position: absolute;
+    border: none;
+    background: rgba(255,255,255,.16);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 900;
+    backdrop-filter: blur(8px);
+  }
+
+  .photo-lightbox-close {
+    top: max(12px, env(safe-area-inset-top));
+    right: 12px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 22px;
+  }
+
+  .photo-lightbox-nav {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 56px;
+    border-radius: 999px;
+    font-size: 30px;
+  }
+
+  .photo-lightbox-prev { left: 10px; }
+  .photo-lightbox-next { right: 10px; }
+
+  .photo-lightbox-counter {
+    position: absolute;
+    left: 50%;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    color: #fff;
+    background: rgba(0,0,0,.42);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 800;
   }
 
   .listing-map-chip {
@@ -4177,8 +4257,90 @@ async function uploadPostImages(category) {
 function renderDetailPhotos(images) {
   const photos = normalizeListingImages(images);
   if (!photos.length) return '';
-  return `<div class="detail-photo-grid">${photos.map(url => `<img src="${escapeHTML(url)}" alt="信息照片" loading="lazy">`).join('')}</div>`;
+  return `
+    <div class="detail-photo-grid" data-detail-photos="${escapeHTML(JSON.stringify(photos))}">
+      ${photos.map((url, index) => `
+        <button class="detail-photo-button" type="button" data-photo-index="${index}" aria-label="放大第 ${index + 1} 张图片">
+          <img src="${escapeHTML(url)}" alt="信息照片" loading="lazy">
+        </button>
+      `).join('')}
+    </div>`;
 }
+
+let photoLightboxPhotos = [];
+let photoLightboxIndex = 0;
+
+function ensurePhotoLightbox() {
+  let box = document.getElementById('photoLightbox');
+  if (box) return box;
+  box = document.createElement('div');
+  box.id = 'photoLightbox';
+  box.className = 'photo-lightbox';
+  box.innerHTML = `
+    <button class="photo-lightbox-close" type="button" aria-label="关闭图片预览">×</button>
+    <button class="photo-lightbox-nav photo-lightbox-prev" type="button" aria-label="上一张">‹</button>
+    <img id="photoLightboxImg" alt="放大图片">
+    <button class="photo-lightbox-nav photo-lightbox-next" type="button" aria-label="下一张">›</button>
+    <div class="photo-lightbox-counter" id="photoLightboxCounter"></div>`;
+  document.body.appendChild(box);
+  box.addEventListener('click', event => {
+    if (event.target === box || event.target.closest('.photo-lightbox-close')) closePhotoLightbox();
+    if (event.target.closest('.photo-lightbox-prev')) showPhotoLightboxAt(photoLightboxIndex - 1);
+    if (event.target.closest('.photo-lightbox-next')) showPhotoLightboxAt(photoLightboxIndex + 1);
+  });
+  return box;
+}
+
+function showPhotoLightboxAt(index) {
+  if (!photoLightboxPhotos.length) return;
+  photoLightboxIndex = (index + photoLightboxPhotos.length) % photoLightboxPhotos.length;
+  const img = document.getElementById('photoLightboxImg');
+  const counter = document.getElementById('photoLightboxCounter');
+  const prev = document.querySelector('.photo-lightbox-prev');
+  const next = document.querySelector('.photo-lightbox-next');
+  if (img) img.src = photoLightboxPhotos[photoLightboxIndex];
+  if (counter) counter.textContent = `${photoLightboxIndex + 1} / ${photoLightboxPhotos.length}`;
+  const multiple = photoLightboxPhotos.length > 1;
+  if (prev) prev.style.display = multiple ? '' : 'none';
+  if (next) next.style.display = multiple ? '' : 'none';
+}
+
+function openPhotoLightbox(photos, index = 0, event = null) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  photoLightboxPhotos = Array.isArray(photos) ? photos.filter(Boolean) : [];
+  if (!photoLightboxPhotos.length) return;
+  ensurePhotoLightbox().classList.add('open');
+  document.body.style.overflow = 'hidden';
+  showPhotoLightboxAt(index);
+}
+
+function closePhotoLightbox() {
+  const box = document.getElementById('photoLightbox');
+  if (box) box.classList.remove('open');
+  if (typeof syncModalScrollLock === 'function') syncModalScrollLock();
+}
+
+document.addEventListener('click', event => {
+  const button = event.target.closest?.('.detail-photo-button');
+  if (!button) return;
+  const grid = button.closest('.detail-photo-grid');
+  if (!grid) return;
+  try {
+    const photos = JSON.parse(grid.dataset.detailPhotos || '[]');
+    openPhotoLightbox(photos, Number(button.dataset.photoIndex || 0), event);
+  } catch (error) {}
+});
+
+document.addEventListener('keydown', event => {
+  const box = document.getElementById('photoLightbox');
+  if (!box?.classList.contains('open')) return;
+  if (event.key === 'Escape') closePhotoLightbox();
+  if (event.key === 'ArrowLeft') showPhotoLightboxAt(photoLightboxIndex - 1);
+  if (event.key === 'ArrowRight') showPhotoLightboxAt(photoLightboxIndex + 1);
+});
 
 function buildMapQuery(address, city) {
   return [address, normalizeProvinceName(city), 'España'].filter(Boolean).join(', ');
@@ -6521,7 +6683,7 @@ if (window.MutationObserver) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js?v=20260607-compact-home-ads').catch(function() {});
+    navigator.serviceWorker.register('/sw.js?v=20260607-photo-lightbox').catch(function() {});
   });
 }
 window.addEventListener('load', function() {
